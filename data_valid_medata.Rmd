@@ -82,3 +82,16 @@ nrow(mpa_na)
 ```
 
 All of the above can be printed as tables, they're just extremely long.
+
+# Location and MPAs
+
+```{r}
+medata$protection <- ifelse(test = medata$protection == 1, yes = TRUE, no = FALSE) # convert to logical
+p2 <- ggplot(medata, aes(x = medata$lon, y = medata$lat)) +
+  geom_jitter(aes(colour = medata$protection), show.legend = T, alpha = 0.2) +
+  xlab("Longitude") + ylab("Latitude") +
+  scale_color_discrete(name = "MPAs", na.value = "snow4")
+
+ggplotly(p2)
+
+```
