@@ -11,18 +11,74 @@ library(tidyverse)
 library(plotly)
 library(wesanderson)
 
+medata <- read.csv("all_uvc_data_21_01_19_20190220.csv")
+
 ```
+
+medata here is the Mediterranean dataframe with the following changes:
+
+* data.origin: “Sala - PEW” to “sala_pew”
+* There are some latitudes that equal integers (1,2,3…)
+* protection: 35460 replacements for YES in 1; 16278 replacements for NO in 0; 637 replacements of #N/A in NA.
+
+Some more work needed:
+
+- sort out caps and spaces: site names; spp names (also parentheses);  season; 
+- species names need to be all changed to genus.spp now some with caps and some with spaces
+- spp length in cm I guess?
+- should we delete the first column?	
 
 # Location and Max Temp
 
 ```{r}
 p1 <- ggplot(medata, aes(x = medata$lon, y = medata$lat)) +
-  geom_jitter(aes(colour = medata$tmax)) +
+  geom_jitter(aes(colour = medata$tmax), show.legend = T) +
   xlab("Longitude") + ylab("Latitude") +
-    scale_color_gradient("Max Annual Temp", na.value = "gray66")
-  legend(x = 10, y = 10, legend = "Max Temp", col = "Zissou1")
+  scale_color_gradient(name = "Max Annual Temp", low = "#3c9ab1", high = "#f22300", na.value = "#899da4")
 
 ggplotly(p1)
 
 ```
+1259 rows removed from above plot because they contained NA values.
 
+# NA checks
+
+## all NAs
+
+```{r}
+medata_na <- subset(medata, is.na(medata))
+nrow(medata_na)
+```
+
+## tmax and tmin
+
+```{r}
+temp_na <- subset(medata, is.na(medata$tmax))
+nrow(temp_na)
+```
+
+## location
+
+```{r}
+loc_na <- subset(medata, is.na(medata$lat))
+nrow(loc_na)
+```
+
+baktana..
+
+## species
+
+```{r}
+spp_na <- subset(medata, is.na(medata$species))
+nrow(spp_na)
+```
+ good!
+ 
+## species
+
+```{r}
+mpa_na <- subset(medata, is.na(medata$protection))
+nrow(mpa_na)
+```
+
+All of the above can be printed as tables, they're just extremely long.
