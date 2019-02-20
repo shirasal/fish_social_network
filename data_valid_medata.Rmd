@@ -1,0 +1,28 @@
+---
+title: "Data Validation for MEData"
+author: "Shira Salingre"
+date: "2019 Feb 20"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(plotly)
+library(wesanderson)
+
+```
+
+# Location and Max Temp
+
+```{r}
+p1 <- ggplot(medata, aes(x = medata$lon, y = medata$lat)) +
+  geom_jitter(aes(colour = medata$tmax)) +
+  xlab("Longitude") + ylab("Latitude") +
+    scale_color_gradient("Max Annual Temp", na.value = "gray66")
+  legend(x = 10, y = 10, legend = "Max Temp", col = "Zissou1")
+
+ggplotly(p1)
+
+```
+

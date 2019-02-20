@@ -4,6 +4,7 @@ library(MRFcov)
 # Citation: Clark, NJ, Wells, K and Lindberg, O. 2018. Unravelling changing interspecific interactions across environmental gradients using Markov random fields. Ecology doi: 10.1002/ecy.2221
 library("testthat")
 library("tidyverse")
+library("plotly")
 medata <- read.csv("all_uvc_data_Jan2019.csv")
 medata$X <- NULL
 
@@ -23,4 +24,6 @@ sub_fish_pa <- sub_fish_pa[2:ncol(sub_fish_pa)]
 sub_fish_pa[sub_fish_pa > 0] <- 1 # turn to presence-absence
 
 # so now sub_fish_pa is a presence absence 
+
+
 
