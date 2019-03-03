@@ -39,6 +39,7 @@ p1 <- ggplot(medata, aes(x = medata$lon, y = medata$lat)) +
 ggplotly(p1)
 
 ```
+Looks like we have a problem with some of the latitudes being integers (see file "lat_problem.csv") 
 
 # NA checks
 
@@ -78,5 +79,3 @@ ggplotly(p2)
 
 ```
 
-
-So, so far we 
