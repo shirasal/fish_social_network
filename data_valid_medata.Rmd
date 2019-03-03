@@ -11,7 +11,7 @@ library(tidyverse)
 library(plotly)
 library(wesanderson)
 
-medata <- read.csv("all_uvc_data_21_01_19_20190220.csv")
+medata <- read.csv("all_uvc_data_25-02-19.csv")
 
 ```
 
@@ -39,7 +39,6 @@ p1 <- ggplot(medata, aes(x = medata$lon, y = medata$lat)) +
 ggplotly(p1)
 
 ```
-1259 rows removed from above plot because they contained NA values.
 
 # NA checks
 
@@ -64,23 +63,6 @@ loc_na <- subset(medata, is.na(medata$lat))
 nrow(loc_na)
 ```
 
-baktana..
-
-## species
-
-```{r}
-spp_na <- subset(medata, is.na(medata$species))
-nrow(spp_na)
-```
- good!
- 
-## species
-
-```{r}
-mpa_na <- subset(medata, is.na(medata$protection))
-nrow(mpa_na)
-```
-
 All of the above can be printed as tables, they're just extremely long.
 
 # Location and MPAs
@@ -95,3 +77,6 @@ p2 <- ggplot(medata, aes(x = medata$lon, y = medata$lat)) +
 ggplotly(p2)
 
 ```
+
+
+So, so far we 
