@@ -5,4 +5,6 @@ library("testthat")
 library("plotly")
 library("tidyverse")
 
+example_data <- Bird.parasites
+MRFcov(data = example_data, family = "binomial")
 
