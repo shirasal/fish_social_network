@@ -14,11 +14,17 @@ first_spp <- 7
 last_spp <- 98
 
 spp_data <- medata %>% 
-  group_by(data.origin, site, trans, season, enforcement, species) %>% 
-  summarise(n = max(as.numeric(sp.n > 0))) %>% # group_by() and summarise() to avoid duplicates. I get abundance data
-  spread(key = species, value = n, fill = 0)
-  
-spp_data <- med_species[first_spp:last_spp]
+  mutate(ID = paste(site, trans, season, sep = "_")) %>% 
+  group_by(ID, data.origin, site, trans, season, enforcement, species) %>% 
+  summarise(n = max(as.numeric(sp.n > 0))) %>%
+  spread(key = species, value = n, fill = 0) %>% 
+  as.data.frame()
+
+# creating matrix for MRFcov
+rownames(spp_data) <- spp_data$ID
+spp_only <- spp_data %>% 
+  select(first_spp:last_spp) %>% 
+  as.matrix()
 
 MRF <- MRFcov(example_data, family = "binomial")
 MRF_mat <- MRF$graph
