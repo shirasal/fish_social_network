@@ -7,11 +7,13 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(skimr)
 library(tidyverse)
 library(plotly)
 library(wesanderson)
-
 medata <- read.csv("all_uvc_data_25-02-19.csv")
+medata$X.1 <- NULL
+medata$X <- NULL
 
 ```
 
@@ -28,6 +30,29 @@ Some more work needed:
 - spp length in cm I guess?
 - should we delete the first column?	
 
+# General overview
+
+```{r}
+medata %>%
+	skimr::skim()
+```
+
+- Country can be completed from data origin? I need a list of what each one means
+- Protection: fix #N/A
+- Spcecies: I would like to group into local and non-local (for comparison later)
+- Lat: South ~30.276670; North ~45.137447 (should be) we have some that are too low (in the following)
+- Lon: West ~ -5.587321; East ~35.110782
+- what's A and B?
+
+
+```{r message=FALSE, warning=FALSE}
+summary(medata$lat)
+
+medata %>% 
+  filter(lat < 30) %>% 
+  write.csv(file = "lat_probs.csv")
+```
+
 # Location and Max Temp
 
 ```{r}
@@ -39,43 +64,9 @@ p1 <- ggplot(medata, aes(x = medata$lon, y = medata$lat)) +
 ggplotly(p1)
 
 ```
-Looks like we have a problem with some of the latitudes being integers (see file "lat_problem.csv") 
 
-# NA checks
 
-## all NAs
 
-```{r}
-medata_na <- subset(medata, is.na(medata))
-nrow(medata_na)
-```
 
-## tmax and tmin
 
-```{r}
-temp_na <- subset(medata, is.na(medata$tmax))
-nrow(temp_na)
-```
-
-## location
-
-```{r}
-loc_na <- subset(medata, is.na(medata$lat))
-nrow(loc_na)
-```
-
-All of the above can be printed as tables, they're just extremely long.
-
-# Location and MPAs
-
-```{r}
-medata$protection <- ifelse(test = medata$protection == 1, yes = TRUE, no = FALSE) # convert to logical
-p2 <- ggplot(medata, aes(x = medata$lon, y = medata$lat)) +
-  geom_jitter(aes(colour = medata$protection), show.legend = T, alpha = 0.2) +
-  xlab("Longitude") + ylab("Latitude") +
-  scale_color_discrete(name = "MPAs", na.value = "snow4")
-
-ggplotly(p2)
-
-```
 
