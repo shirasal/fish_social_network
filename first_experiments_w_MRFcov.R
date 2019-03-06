@@ -1,10 +1,17 @@
 
 library(MRFcov)
 # Citation: Clark, NJ, Wells, K and Lindberg, O. 2018. Unravelling changing interspecific interactions across environmental gradients using Markov random fields. Ecology doi: 10.1002/ecy.2221
-library("testthat")
-library("plotly")
 library("tidyverse")
 
-example_data <- Bird.parasites
-MRFcov(data = example_data, family = "binomial")
+##           Data Wrangling            ##
+med_species <- medata %>% 
+  group_by(data.origin, site, trans, season, enforcement, species) %>% 
+  summarise(sp.n = sum(sp.n)) %>% # group_by() and summarise() to avoid duplicates. I get abundance data
+  spread(key = species, value = sp.n, fill = 0)
+
+example_data <- Bird.parasites[,1:4]
+MRF <- MRFcov(example_data, family = "binomial")
+MRF_mat <- MRF$graph
+heatmap(x = MRF_mat, symm = TRUE, col = terrain.colors(256))
+
 
