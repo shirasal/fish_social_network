@@ -26,7 +26,15 @@ spp_only <- spp_data %>%
   select(first_spp:last_spp) %>% 
   as.matrix()
 
-MRF <- MRFcov(example_data, family = "binomial")
+# Take a wee look at the data to make sure it's good for MRFcov
+class(spp_only)
+class(spp_only[1:ncol(spp_only)])
+table(summary(spp_only > 1))
+# Looks like it's good to go. Now my only trouble is the rownames (samples/sites), which I'll have to sort out later
+# Just a reminder: This matrix does not include spatial or environmental information.
+
+MRF <- MRFcov(spp_only, family = "binomial")
+# ... but for some reason it's not working and telling me there are non-binary variables. I couldn't find them though.
 MRF_mat <- MRF$graph
 heatmap(x = MRF_mat, symm = TRUE, col = terrain.colors(256))
 
