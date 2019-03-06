@@ -20,7 +20,7 @@ spp_data <- medata %>%
   spread(key = species, value = n, fill = 0) %>% 
   as.data.frame()
 
-# creating matrix for MRFcov
+# creating matrix for MRFcov  
 rownames(spp_data) <- spp_data$ID
 spp_only <- spp_data %>% 
   select(first_spp:last_spp) %>% 
