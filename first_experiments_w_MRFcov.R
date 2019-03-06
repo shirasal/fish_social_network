@@ -4,12 +4,22 @@ library(MRFcov)
 library("tidyverse")
 
 ##           Data Wrangling            ##
-med_species <- medata %>% 
+med_species <- medata %>%
   group_by(data.origin, site, trans, season, enforcement, species) %>% 
   summarise(sp.n = sum(sp.n)) %>% # group_by() and summarise() to avoid duplicates. I get abundance data
   spread(key = species, value = sp.n, fill = 0)
 
-example_data <- Bird.parasites[,1:4]
+# set up the position of first and last species:
+first_spp <- 7
+last_spp <- 98
+
+spp_data <- medata %>% 
+  group_by(data.origin, site, trans, season, enforcement, species) %>% 
+  summarise(n = max(as.numeric(sp.n > 0))) %>% # group_by() and summarise() to avoid duplicates. I get abundance data
+  spread(key = species, value = n, fill = 0)
+  
+spp_data <- med_species[first_spp:last_spp]
+
 MRF <- MRFcov(example_data, family = "binomial")
 MRF_mat <- MRF$graph
 heatmap(x = MRF_mat, symm = TRUE, col = terrain.colors(256))
