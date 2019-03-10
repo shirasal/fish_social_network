@@ -11,7 +11,7 @@ library(skimr)
 library(tidyverse)
 library(plotly)
 library(wesanderson)
-medata <- read.csv("all_uvc_data_25-02-19.csv")
+medata <- read.csv("all_uvc_data_07.03.19_2.csv")
 medata$X.1 <- NULL
 medata$X <- NULL
 
