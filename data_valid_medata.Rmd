@@ -8,8 +8,8 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(skimr)
-library(tidyverse)
 library(plotly)
+library(tidyverse)
 library(wesanderson)
 medata <- read.csv("all_uvc_data_07.03.19_2.csv")
 medata$X.1 <- NULL
@@ -38,20 +38,24 @@ medata %>%
 ```
 
 - Country can be completed from data origin? I need a list of what each one means
-- Protection: fix #N/A
 - Spcecies: I would like to group into local and non-local (for comparison later)
 - Lat: South ~30.276670; North ~45.137447 (should be) we have some that are too low (in the following)
 - Lon: West ~ -5.587321; East ~35.110782
-- what's A and B?
 
-
+dat
 ```{r message=FALSE, warning=FALSE}
 summary(medata$lat)
 
-medata %>% 
-  filter(lat < 30) %>% 
-  write.csv(file = "lat_probs.csv")
+lat_prbos <- medata %>% 
+  filter(lat < 30)# %>% 
+  #write.csv(file = "lat_probs.csv")
+
+lat_prbos %>% 
+  dplyr::select(1:7) %>% 
+  dplyr::filter(!duplicated(.))
+
 ```
+The above table shows the problematic lats
 
 # Location and Max Temp
 
