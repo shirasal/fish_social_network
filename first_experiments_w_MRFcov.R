@@ -10,12 +10,12 @@ med_species <- medata %>%
   spread(key = species, value = sp.n, fill = 0)
 
 # set up the position of first and last species:
-first_spp <- 7
-last_spp <- 98
+first_spp <- 5
+last_spp <- 96
 
 spp_data <- medata %>% 
-  mutate(ID = paste(site, trans, season, sep = "_")) %>% 
-  group_by(ID, data.origin, site, trans, season, enforcement, species) %>% 
+  mutate(ID = paste(site, trans, sep = "_")) %>% 
+  group_by(ID, data.origin, site, trans, species) %>% 
   summarise(n = max(as.numeric(sp.n > 0))) %>%
   spread(key = species, value = n, fill = 0) %>% 
   as.data.frame()
@@ -29,7 +29,7 @@ spp_only <- spp_data %>%
 # Take a wee look at the data to make sure it's good for MRFcov
 class(spp_only)
 class(spp_only[1:ncol(spp_only)])
-table(summary(spp_only > 1))
+table(summary(spp_only == 1 | spp_only == 0))
 # Looks like it's good to go. Now my only trouble is the rownames (samples/sites), which I'll have to sort out later
 # Just a reminder: This matrix does not include spatial or environmental information.
 
