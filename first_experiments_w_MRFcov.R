@@ -35,7 +35,14 @@ table(summary(spp_only == 1 | spp_only == 0))
 
 MRF <- MRFcov(spp_only, family = "binomial")
 # ... but for some reason it's not working and telling me there are non-binary variables. I couldn't find them though.
-MRF_mat <- MRF$graph
-heatmap(x = MRF_mat, symm = TRUE, col = terrain.colors(256))
+#MRF_mat <- MRF$graph
+#heatmap(x = MRF_mat, symm = TRUE, col = terrain.colors(256))
 
+# prepare abundance data for MRFcov:
+med_abund <- med_species %>% 
+  mutate(ID = paste(site, trans, sep = ".")) %>% 
+  group_by(data.origin, site, trans, season, enforcement) %>% 
+  summarise(max(.)) %>% 
+  select(6:ncol(.))
 
+rownames(med_abund) <- med_abund$ID
