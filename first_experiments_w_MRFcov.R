@@ -1,6 +1,5 @@
 
 library(MRFcov)
-# Citation: Clark, NJ, Wells, K and Lindberg, O. 2018. Unravelling changing interspecific interactions across environmental gradients using Markov random fields. Ecology doi: 10.1002/ecy.2221
 library("tidyverse")
 
 ##           Data Wrangling            ##
@@ -26,14 +25,19 @@ spp_only <- spp_data %>%
   select(first_spp:last_spp) %>% 
   as.matrix()
 
+# Creating a subsample to test the function
+spp_only_df <- as.data.frame(spp_only)
+spp_data_sample <- as.matrix(sample_n(spp_only_df, size = 100))
+
 # Take a wee look at the data to make sure it's good for MRFcov
 class(spp_only)
 class(spp_only[1:ncol(spp_only)])
 table(summary(spp_only == 1 | spp_only == 0))
+
 # Looks like it's good to go. Now my only trouble is the rownames (samples/sites), which I'll have to sort out later
 # Just a reminder: This matrix does not include spatial or environmental information.
-
-MRF <- MRFcov(spp_only, family = "binomial")
+MRF <- MRFcov(spp_data_sample, family = "binomial")
+#MRF <- MRFcov(spp_only, family = "binomial")
 # ... but for some reason it's not working and telling me there are non-binary variables. I couldn't find them though.
 #MRF_mat <- MRF$graph
 #heatmap(x = MRF_mat, symm = TRUE, col = terrain.colors(256))
