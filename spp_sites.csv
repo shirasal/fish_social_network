@@ -1,87 +1,86 @@
-,Coris.julis,Diplodus.annularis,Diplodus.puntazzo,Labrus.merula,Thalassoma.pavo,Diplodus.sargus,Sarpa.salpa
-ASINARA_add,1,1,0,0,0,0,0
-Asinara,0,1,1,0,1,0,0
-Linosa,1,0,0,1,0,1,1
-Lampedusa,0,0,1,0,1,1,1
-Malta,1,1,0,0,1,0,1
-Brijuni,0,0,1,0,0,1,1
-Kornati,0,1,0,1,0,0,1
-Miljet,1,0,1,1,1,0,1
-Mljet,1,0,0,0,0,1,1
-500m S of Harbor,0,0,0,1,1,0,1
-1000m S of Harbor,0,0,0,1,0,1,0
-Behind the marina,1,1,0,1,1,1,0
-South edge of no-take zone,1,0,0,0,1,1,0
-Outside reseve,0,0,1,0,1,1,0
-Banyuls,0,1,0,1,1,1,1
-Banyuls port,1,1,0,1,0,0,1
-south of Cape Bear,1,0,1,0,1,1,0
-Beach at next bay over from Banyuls,1,0,1,0,1,0,1
-"North of the arches, public beach",1,1,0,1,1,1,1
-1 Km South of the marina,1,1,1,1,0,0,0
-Keysaria Port,1,1,0,1,0,0,0
-Habonim,1,0,1,1,0,0,1
-Shikmona,0,0,0,0,1,1,0
-Achziv,0,1,0,0,0,1,1
-Gdor,1,1,0,0,1,1,1
-Marettimo,0,1,0,0,0,0,0
-Ustica,0,0,0,0,1,1,0
-San vito,1,1,0,0,0,0,0
-Cap Bear,1,0,1,0,1,0,0
-Cap d'Ullastrell,0,0,1,0,1,1,0
-Cap Peyrefite,1,0,1,0,0,0,1
-Cap Cerbere,0,0,0,0,1,0,1
-Cap Canadelle,0,0,0,0,1,0,1
-Cap Rederis,1,1,0,0,1,0,0
-Cap l'Abeille,1,1,1,1,0,1,0
-Akhziv Is.,1,0,1,1,1,1,0
-Alykes,1,0,0,1,1,1,0
-Chapel,1,1,0,1,0,0,0
-Kolokytha,1,0,1,1,0,1,1
-Konnos Point,0,0,1,1,1,1,1
-Mades,0,1,1,0,0,1,1
-Nachlieli,1,1,1,1,0,1,0
-North slope algae,1,1,1,1,0,0,0
-North slope C,0,0,0,1,1,1,0
-North slope GZ,1,1,0,1,1,0,0
-Ridge 1,1,0,0,0,0,1,0
-Segavion,0,1,0,1,0,0,0
-Shachaf,0,0,0,1,1,0,1
-Shikmona 1,1,0,1,1,0,1,0
-Shikmona 2,1,0,1,0,1,0,0
-Shikmona 3,0,0,0,1,1,0,1
-Shikmona 4,0,1,1,1,0,1,0
-Shikmona 5,0,0,1,0,1,0,1
-Spartan,1,1,1,0,1,1,0
-Sponge Bob Harbor,0,1,1,0,1,1,0
-ADRASAN,1,1,1,0,0,0,1
-ILLA DE L'AIRE,1,1,1,1,0,1,1
-ALONISSOS,1,0,0,1,0,0,0
-AYVALIK,0,0,1,1,0,1,0
-CABRERA,1,0,1,1,0,0,1
-CAPO CACCIA,1,0,0,1,1,1,1
-CARLOFORTE,0,0,1,1,0,1,0
-CAVALLERIA,1,0,1,1,0,0,0
-CAP DE CREUS,1,1,0,1,1,1,0
-DRAGONERA,0,0,0,1,1,0,0
-EIVISSA,1,1,1,1,0,1,0
-FETHIYE,1,1,0,0,1,1,0
-FORMENTERA,0,0,1,1,0,1,1
-FORMENTOR,0,1,1,0,1,0,1
-GENOVA,1,0,0,1,0,0,1
-GOKOVA,1,0,1,0,0,0,0
-GYAROS,0,1,1,0,1,1,0
-KARPATHOS,1,0,1,0,1,0,0
-KAS,1,0,1,0,0,1,0
-KIMOLOS,1,1,1,1,1,0,0
-MARATEA,1,0,1,1,1,1,0
-MEDES,0,0,1,0,0,0,1
-MONTGRI,0,1,1,1,1,1,1
-OTRANTO,0,1,1,1,1,0,0
-PORTO CESAREO,0,0,0,1,0,1,0
-PIPERI,0,0,1,1,1,0,0
-PORTOFINO,1,1,1,1,1,1,1
-TAVOLARA,0,1,0,1,0,0,1
-TORRE GUACETO,0,0,1,0,1,0,1
-TREMITI,1,1,1,0,0,1,1
-,1,1,0,0,0,0,1
+,Coris.julis,Diplodus.annularis,Diplodus.puntazzo,Labrus.merula,Thalassoma.pavo,Diplodus.sargus,Sarpa.salpa,Oblada.melanura,Apogon.imberbis,Sciaena.umbra,Parablennius.gattorugine,Labrus.viridis,Seriola.dumerili
+ASINARA_add,0,0,0,0,0,1,0,1,0,1,0,1,1
+Asinara,0,1,1,1,1,0,0,1,1,0,0,0,1
+Linosa,1,0,1,1,0,1,1,1,0,0,1,0,1
+Lampedusa,1,0,0,1,0,1,0,1,0,0,1,0,0
+Malta,0,0,0,0,0,1,1,1,0,0,0,1,0
+Brijuni,1,0,1,1,1,0,1,0,1,1,1,0,0
+Kornati,0,1,1,0,1,1,0,1,0,1,0,1,1
+Miljet,1,1,0,0,0,1,1,0,0,0,0,1,1
+Mljet,0,1,0,1,0,0,0,0,0,0,1,0,0
+500m S of Harbor,0,0,1,0,0,1,0,1,1,0,0,1,1
+1000m S of Harbor,1,0,1,0,1,1,1,1,1,0,0,0,1
+Behind the marina,1,1,0,1,1,0,0,1,0,0,0,1,0
+South edge of no-take zone,0,0,1,1,0,1,1,0,1,1,1,1,0
+Outside reseve,1,0,1,0,0,1,0,1,1,1,1,0,0
+Banyuls,1,1,0,0,0,1,0,1,0,0,1,0,0
+Banyuls port,0,0,1,0,1,1,1,1,1,0,1,1,1
+south of Cape Bear,0,1,0,1,0,1,0,1,1,0,1,0,0
+Beach at next bay over from Banyuls,0,0,0,1,0,1,0,0,1,1,0,1,0
+"North of the arches, public beach",1,1,0,0,0,0,1,1,0,0,0,0,0
+1 Km South of the marina,0,0,1,1,0,1,0,0,1,1,0,1,0
+Keysaria Port,1,0,1,1,1,1,0,1,0,1,1,0,1
+Habonim,1,1,1,0,1,1,0,1,1,0,0,1,1
+Shikmona,1,0,1,1,1,1,1,1,0,1,0,0,1
+Achziv,0,1,1,1,1,0,1,1,0,1,1,0,1
+Gdor,1,1,1,0,0,1,1,1,0,0,1,1,0
+Marettimo,1,1,0,0,0,1,0,1,0,0,0,0,0
+Ustica,0,1,1,1,1,1,0,1,0,0,0,0,0
+San vito,0,0,1,1,1,0,1,1,0,1,1,1,1
+Cap Bear,0,0,1,1,0,1,1,0,0,1,1,0,0
+Cap d'Ullastrell,0,1,1,1,0,1,1,0,0,1,1,1,1
+Cap Peyrefite,1,0,0,0,0,1,0,0,0,0,1,1,0
+Cap Cerbere,0,1,1,0,1,1,0,1,1,0,0,0,0
+Cap Canadelle,1,0,0,0,1,1,1,1,0,1,1,0,1
+Cap Rederis,1,0,0,0,0,0,0,1,0,1,0,1,1
+Cap l'Abeille,1,0,0,1,1,1,1,1,1,1,0,1,0
+Akhziv Is.,0,1,0,0,0,1,1,0,0,0,0,0,1
+Alykes,0,0,1,1,0,0,1,0,1,0,0,0,0
+Chapel,0,1,0,1,1,0,0,1,0,1,1,1,1
+Kolokytha,0,1,1,0,1,0,0,0,0,1,0,1,0
+Konnos Point,0,1,1,1,0,1,0,0,1,1,0,0,1
+Mades,0,1,1,1,1,0,1,0,1,0,0,1,1
+Nachlieli,1,0,0,0,0,0,0,1,1,0,1,0,0
+North slope algae,1,1,0,1,0,0,1,1,0,0,1,1,1
+North slope C,1,1,0,0,0,1,0,1,1,1,1,1,1
+North slope GZ,0,1,0,1,0,0,0,1,1,1,0,0,0
+Ridge 1,1,0,0,1,0,0,0,1,0,0,0,0,0
+Segavion,0,0,1,0,0,1,0,1,0,0,0,0,1
+Shachaf,0,1,0,0,0,1,1,0,0,1,1,0,0
+Shikmona 1,1,0,1,1,1,1,1,1,1,1,1,0,1
+Shikmona 2,0,1,1,0,1,1,1,0,1,0,1,0,0
+Shikmona 3,0,0,0,1,0,1,1,1,1,1,0,1,1
+Shikmona 4,0,1,1,0,0,0,1,0,0,0,1,0,1
+Shikmona 5,1,1,1,1,0,0,0,0,0,1,0,0,0
+Spartan,1,0,0,1,1,0,1,0,0,0,1,0,0
+Sponge Bob Harbor,1,1,0,1,0,0,1,0,1,0,1,1,1
+ADRASAN,0,0,1,1,1,1,1,0,1,1,0,1,0
+ILLA DE L'AIRE,0,1,1,1,0,1,0,1,0,0,1,1,1
+ALONISSOS,1,0,1,1,0,0,0,1,0,1,1,0,0
+AYVALIK,0,0,0,1,1,0,1,0,1,0,1,0,1
+CABRERA,0,0,1,0,1,1,0,1,1,1,0,1,1
+CAPO CACCIA,1,0,1,1,0,0,1,1,1,1,1,0,0
+CARLOFORTE,0,1,0,1,1,0,0,1,1,1,1,1,1
+CAVALLERIA,1,0,1,1,1,0,0,1,1,1,0,0,0
+CAP DE CREUS,0,1,1,0,1,1,1,1,0,1,0,1,0
+DRAGONERA,0,0,0,1,0,1,0,0,0,1,1,1,0
+EIVISSA,1,0,1,0,1,1,1,1,0,0,1,0,1
+FETHIYE,1,1,1,1,1,0,0,0,1,1,1,0,1
+FORMENTERA,0,1,1,0,0,1,1,0,1,0,1,1,1
+FORMENTOR,0,1,0,0,0,0,1,0,1,0,0,1,0
+GENOVA,1,0,0,1,0,1,0,0,0,0,1,0,1
+GOKOVA,1,0,0,1,0,1,0,1,1,0,0,1,1
+GYAROS,1,0,0,0,1,1,0,0,1,1,0,0,0
+KARPATHOS,0,1,0,1,0,0,1,1,1,1,0,0,0
+KAS,0,0,1,0,0,1,0,1,1,0,1,0,0
+KIMOLOS,0,0,0,1,1,1,1,0,1,1,1,1,0
+MARATEA,1,1,0,1,1,1,1,0,1,0,1,1,1
+MEDES,0,0,0,1,0,1,0,0,1,1,1,0,1
+MONTGRI,1,1,1,0,1,1,1,1,0,1,0,0,1
+OTRANTO,0,1,0,0,0,1,1,0,0,1,1,0,1
+PORTO CESAREO,1,1,0,0,0,1,1,1,1,1,0,1,1
+PIPERI,1,0,1,1,0,0,1,1,0,0,1,1,0
+PORTOFINO,1,0,1,0,0,0,1,1,0,0,1,1,1
+TAVOLARA,0,0,0,0,0,1,1,1,0,1,0,0,0
+TORRE GUACETO,0,1,0,1,0,1,0,1,0,1,0,1,0
+TREMITI,1,1,0,1,0,0,0,1,0,1,1,1,1
