@@ -17,3 +17,9 @@ plotMRF_hm(mrf_birds)
 # 
 # rm(spp, spp_unq, sites, sites_unq, rand_mat)
 
+fish_samp_mat <- read.csv("spp_sites.csv")
+# View(med_samp_mat)
+rownames(fish_samp_mat) <- fish_samp_mat$X
+fish_samp_mat$X <- NULL
+mrf_fish <- MRFcov(fish_samp_mat, family = "binomial")
+plotMRF_hm(mrf_fish)
