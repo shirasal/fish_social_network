@@ -55,15 +55,12 @@ fake_spp_mat <- matrix(rbinom(7905, 1, 0.5), nrow = nrow(spp_list), ncol = nrow(
 rownames(fake_spp_mat)<-site_list$site
 colnames(fake_spp_mat)<-spp_list$Species
 
-
 #fake_spp_mat <- rbinom(100, 1, 0.5)
 
 # Just a reminder: This matrix does not include spatial or environmental information.
 MRF <- MRFcov(fake_spp_only, family = "binomial")
 #MRF <- MRFcov(spp_only, family = "binomial")
 # ... but for some reason it's not working and telling me there are non-binary variables. I couldn't find them though.
-#MRF_mat <- MRF$graph
-#heatmap(x = MRF_mat, symm = TRUE, col = terrain.colors(256))
 
 # prepare abundance data for MRFcov:
 med_abund <- med_species %>% 
