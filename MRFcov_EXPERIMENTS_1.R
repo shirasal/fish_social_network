@@ -1,10 +1,11 @@
 library(MRFcov)
+library(tidyverse)
 
-vignette("CRF_data_prep")
+#vignette("CRF_data_prep")
 
-#birds_binomial <- Bird.parasites[, 1:4]
-mrf_birds <- MRFcov(birds_binomial, family = "binomial")
-plotMRF_hm(mrf_birds)
+# birds_binomial <- Bird.parasites[, 1:4]
+# mrf_birds <- MRFcov(birds_binomial, family = "binomial")
+# plotMRF_hm(mrf_birds)
 
 # spp <- read.csv(file = "species.csv", header = TRUE, check.names = TRUE)
 # spp_unq <- unique(spp)
@@ -20,8 +21,9 @@ plotMRF_hm(mrf_birds)
 # rm(spp, spp_unq, sites, sites_unq, rand_mat)
 
 fish_samp_mat <- read.csv("spp_sites.csv")
-# View(med_samp_mat)
+View(fish_samp_mat)
 rownames(fish_samp_mat) <- fish_samp_mat$X
 fish_samp_mat$X <- NULL
+
 mrf_fish <- MRFcov(fish_samp_mat, family = "binomial")
-plotMRF_hm(mrf_fish, plot_observed_vals = TRUE, data = fish_samp_mat)
+plotMRF_hm(mrf_fish)
