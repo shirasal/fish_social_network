@@ -20,7 +20,7 @@ library(tidyverse)
 # 
 # rm(spp, spp_unq, sites, sites_unq, rand_mat)
 
-fish_samp_mat <- read.csv("spp_sites.csv")
+fish_samp_mat <- read.csv("spp_sites.csv") # I need to change this to a new matrix with common species with interactions
 View(fish_samp_mat)
 rownames(fish_samp_mat) <- fish_samp_mat$X
 fish_samp_mat$X <- NULL
