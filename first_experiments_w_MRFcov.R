@@ -1,4 +1,3 @@
-
 library(MRFcov)
 library("tidyverse")
 
@@ -70,3 +69,8 @@ med_abund <- med_species %>%
   select(6:ncol(.))
 
 rownames(med_abund) <- med_abund$ID
+
+####### NEW DATA FRAME WITH TOP 25% of SPECIES BY OCCURENCE ########
+medata_new <- read.csv("sites_spp_matrix.csv")
+medata_new[is.na(medata_new)] <- 0
+View(medata_new) # YAAAAAAS! Abundance matrix!!!
