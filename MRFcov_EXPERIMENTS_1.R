@@ -1,4 +1,5 @@
 library(MRFcov)
+library(igraph)
 library(tidyverse)
 
 #vignette("CRF_data_prep")
@@ -27,3 +28,5 @@ fish_samp_mat$X <- NULL
 
 mrf_fish <- MRFcov(fish_samp_mat, family = "binomial")
 plotMRF_hm(mrf_fish)
+MRF_graph <- predict_MRFnetworks(fish_samp_mat, mrf_fish)
+
