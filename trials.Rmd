@@ -7,6 +7,7 @@ output: html_notebook
 
 ```{r load packages}
 library(MRFcov)
+library(igraph)
 library(tidyverse)
 
 ```
@@ -78,9 +79,16 @@ network <- predict_MRFnetworks(data = Bird.parasites, MRF_mod = boot, cached_pre
 
 ```
 
+So looks like network will now work with igraph package to create a graphical representation of the data.
 
+```{r Graphics for network}
 
+network[[9]]
+```
 
+# Experiment with IGRAPH
+
+Create a 
 
 
 
