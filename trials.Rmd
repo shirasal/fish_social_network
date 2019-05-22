@@ -75,27 +75,23 @@ This function runs MRFcov models multiple times to capture uncertainty in parame
 ```{r Networks prediction}
 boot <- bootstrap_MRF(data = Bird.parasites, n_nodes = 4, n_covariates = 1, family = "binomial")
 
-network <- predict_MRFnetworks(data = Bird.parasites, MRF_mod = boot, cached_predictions = bird_predictors, prep_covariates = TRUE)
+network <- predict_MRFnetworks(data = Bird.parasites, MRF_mod = mrf_birds_cov, cached_predictions = bird_predictors, prep_covariates = TRUE)
 
 ```
 
 So looks like network will now work with igraph package to create a graphical representation of the data.
 
 ```{r Graphics for network}
+network <- graph.adjacency(mrf_birds_cov$graph, weighted = T, mode = "undirected") # inside the MRFcov new variable there is a graph element which I'll need to use for igraph
+plot.igraph(network, layout = layout.circle(network),
+            edge.width = abs(E(network)$weight),
+            edge.color = ifelse(E(network)$weight < 0, 
+                                'blue',
+                                'red'))
 
-network[[9]]
 ```
 
-# Experiment with IGRAPH
-
-Create a 
-
-
-
-
-
-
-
+Again, I don't know what's the covariate condition in this graph (what's the host relative abundance in this case)
 
 
 
