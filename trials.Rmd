@@ -86,8 +86,8 @@ network <- graph.adjacency(mrf_birds_cov$graph, weighted = T, mode = "undirected
 plot.igraph(network, layout = layout.circle(network),
             edge.width = abs(E(network)$weight),
             edge.color = ifelse(E(network)$weight < 0, 
-                                'blue',
-                                'red'))
+                                          'blue',
+                                          'red'))
 
 ```
 
