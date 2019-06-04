@@ -111,6 +111,7 @@ plot(g_network,
 
 ```
 
+# Including covariates #
 It is also highly advisable to scale any continuous variables so they all have mean = 0 and sd = 1 analysis (Clark's recommendation from `vignette(CRF_data_prep)`)
 
 ```{r MRFcov Fish with covariates, warning=FALSE}
@@ -127,6 +128,7 @@ fish_cov_mrf <- MRFcov(data = fish_w_cov, n_nodes = 6, family = "binomial") # sy
 
 ```
 
+Plot co-occurrence
 ```{r Co-occurrence matrix with covariates}
 # png("co_occurrence.png")
 plotMRF_hm(fish_cov_mrf)
@@ -138,7 +140,7 @@ Now let's explore relationships
 ```{r GRAPH with covariates}
 fishcov_network <- graph.adjacency(fish_cov_mrf$graph, weighted = T, mode = "undirected")
 
-png("stationary_network_with_cov.png")
+# png("stationary_network_with_cov.png")
 plot.igraph(fishcov_network, layout = layout.circle(fishcov_network),
             edge.width = abs(E(fishcov_network)$weight),
             edge.color = ifelse(E(fishcov_network)$weight < 0,
@@ -149,7 +151,7 @@ plot.igraph(fishcov_network, layout = layout.circle(fishcov_network),
             vertex.label.color = "azure4",
             vertex.label.dist = 2,
             vertex.label.degree = -20)
-dev.off()
+# dev.off()
 
 ```
 
@@ -171,5 +173,143 @@ I think this means covariate improves the model...
 
 Ok, so far this was giving me one "snapshot". Now I want to create graphs for 3 temperature ranges:
 
+```{r Preps}
+# Fish matrices/data frames
+fish_df <- read.csv(file = "fish sample matrix.csv", header = TRUE)
+fish_mat <- read.csv(file = "fish sample matrix.csv", header = TRUE, row.names = 1) %>% as.matrix()
+
+# Temperature tables
+low_temp <- read.csv("low_temp_sites.csv", header = TRUE)
+med_temp <- read.csv("medium_temp_sites.csv", header = TRUE)
+high_temp <- read.csv("high_temp_sites.csv", header = TRUE)
+
+```
 
 
+## Low temperature ##
+
+```{r MRFcov Fish with covariates - Low temp, warning=FALSE}
+lowtemp_model <- inner_join(fish_df, low_temp, by = 'site', na_matches = "never")
+row.names(lowtemp_model) <- lowtemp_model$site
+lowtemp_model$site <- NULL
+lowtemp_model$max_temp <- scale(lowtemp_model$max_temp,
+                                center = TRUE, scale = TRUE) # standardise temperatures (mean = 0; sd = 1)
+
+View(lowtemp_model)
+
+low_mrf <- MRFcov(data = lowtemp_model, n_nodes = 6, family = "gaussian") # symmetrise = mean
+# I'm using gaussian just because it tells me there are non-binary data (but I cant find them. I noticed it's a lot faster)
+# Note: D. sargus are always present and S. rubrum are always absent here
+
+```
+
+Plot co-occurrence
+```{r Co-occurrence matrix with covariates - Low temp}
+# png("co_occurrence_low.png")
+plotMRF_hm(low_mrf)
+# dev.off()
+
+```
+
+Now let's explore relationships
+```{r GRAPH with covariates - Low temp}
+lowmod_network <- graph.adjacency(low_mrf$graph, weighted = T, mode = "undirected")
+
+# png("low temp network.png")
+plot.igraph(lowmod_network, layout = layout.circle(lowmod_network),
+            edge.width = abs(E(lowmod_network)$weight),
+            edge.color = ifelse(E(lowmod_network)$weight < 0,
+                                'slateblue',
+                                'darkred'),
+            vertex.color = 'wheat',
+            vertex.label.family = "Ariel",
+            vertex.label.color = "azure4",
+            vertex.label.dist = 2,
+            vertex.label.degree = -20)
+# dev.off()
+
+```
+
+## Medium temperature ##
+
+```{r MRFcov Fish with covariates - Med temp, warning=FALSE}
+medtemp_model <- inner_join(fish_df, med_temp, by = 'site', na_matches = "never")
+row.names(medtemp_model) <- medtemp_model$site
+medtemp_model$site <- NULL
+medtemp_model$max_temp <- scale(medtemp_model$max_temp,
+                                center = TRUE, scale = TRUE) # standardise temperatures (mean = 0; sd = 1)
+
+View(medtemp_model)
+
+med_mrf <- MRFcov(data = medtemp_model, n_nodes = 6, family = "gaussian") # symmetrise = mean
+# Note: D. sargus are always present
+
+```
+Plot co-occurrence:
+```{r Co-occurrence matrix with covariates - Med temp}
+# png("co_occurrence_med.png")
+plotMRF_hm(med_mrf)
+# dev.off()
+
+```
+
+Now let's explore relationships
+```{r GRAPH with covariates - Med temp}
+medmod_network <- graph.adjacency(med_mrf$graph, weighted = T, mode = "undirected")
+
+# png("med temp network.png")
+plot.igraph(medmod_network, layout = layout.circle(medmod_network),
+            edge.width = abs(E(medmod_network)$weight),
+            edge.color = ifelse(E(medmod_network)$weight < 0,
+                                'slateblue',
+                                'darkred'),
+            vertex.color = 'wheat',
+            vertex.label.family = "Ariel",
+            vertex.label.color = "azure4",
+            vertex.label.dist = 2,
+            vertex.label.degree = -20)
+# dev.off()
+
+```
+
+## High temperature ##
+```{r MRFcov Fish with covariates - High temp, warning=FALSE}
+hitemp_model <- inner_join(fish_df, high_temp, by = 'site', na_matches = "never")
+row.names(hitemp_model) <- hitemp_model$site
+hitemp_model$site <- NULL
+hitemp_model$max_temp <- scale(hitemp_model$max_temp,
+                                center = TRUE, scale = TRUE) # standardise temperatures (mean = 0; sd = 1)
+
+View(hitemp_model)
+
+hi_mrf <- MRFcov(data = hitemp_model, n_nodes = 6, family = "gaussian") # symmetrise = mean
+
+```
+Plot co-occurrence:
+```{r Co-occurrence matrix with covariates - High temp}
+# png("co_occurrence_hi.png")
+plotMRF_hm(hi_mrf)
+# dev.off()
+
+```
+
+Now let's explore relationships
+```{r GRAPH with covariates - High temp}
+himod_network <- graph.adjacency(hi_mrf$graph, weighted = T, mode = "undirected")
+
+# png("hi temp network.png")
+plot.igraph(himod_network, layout = layout.circle(himod_network),
+            edge.width = abs(E(himod_network)$weight),
+            edge.color = ifelse(E(himod_network)$weight < 0,
+                                'slateblue',
+                                'darkred'),
+            vertex.color = 'wheat',
+            vertex.label.family = "Ariel",
+            vertex.label.color = "azure4",
+            vertex.label.dist = 2,
+            vertex.label.degree = -20)
+# dev.off()
+
+```
+
+AWESOME!
