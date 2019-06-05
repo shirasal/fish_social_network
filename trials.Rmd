@@ -8,6 +8,8 @@ library(MRFcov)
 library(igraph)
 library(tidyverse)
 
+windowsFonts(Verdana = windowsFont("Verdana"))
+
 ```
 
 Data has to have the following structure:
@@ -64,10 +66,11 @@ plot.igraph(fish_network, layout = layout.circle(fish_network),
                                 'slateblue',
                                 'darkred'),
             vertex.color = 'wheat',
-            vertex.label.family = "Ariel",
+            vertex.label.family = "Verdana",
             vertex.label.color = "azure4",
             vertex.label.dist = 2,
-            vertex.label.degree = -20)
+            vertex.label.cex = 1,
+            label.degree = pi/4)
 # dev.off()
 
 ```
@@ -140,19 +143,31 @@ Now let's explore relationships
 ```{r GRAPH with covariates}
 fishcov_network <- graph.adjacency(fish_cov_mrf$graph, weighted = T, mode = "undirected")
 
-# png("stationary_network_with_cov.png")
+# png("stationary_network_with_cov_nolabs.png")
 plot.igraph(fishcov_network, layout = layout.circle(fishcov_network),
             edge.width = abs(E(fishcov_network)$weight),
             edge.color = ifelse(E(fishcov_network)$weight < 0,
                                 'slateblue',
                                 'darkred'),
             vertex.color = 'wheat',
-            vertex.label.family = "Ariel",
-            vertex.label.color = "azure4",
-            vertex.label.dist = 2,
-            vertex.label.degree = -20)
+            vertex.label = NA
+            # vertex.label.family = "Verdana",
+            # vertex.label.color = "azure4",
+            # vertex.label.dist = 2,
+            # vertex.label.cex = 1,
+            # label.degree = pi/4
+            )
 # dev.off()
 
+
+# === vertex label
+vertex.label = LETTERS[1:10],         # Character vector used to label the nodes
+vertex.label.color = "white",
+vertex.label.family = "Times",        # Font family of the label (e.g.“Times”, “Helvetica”)
+vertex.label.font = 2,                # Font: 1 plain, 2 bold, 3, italic, 4 bold italic, 5 symbol
+vertex.label.cex = 1,                 # Font size (multiplication factor, device-dependent)
+vertex.label.dist = 0,                # Distance between the label and the vertex
+vertex.label.degree = 0,              # The position of the label in relation to the vertex (use pi)
 ```
 
 A key step in the process of model exploration is to determine whether inclusion of covariates actually improves
