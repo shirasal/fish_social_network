@@ -159,15 +159,6 @@ plot.igraph(fishcov_network, layout = layout.circle(fishcov_network),
             )
 # dev.off()
 
-
-# === vertex label
-vertex.label = LETTERS[1:10],         # Character vector used to label the nodes
-vertex.label.color = "white",
-vertex.label.family = "Times",        # Font family of the label (e.g.“Times”, “Helvetica”)
-vertex.label.font = 2,                # Font: 1 plain, 2 bold, 3, italic, 4 bold italic, 5 symbol
-vertex.label.cex = 1,                 # Font size (multiplication factor, device-dependent)
-vertex.label.dist = 0,                # Distance between the label and the vertex
-vertex.label.degree = 0,              # The position of the label in relation to the vertex (use pi)
 ```
 
 A key step in the process of model exploration is to determine whether inclusion of covariates actually improves
@@ -230,17 +221,15 @@ Now let's explore relationships
 ```{r GRAPH with covariates - Low temp}
 lowmod_network <- graph.adjacency(low_mrf$graph, weighted = T, mode = "undirected")
 
-# png("low temp network.png")
+# png("low temp network no labs.png")
 plot.igraph(lowmod_network, layout = layout.circle(lowmod_network),
             edge.width = abs(E(lowmod_network)$weight),
             edge.color = ifelse(E(lowmod_network)$weight < 0,
                                 'slateblue',
                                 'darkred'),
             vertex.color = 'wheat',
-            vertex.label.family = "Ariel",
-            vertex.label.color = "azure4",
-            vertex.label.dist = 2,
-            vertex.label.degree = -20)
+            vertex.label = NA
+            )
 # dev.off()
 
 ```
@@ -272,17 +261,15 @@ Now let's explore relationships
 ```{r GRAPH with covariates - Med temp}
 medmod_network <- graph.adjacency(med_mrf$graph, weighted = T, mode = "undirected")
 
-# png("med temp network.png")
+# png("med temp network no labs.png")
 plot.igraph(medmod_network, layout = layout.circle(medmod_network),
             edge.width = abs(E(medmod_network)$weight),
             edge.color = ifelse(E(medmod_network)$weight < 0,
                                 'slateblue',
                                 'darkred'),
             vertex.color = 'wheat',
-            vertex.label.family = "Ariel",
-            vertex.label.color = "azure4",
-            vertex.label.dist = 2,
-            vertex.label.degree = -20)
+            vertex.label = NA
+            )
 # dev.off()
 
 ```
@@ -312,17 +299,15 @@ Now let's explore relationships
 ```{r GRAPH with covariates - High temp}
 himod_network <- graph.adjacency(hi_mrf$graph, weighted = T, mode = "undirected")
 
-# png("hi temp network.png")
+# png("hi temp network no labs.png")
 plot.igraph(himod_network, layout = layout.circle(himod_network),
             edge.width = abs(E(himod_network)$weight),
             edge.color = ifelse(E(himod_network)$weight < 0,
                                 'slateblue',
                                 'darkred'),
             vertex.color = 'wheat',
-            vertex.label.family = "Ariel",
-            vertex.label.color = "azure4",
-            vertex.label.dist = 2,
-            vertex.label.degree = -20)
+            vertex.label = NA
+            )
 # dev.off()
 
 ```
