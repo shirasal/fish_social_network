@@ -1,0 +1,51 @@
+---
+title: "Research Notebook"
+output: html_notebook
+---
+
+15/07/19
+```{r}
+library(tidyverse)
+
+functional <- read.csv("C:/Users/Shira/Documents/FishMed - Albouy et al 2015 Ecological Archives E096-203/Functional_data/Functional_data.csv", header = TRUE, sep = ";")
+head(functional)
+traits <- colnames(functional[7:ncol(functional)])
+traits
+# These data ^ are of Albouy et al. 2015
+str(functional)
+summary(functional)
+
+raw_med <- read.csv("C:/Users/Shira/Documents/R/medata/med_raw.csv", na.strings = c("", "NA"))
+summary(raw_med)
+
+# create a sites list from all unique sites:
+sites <- raw_med %>%
+  distinct(site)
+
+# same for locations (this one includes lon and lat)
+locations <- raw_med %>%
+  distinct(lon, lat, site)
+
+# and one more for species
+species <- raw_med %>% 
+  distinct(species)
+
+# create myself a useful matrix
+med_mat <- raw_med %>% 
+  group_by(species) %>% 
+  mutate(grouped_id = row_number()) %>% # group_by() and mutate() are a workaround an error
+  spread(species, sp.n) %>% 
+  select(-sp.length, -a, -b, -grouped_id) # irrelevant variables
+med_mat[, 18:136][is.na(med_mat[, 18:136])] <- 0 # change NAs to 0s only for species
+
+head(med_mat)
+# last column of metadata is 18
+# species are in cols (19:ncol(.))
+
+# check it out:
+summary(med_mat)
+
+```
+
+* More info on `med_raw.csv` can be found in repo `/medata/data_warngling_and_acquaintance.html`)
+
