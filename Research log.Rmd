@@ -49,3 +49,41 @@ summary(med_mat)
 
 * More info on `med_raw.csv` can be found in repo `/medata/data_warngling_and_acquaintance.html`)
 
+21/07/19
+Trying to get countries by coordinates but all the functions/packages don't work well for the sea.. so I'll try and do it from a shapefile of EEZs. It might be worth making a sort of package for it to extract the relevant shapefile and then extract the countries from this shapefile.
+Downloaded Marine Regions shp file
+
+* IHO sea areas: Flanders Marine Institute (2018). IHO Sea Areas, version 3. Available online at http://www.marineregions.org/ https://doi.org/10.14284/323
+* Marine boundries (EEZ): Flanders Marine Institute (2018). Maritime Boundaries Geodatabase: Maritime Boundaries and Exclusive Economic Zones (200NM), version 10. Available online at http://www.marineregions.org/ https://doi.org/10.14284/312
+
+```{r}
+library(sp)
+library(rgdal)
+library(raster)
+# library(maptools)
+library(rgeos)
+library(tidyverse)
+
+## Load a shapefile that contains the extent of the mediterranean (medmask) and extrat its extent to crop the world shapefile onto it:
+
+poly_mask <- readOGR("C:/Users/Shira/Documents/GIS/Bio-Oracle-Rasters/Mediterranean Mask - not BioOracle/medmask.shp") #load the shapefile
+med_extent <- extent(poly_mask) # extract its extent
+
+# Read the shapefile of all EEZs (countries) - from Marine Regions website:
+world_eez <- readOGR(dsn = "C:/Users/Shira/Documents/MEData/Marine Regions/World_EEZ_v10_20180221", "eez_v10")
+
+# Create the clipping polygon
+CP <- as(med_extent, "SpatialPolygons") # convert extent to SpatialPolygons object
+proj4string(CP) <- CRS(proj4string(world_eez)) # set its projection to the same as EEZ file
+
+# Clip the map
+med_eez <- gIntersection(world_eez, CP, byid=TRUE)
+
+# Plot the output to check it:
+# plot(med_eez, col="khaki", bg="azure2")
+
+head(world_eez@data)
+
+
+```
+
