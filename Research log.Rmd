@@ -2,6 +2,16 @@
 title: "Research Notebook"
 output: html_notebook
 ---
+20/02/19
+
+# Data validation #
+
+* data.origin: replaced 9114 incidents of “Sala - PEW” to “sala_pew”
+* There are some latitudes that equal integers (1,2,3…)
+* sort out caps and spaces: site names; spp names (also parentheses);  season; 
+* species names need to be all changed to genus.spp now some with caps and some with spaces
+* spp length in cm I guess?
+* protection: 35460 replacements for YES in 1; 16278 replacements for NO in 0; 637 replacements of #N/A in NA.
 
 15/07/19
 ```{r}
