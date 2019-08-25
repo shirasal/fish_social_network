@@ -97,3 +97,17 @@ head(world_eez@data)
 
 ```
 
+25/08/19
+Medata dataset is now complete and can be found in repo "medata" with up to date information and data wrangling code.
+Species traits table is now complete (expept for some NAs). It's in directory "MEDATA" (case sensitive) 
+
+Next few tasks:
+[ ] Create observation maps for each species. Also check where species overlap.
+[ ] Look at the distribution of seasons. This comes from the thought that if I'm using temperature as a predictor, and the variance in temperature across seasons is larger than the spatial variance of temperatures, I should subset to seasons accordingly.
+[ ] Subset to countries?
+
+
+
+
+
+
