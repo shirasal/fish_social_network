@@ -46,3 +46,9 @@ full_med_mat <- left_join(med_meta, med_mat, by = c("site", "lon", "lat"))
 write_csv(full_med_mat, "med_species_matrix.csv")
 read_csv("med_species_matrix.csv")
 View(full_med_mat)
+
+# Convert the abundance matrix to presence-absence matrix
+pres_abs_mat <- full_med_mat
+pres_abs_mat[17:ncol(pres_abs_mat)] <- ifelse(pres_abs_mat[17:ncol(pres_abs_mat)] > 0, 1, 0)
+View(pres_abs_mat)
+write_csv(pres_abs_mat, "presence_absence_med_mat.csv")
