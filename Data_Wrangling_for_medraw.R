@@ -29,3 +29,9 @@ read_csv("zeros.csv")
 
 # TODO Change "protection" to logical
 
+# Create a species matrix with summation of each species in each site
+med_mat <- raw_med %>% 
+  group_by(site, lon, lat, species) %>% # Note it only shows sites and species (with coordinate-locations)
+  summarise(n = sum(sp.n)) %>% 
+  spread(species, n, fill = 0)
+head(med_mat)
