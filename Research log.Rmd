@@ -80,19 +80,19 @@ poly_mask <- readOGR("C:/Users/Shira/Documents/GIS/Bio-Oracle-Rasters/Mediterran
 med_extent <- extent(poly_mask) # extract its extent
 
 # Read the shapefile of all EEZs (countries) - from Marine Regions website:
-world_eez <- readOGR(dsn = "C:/Users/Shira/Documents/MEData/Marine Regions/World_EEZ_v10_20180221", "eez_v10")
+world_eez <- readOGR(dsn = "Spatial/MarReg_World_EEZ_v10", "eez_v10")
 
-# Create the clipping polygon
+# Create the clipped polygon
 CP <- as(med_extent, "SpatialPolygons") # convert extent to SpatialPolygons object
 proj4string(CP) <- CRS(proj4string(world_eez)) # set its projection to the same as EEZ file
 
 # Clip the map
-med_eez <- gIntersection(world_eez, CP, byid=TRUE)
+med_eez <- gIntersection(world_eez, CP, byid = TRUE)
 
 # Plot the output to check it:
-# plot(med_eez, col="khaki", bg="azure2")
+ggplot(data = med_eez) + geom_sf()
 
-head(world_eez@data)
+head(med_eez)
 
 
 ```
@@ -102,10 +102,29 @@ Medata dataset is now complete and can be found in repo "medata" with up to date
 Species traits table is now complete (expept for some NAs). It's in directory "MEDATA" (case sensitive) 
 
 Next few tasks:
-[ ] Create observation maps for each species. Also check where species overlap.
-[ ] Look at the distribution of seasons. This comes from the thought that if I'm using temperature as a predictor, and the variance in temperature across seasons is larger than the spatial variance of temperatures, I should subset to seasons accordingly.
-[ ] Subset to countries?
 
+- Create observation maps for each species. Also check where species overlap.
+- Look at the distribution of seasons. This comes from the thought that if I'm using temperature as a predictor, and the variance in temperature across seasons is larger than the spatial variance of temperatures, I should subset to seasons accordingly.
+- Subset to countries?
+
+```{r}
+# Create point graph (lon/lat) for each species
+med_raw <- read.csv("med_raw.csv")
+head(med_raw)
+
+```
+
+Create a species matrix with sum of sp/n for each species at each site
+
+```{r}
+
+med_mat <- med_raw %>% 
+  group_by(site, lon, lat, species) %>%
+  summarise(n = sum(sp.n)) %>% 
+  spread(species, n, fill = 0)
+
+head(med_mat)
+```
 
 
 
