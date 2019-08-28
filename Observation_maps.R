@@ -56,9 +56,9 @@ for (j in 1:length(spp_list)) {
   
   ggsave(filename = paste0("ObserveMaps/", spp_names[j], "_obs.png"), plot = last_plot(),
          width = 12, height = 8, units = "in", dpi = 300, limitsize = FALSE, device = "png")
-
+  
 }
 
-list.files(path = "ObserveMaps")
+list.files(path = "ObserveMaps") # Check all maps have been written to the directory
 
-       
+# I also wanted to make a Mega_plot of all the species and their observation locations, but since the locations overlap, it's useless.
