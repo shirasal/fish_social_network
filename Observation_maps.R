@@ -62,5 +62,21 @@ for (j in 1:length(spp_list)) {
 
 list.files(path = "ObserveMaps") # Check all maps have been written to the directory
 
-# I also wanted to make a Mega_plot of all the species and their observation locations, but since the locations overlap, it's useless.
+# I also wanted to make a Mega_plot of all the species and their observation locations,
+# but since the locations overlap, it's useless.
 
+# See how the seasons are spread spatially
+med_raw <- read_csv("med_raw.csv")
+med_raw$depth <- as.numeric(med_raw$depth) # fix class issue (instead of logic, as is has been parsed)
+
+seasons <- med_raw %>%
+  select(country, site, lon, lat, season, sp.n) %>% 
+  arrange(season)
+
+# TODO make 3 graphs of observations (use facets) with basemap of mediterranean
+# to show which site are sampled at what seasons.
+# Since there is a strong temporal (seasonal) variation in the Med,
+# I want to make sure the seasons are spread randomly enough through the Med.
+# There might be variation in community temporally, and I don't want to this to create a bias.
+  
+  
