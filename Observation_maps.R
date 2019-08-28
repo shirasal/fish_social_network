@@ -47,20 +47,23 @@ med_mat_minimal <- med_mat %>%
   select(lon, lat, 17:ncol(.))
 
 # Create a loop to subset each species obaservation
-spp_list <- NULL
-for(i in 3:ncol(med_mat_minimal)) {
-  spp_list[[i]] <- med_mat_minimal %>%
-    select(lon, lat, i) %>% 
-    filter(.[, 3] > 0)
+spp_list <- NULL # Create an empty list
+for(i in 3:ncol(med_mat_minimal)) { # for each column in this array
+  spp_list[[i]] <- med_mat_minimal %>% # create a new list item, relying on this df
+    select(lon, lat, i) %>%  # select only the column of the specified species
+    filter(.[, 3] > 0) # filter for observations (not 0s)
 }
-spp_list[[1]] <- NULL # this one is only lon
-spp_list[[2]] <- NULL # thi one is only lat
+# there's some kind of a mistake here and the 2 first list elements are duplicates of Anthias anthias, so I will delete them:
+spp_list[1] <- NULL 
+spp_list[2] <- NULL
 
 spp_names <- colnames(med_mat_minimal[3:ncol(med_mat_minimal)])
+names(spp_list) <- spp_names
 names(spp_list)
 # Check if I can find specific object in that list:
-spp_list[["Boops.boops"]]
+spp_list[["Belone.belone"]]
 # Great success!
 
 saveRDS(spp_list, file = "spp_obs.rds")
 NEW <- readRDS("spp_obs.rds")
+
