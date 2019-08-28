@@ -20,7 +20,8 @@ ggplot(sarpa.salpa) + geom_point(aes(x = lon, y = lat))
 
 # Create a base map of the mediterranean
 library(sf)
-med_seas <- st_read("~/GIS/Marine Regions/Mediterraneans_Seas_IHO/Med_Seas.shp")
+med_seas <- st_read("~/GIS/Marine Regions/Mediterraneans_Seas_IHO/Med_Seas.shp") # for Lab computer
+med_seas <- st_read("~/1Masters/GIS/Med/iho.shp")# For personal laptop
 
 # Map for Sarpa salpa
 (ss_p <- ggplot(sarpa.salpa) +
@@ -45,34 +46,18 @@ med_mat <- read_csv("med_species_matrix.csv")
 med_mat_minimal <- med_mat %>% 
   select(lon, lat, 17:ncol(.))
 
-########## 1st try ##########
-for (i in med_mat[, 3:ncol(med_mat)]) {
-  med_mat[[i]] <- med_mat %>% ggplot(i, aes(x = lon, y = lat)) +
-      geom_sf(data = med_seas) +
-      geom_point()
+# Create a loop to subset each species obaservation
+spp_list <- NULL
+for(i in 3:ncol(med_mat_minimal)) {
+  spp_list[[i]] <- med_mat_minimal %>%
+    select(lon, lat, i) %>% 
+    filter(.[, 3] > 0)
 }
+spp_list[[1]] <- NULL # this one is only lon
+spp_list[[2]] <- NULL # thi one is only lat
 
-########## 2nd try ##########
-for (i in med_mat) {
-  spp_tbl <- tibble(med_mat$lon, med_mat$lat)
-}
-
-########## 3rd try ##########
-spp_tbl <- NULL
-for (i in c(17:ncol(med_mat))) {
-  spp_tbl <- tibble(med_mat$lon, med_mat$lat, med_mat[[i]])
-  colnames(spp_tbl) <- c("lon", "lat", i)
-}
-
-########## Check on one species ##########
-spp_tbl <- tibble(med_mat$lon, med_mat$lat, med_mat[["Diplodus.annularis"]])
-colnames(spp_tbl) <- c("lon", "lat", "Diplodus.annularis")
-
-########## 4th try ##########
-spp_tbl <- NULL
-for (i in cols(med_mat_minimal)) {
-  spp_tbl <- tibble(med_mat_minimal$lon, med_mat_minimal$lat, med_mat_minimal[[i]])
-  colnames(spp_tbl) <- c("lon", "lat", i)
-}
-
-
+spp_names <- colnames(med_mat_minimal[3:ncol(med_mat_minimal)])
+names(spp_list)
+# Check if I can find specific object in that list:
+spp_list[["Boops.boops"]]
+# Great success!
