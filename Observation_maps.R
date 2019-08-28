@@ -61,3 +61,6 @@ names(spp_list)
 # Check if I can find specific object in that list:
 spp_list[["Boops.boops"]]
 # Great success!
+
+saveRDS(spp_list, file = "spp_obs.rds")
+NEW <- readRDS("spp_obs.rds")
