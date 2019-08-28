@@ -52,10 +52,11 @@ for (j in 1:length(spp_list)) {
   
   spp_maps[[j]] <- ggplot(data = spp_list[[j]]) +
     geom_sf(data = med_seas, colour = "black", fill = "#00E5E5", alpha = 0.3) +
-    geom_point(aes(x = lon, y = lat), colour = "#F7347A", size = 5, alpha = 0.6)
+    geom_point(aes(x = lon, y = lat), colour = "#F7347A", size = 5, alpha = 0.6) +
+    title(main = spp_names[j])
   
   ggsave(filename = paste0("ObserveMaps/", spp_names[j], "_obs.png"), plot = last_plot(),
-         width = 12, height = 8, units = "in", dpi = 300, limitsize = FALSE, device = "png")
+         width = 12, height = 8, units = "in", dpi = 300, device = "png")
   
 }
 
