@@ -36,10 +36,11 @@ full_med_mat_sub1 <- left_join(med_mat_sub1, med_meta_env, by = c("site", "lon",
 View(full_med_mat_sub1)
 
 # Preps for MRFcov analysis: 1. remove NAs
-full_med_mat_sub1 <- full_med_mat_sub1 %>% filter(complete.cases(.))
+full_med_mat_sub1 <- na.omit(full_med_mat_sub1)
+unique(is.na(full_med_mat_sub1)) # check there is no NAs
 
 # Preps for MRFcov analysis: 2. Sites to rownames
-full_med_mat_sub1 <- as.data.frame(full_med_mat_sub1)
+full_med_mat_sub1 <- as.data.frame(full_med_mat_sub1) # required for changing row names
 rownames(full_med_mat_sub1) <- make.unique(full_med_mat_sub1$site, sep = "_")
 full_med_mat_sub1 <-  full_med_mat_sub1 %>% select(-c("site", "lon", "lat"))
 View(full_med_mat_sub1)
@@ -49,6 +50,9 @@ View(full_med_mat_sub1)
 # pres_abs_mat_sub1[17:ncol(pres_abs_mat_sub1)] <- ifelse(pres_abs_mat_sub1[17:ncol(pres_abs_mat_sub1)] > 0, 1, 0)
 # View(pres_abs_mat_sub1)
 
-MRF_sub1 <- MRFcov(data = full_med_mat_sub1, n_nodes = 30, n_covariates = 3, family = "gaussian")
-MRF_sub1_predict <- predict_MRF(data = full_med_mat_sub1, MRF_mod = MRF_sub1)
-MRF_sub1_predict
+MRF_sub1 <- MRFcov(data = full_med_mat_sub1, n_nodes = 54, n_covariates = 3, family = "gaussian")
+plotMRF_hm(MRF_sub1)
+# cv_MRF_diag(data = full_med_mat_sub1, n_nodes = 54, n_covariates = 3, family = "gaussian")
+
+
+
