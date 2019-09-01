@@ -29,17 +29,19 @@ write_csv(check_zeros, "Issues/zeros.csv")
 read_csv("Issues/zeros.csv")
 # TODO find out why there are 0s
 
-# Create a species matrix with summation of each species in each site
+##### ========= CREATE SPECIES MATRIX ========= #####
+# Create a tibble of metadata
+med_meta <- raw_med %>% 
+  distinct(country, site, lon, lat, season, protection, enforcement, total.mpa.ha, size.notake, 
+           yr.creation, age.reserve.yr, tmean, trange, sal_mean, pp_mean, pp_range)
+
+# Create a species matrix with summation of each species in each site (abundance)
+# TODO is this the correct way to do this?
 med_mat <- raw_med %>% 
   group_by(site, lon, lat, species) %>% # Note it only shows sites and species (with coordinate-locations)
   summarise(n = sum(sp.n)) %>% 
   spread(species, n, fill = 0)
 head(med_mat)
-
-# Create a tibble of metadata
-med_meta <- raw_med %>% 
-  distinct(country, site, lon, lat, season, protection, enforcement, total.mpa.ha, size.notake, 
-           yr.creation, age.reserve.yr, tmean, trange, sal_mean, pp_mean, pp_range)
 
 # Put the 2 data sets together (species and metadata)
 full_med_mat <- left_join(med_meta, med_mat, by = c("site", "lon", "lat"))
