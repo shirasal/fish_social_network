@@ -70,13 +70,20 @@ med_raw <- read_csv("med_raw.csv")
 med_raw$depth <- as.numeric(med_raw$depth) # fix class issue (instead of logic, as is has been parsed)
 
 seasons <- med_raw %>%
-  select(country, site, lon, lat, season, sp.n) %>% 
+  select(country, site, lon, lat, season) %>% 
+  group_by(country, site, lon, lat, season) %>% 
+  summarise(count = n()) %>% 
   arrange(season)
 
-# TODO make 3 graphs of observations (use facets) with basemap of mediterranean
-# to show which site are sampled at what seasons.
 # Since there is a strong temporal (seasonal) variation in the Med,
 # I want to make sure the seasons are spread randomly enough through the Med.
 # There might be variation in community temporally, and I don't want to this to create a bias.
-  
-  
+seasons_maps <- ggplot(data = seasons) +
+    geom_sf(data = med_seas, colour = "black", fill = "#00E5E5", alpha = 0.3) +
+    geom_point(aes(x = lon, y = lat, colour = season, size = count), alpha = 0.5) +
+    facet_grid(rows = vars(season))
+# ggsave(plot = seasons_maps, filename = "seasons.png", path = "SpatialMaps")
+
+# Maybe the difference is not so great if it's all between spring-autumn - 
+# how do we consider the seasons?
+
