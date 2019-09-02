@@ -4,8 +4,6 @@ library(MRFcov)
 
 med_raw <- read_csv("med_raw.csv")
 med_raw$depth <- as.numeric(med_raw$depth) # fix class issue (instead of logic, as is has been parsed)
-
-##### ==== CREATE SPECIES MATRIX from SUBSETTED DATA ==== #####
 ## Create metadata tibbles:
 ## 1. Temperature:
 med_temp_mean <- med_raw %>% 
@@ -23,6 +21,8 @@ med_pp_mean <- med_raw %>%
 med_meta_env <- left_join(x = med_temp_mean, y = med_sal_mean, by = c("site", "lon", "lat")) %>% 
   left_join(., med_pp_mean, by = c("site", "lon", "lat"))
 
+##### ==== CREATE SPECIES MATRIX from SUBSETTED DATA ==== #####
+
 ## sub1 = species matrix where the count of fish > 10
 med_mat_sub1 <- med_raw %>%
   group_by(site, lon, lat, species) %>%
@@ -33,27 +33,26 @@ head(med_mat_sub1)
 
 ## Add environmental (meta) data
 full_med_mat_sub1 <- left_join(med_mat_sub1, med_meta_env, by = c("site", "lon", "lat"))
-View(full_med_mat_sub1)
+# View(full_med_mat_sub1)
 
 # Preps for MRFcov analysis: 1. remove NAs
 full_med_mat_sub1 <- na.omit(full_med_mat_sub1)
-unique(is.na(full_med_mat_sub1)) # check there are no NAs
+# unique(is.na(full_med_mat_sub1)) # check there are no NAs
 
 # Preps for MRFcov analysis: 2. Sites to rownames
 full_med_mat_sub1 <- as.data.frame(full_med_mat_sub1) # required for changing row names
 rownames(full_med_mat_sub1) <- make.unique(full_med_mat_sub1$site, sep = "_")
 full_med_mat_sub1 <-  full_med_mat_sub1 %>% select(-c("site", "lon", "lat"))
-View(full_med_mat_sub1)
+# View(full_med_mat_sub1)
 
 # Convert the abundance matrix to presence-absence matrix
 pres_abs_mat_sub1 <- full_med_mat_sub1
 pres_abs_mat_sub1[1:54] <- ifelse(pres_abs_mat_sub1[1:54] > 0, 1, 0)
-View(pres_abs_mat_sub1)
-
+# View(pres_abs_mat_sub1)
 
 MRF_sub1 <- MRFcov(data = full_med_mat_sub1, n_nodes = 54, n_covariates = 3, family = "gaussian")
-MRF_PA_sub1 <- MRFcov(data = pres_abs_mat_sub1, n_nodes = 54, n_covariates = 3, family = "binomial")
-plotMRF_hm(MRF_sub1)
+# MRF_PA_sub1 <- MRFcov(data = pres_abs_mat_sub1, n_nodes = 54, n_covariates = 3, family = "binomial")
+plotMRF_hm(MRF_sub1, main = "Sum of sp.n > 10, 54 species")
 # cv_MRF_diag(data = full_med_mat_sub1, n_nodes = 54, n_covariates = 3, family = "gaussian")
 
 ##############################################################################
@@ -70,11 +69,11 @@ full_med_mat_sub2_su <- as.data.frame(full_med_mat_sub2_su) # required for chang
 rownames(full_med_mat_sub2_su) <- make.unique(full_med_mat_sub2_su$site, sep = "_")
 full_med_mat_sub2_su <-  full_med_mat_sub2_su %>% select(-c("site", "lon", "lat"))
 pres_abs_mat_sub2_su <- full_med_mat_sub2_su
-pres_abs_mat_sub2_su[1:54] <- ifelse(pres_abs_mat_sub2_su[1:54] > 0, 1, 0)
-MRF_sub2_su <- MRFcov(data = full_med_mat_sub2_su, n_nodes = 54, n_covariates = 3,
+pres_abs_mat_sub2_su[1:96] <- ifelse(pres_abs_mat_sub2_su[1:96] > 0, 1, 0)
+MRF_sub2_su <- MRFcov(data = full_med_mat_sub2_su, n_nodes = 96, n_covariates = 3,
                       family = "gaussian")
-MRF_PA_sub2_su <- MRFcov(data = pres_abs_mat_sub2_su, n_nodes = 54, n_covariates = 3,
-                         family = "binomial")
+# MRF_PA_sub2_su <- MRFcov(data = pres_abs_mat_sub2_su, n_nodes = 96, n_covariates = 3, family = "binomial")
+plotMRF_hm(MRF_sub2_su, main =  "Summer, 96 species")
 
 # Autumn:
 med_mat_sub2_au <- med_raw %>%
@@ -88,11 +87,12 @@ full_med_mat_sub2_au <- as.data.frame(full_med_mat_sub2_au) # required for chang
 rownames(full_med_mat_sub2_au) <- make.unique(full_med_mat_sub2_au$site, sep = "_")
 full_med_mat_sub2_au <-  full_med_mat_sub2_au %>% select(-c("site", "lon", "lat"))
 pres_abs_mat_sub2_au <- full_med_mat_sub2_au
-pres_abs_mat_sub2_au[1:54] <- ifelse(pres_abs_mat_sub2_au[1:54] > 0, 1, 0)
-MRF_sub2_au <- MRFcov(data = full_med_mat_sub2_au, n_nodes = 54, n_covariates = 3,
+pres_abs_mat_sub2_au[1:88] <- ifelse(pres_abs_mat_sub2_au[1:88] > 0, 1, 0)
+MRF_sub2_au <- MRFcov(data = full_med_mat_sub2_au, n_nodes = 88, n_covariates = 3,
                       family = "gaussian")
-MRF_PA_sub2_au <- MRFcov(data = pres_abs_mat_sub2_au, n_nodes = 54, n_covariates = 3,
+MRF_PA_sub2_au <- MRFcov(data = pres_abs_mat_sub2_au, n_nodes = 88, n_covariates = 3,
                          family = "binomial")
+plotMRF_hm(MRF_sub2_au, main =  "Autumn, 88 species")
 
 # Spring:
 med_mat_sub2_sp <- med_raw %>%
@@ -106,15 +106,12 @@ full_med_mat_sub2_sp <- as.data.frame(full_med_mat_sub2_sp) # required for chang
 rownames(full_med_mat_sub2_sp) <- make.unique(full_med_mat_sub2_sp$site, sep = "_")
 full_med_mat_sub2_sp <-  full_med_mat_sub2_sp %>% select(-c("site", "lon", "lat"))
 pres_abs_mat_sub2_sp <- full_med_mat_sub2_sp
-pres_abs_mat_sub2_sp[1:54] <- ifelse(pres_abs_mat_sub2_sp[1:54] > 0, 1, 0)
-MRF_sub2_sp <- MRFcov(data = full_med_mat_sub2_sp, n_nodes = 54, n_covariates = 3,
+pres_abs_mat_sub2_sp[1:75] <- ifelse(pres_abs_mat_sub2_sp[1:75] > 0, 1, 0)
+MRF_sub2_sp <- MRFcov(data = full_med_mat_sub2_sp, n_nodes = 75, n_covariates = 3,
                       family = "gaussian")
-MRF_PA_sub2_sp <- MRFcov(data = pres_abs_mat_sub2_sp, n_nodes = 54, n_covariates = 3,
-                         family = "binomial")
+# MRF_PA_sub2_sp <- MRFcov(data = pres_abs_mat_sub2_sp, n_nodes = 75, n_covariates = 3, family = "binomial")
 
-plotMRF_hm(MRF_sub2_su, main =  "Estimated co-occurrence summer")
-plotMRF_hm(MRF_sub2_au, main =  "Estimated co-occurrence autumn")
-plotMRF_hm(MRF_sub2_sp, main =  "Estimated co-occurrence spring")
+plotMRF_hm(MRF_sub2_sp, main =  "Spring, 75 species")
 
 #################################################################
 
@@ -125,7 +122,6 @@ med_mat_sub3 <- med_raw %>%
   group_by(site, lon, lat, species) %>%
   summarise(n = sum(sp.n)) %>% 
   spread(species, n, fill = 0)
-head(med_mat_sub3)
 # Add the meta-data and remove NAs
 full_med_mat_sub3 <- left_join(med_mat_sub3, med_meta_env, by = c("site", "lon", "lat")) %>%
   na.omit(full_med_mat_sub3)
@@ -133,14 +129,44 @@ full_med_mat_sub3 <- left_join(med_mat_sub3, med_meta_env, by = c("site", "lon",
 full_med_mat_sub3 <- as.data.frame(full_med_mat_sub3) # required for changing row names
 rownames(full_med_mat_sub3) <- make.unique(full_med_mat_sub3$site, sep = "_")
 full_med_mat_sub3 <-  full_med_mat_sub3 %>% select(-c("site", "lon", "lat"))
-View(full_med_mat_sub3)
+# View(full_med_mat_sub3)
 
-# Convert the abundance matrix to presence-absence matrix
-pres_abs_mat_sub3 <- full_med_mat_sub3
-pres_abs_mat_sub3[1:54] <- ifelse(pres_abs_mat_sub3[1:54] > 0, 1, 0)
-View(pres_abs_mat_sub3)
+# # Convert the abundance matrix to presence-absence matrix
+# pres_abs_mat_sub3 <- full_med_mat_sub3
+# pres_abs_mat_sub3[1:97] <- ifelse(pres_abs_mat_sub3[1:97] > 0, 1, 0)
+# View(pres_abs_mat_sub3)
 
 # Run model
-MRF_sub3 <- MRFcov(data = full_med_mat_sub3, n_nodes = 54, n_covariates = 3, family = "gaussian")
-MRF_PA_sub3 <- MRFcov(data = pres_abs_mat_sub3, n_nodes = 54, n_covariates = 3, family = "binomial")
-plotMRF_hm(MRF_sub3)
+MRF_sub3 <- MRFcov(data = full_med_mat_sub3, n_nodes = 97, n_covariates = 3, family = "gaussian")
+# MRF_PA_sub3 <- MRFcov(data = pres_abs_mat_sub3, n_nodes = 97, n_covariates = 3, family = "binomial")
+plotMRF_hm(MRF_sub3, main = "Belmaker only, 97 species")
+
+##########################################################
+## Considering temperature only as covariate:
+## sub4 = species matrix where the count of fish > 10 and only one covariate = temperature
+
+# 1. Create matrix
+med_mat_sub4 <- med_raw %>%
+  group_by(site, lon, lat, species) %>%
+  filter(sp.n > 10) %>% 
+  summarise(n = sum(sp.n)) %>% 
+  spread(species, n, fill = 0)
+# Add meta-data (temperature only)
+full_med_mat_sub4 <- left_join(med_mat_sub4, med_temp_mean, by = c("site", "lon", "lat"))
+# Preps for MRFcov analysis: 1. remove NAs
+full_med_mat_sub4 <- na.omit(full_med_mat_sub4)
+# unique(is.na(full_med_mat_sub4)) # check there are no NAs
+# Preps for MRFcov analysis: 2. Sites to rownames
+full_med_mat_sub4 <- as.data.frame(full_med_mat_sub4) # required for changing row names
+rownames(full_med_mat_sub4) <- make.unique(full_med_mat_sub4$site, sep = "_")
+full_med_mat_sub4 <-  full_med_mat_sub4 %>% select(-c("site", "lon", "lat"))
+# View(full_med_mat_sub4)
+
+# # Convert the abundance matrix to presence-absence matrix
+# pres_abs_mat_sub4 <- full_med_mat_sub4
+# pres_abs_mat_sub4[1:54] <- ifelse(pres_abs_mat_sub4[1:54] > 0, 1, 0)
+# View(pres_abs_mat_sub4)
+
+MRF_sub4 <- MRFcov(data = full_med_mat_sub4, n_nodes = 54, n_covariates = 1, family = "gaussian")
+# MRF_PA_sub4 <- MRFcov(data = pres_abs_mat_sub4, n_nodes = 54, n_covariates = 1, family = "binomial")
+plotMRF_hm(MRF_sub4, main = "Temperature only, sum of sp.n > 10; 54 species")
