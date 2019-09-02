@@ -50,9 +50,11 @@ pres_abs_mat_sub1 <- full_med_mat_sub1
 pres_abs_mat_sub1[1:54] <- ifelse(pres_abs_mat_sub1[1:54] > 0, 1, 0)
 # View(pres_abs_mat_sub1)
 
-MRF_sub1 <- MRFcov(data = full_med_mat_sub1, n_nodes = 54, n_covariates = 3, family = "gaussian")
+MRF_sub1 <- MRFcov(data = full_med_mat_sub1, n_nodes = grep("tmean", colnames(full_med_mat_sub1)) - 1,
+                   n_covariates = 3, family = "gaussian")
 # MRF_PA_sub1 <- MRFcov(data = pres_abs_mat_sub1, n_nodes = 54, n_covariates = 3, family = "binomial")
-plotMRF_hm(MRF_sub1, main = "Sum of sp.n > 10, 54 species")
+plotMRF_hm(MRF_sub1,
+           main =  paste("Sum of sp.n > 10, ", grep("tmean", colnames(full_med_mat_sub1)) - 1, " species"))
 # cv_MRF_diag(data = full_med_mat_sub1, n_nodes = 54, n_covariates = 3, family = "gaussian")
 
 ##############################################################################
@@ -68,12 +70,13 @@ full_med_mat_sub2_su <- left_join(med_mat_sub2_su, med_meta_env, by = c("site", 
 full_med_mat_sub2_su <- as.data.frame(full_med_mat_sub2_su) # required for changing row names
 rownames(full_med_mat_sub2_su) <- make.unique(full_med_mat_sub2_su$site, sep = "_")
 full_med_mat_sub2_su <-  full_med_mat_sub2_su %>% select(-c("site", "lon", "lat"))
-pres_abs_mat_sub2_su <- full_med_mat_sub2_su
-pres_abs_mat_sub2_su[1:96] <- ifelse(pres_abs_mat_sub2_su[1:96] > 0, 1, 0)
-MRF_sub2_su <- MRFcov(data = full_med_mat_sub2_su, n_nodes = 96, n_covariates = 3,
-                      family = "gaussian")
+# pres_abs_mat_sub2_su <- full_med_mat_sub2_su
+# pres_abs_mat_sub2_su[1:96] <- ifelse(pres_abs_mat_sub2_su[1:96] > 0, 1, 0)
+MRF_sub2_su <- MRFcov(data = full_med_mat_sub2_su, n_nodes = grep("tmean", colnames(full_med_mat_sub2_su)) - 1,
+                      n_covariates = 3, family = "gaussian")
 # MRF_PA_sub2_su <- MRFcov(data = pres_abs_mat_sub2_su, n_nodes = 96, n_covariates = 3, family = "binomial")
-plotMRF_hm(MRF_sub2_su, main =  "Summer, 96 species")
+plotMRF_hm(MRF_sub2_su,
+           main =  paste("Summer, ", grep("tmean", colnames(full_med_mat_sub2_su)) - 1, " species"))
 
 # Autumn:
 med_mat_sub2_au <- med_raw %>%
@@ -88,11 +91,12 @@ rownames(full_med_mat_sub2_au) <- make.unique(full_med_mat_sub2_au$site, sep = "
 full_med_mat_sub2_au <-  full_med_mat_sub2_au %>% select(-c("site", "lon", "lat"))
 pres_abs_mat_sub2_au <- full_med_mat_sub2_au
 pres_abs_mat_sub2_au[1:88] <- ifelse(pres_abs_mat_sub2_au[1:88] > 0, 1, 0)
-MRF_sub2_au <- MRFcov(data = full_med_mat_sub2_au, n_nodes = 88, n_covariates = 3,
-                      family = "gaussian")
+MRF_sub2_au <- MRFcov(data = full_med_mat_sub2_au, n_nodes = grep("tmean", colnames(full_med_mat_sub2_au)) - 1,
+                      n_covariates = 3, family = "gaussian")
 MRF_PA_sub2_au <- MRFcov(data = pres_abs_mat_sub2_au, n_nodes = 88, n_covariates = 3,
                          family = "binomial")
-plotMRF_hm(MRF_sub2_au, main =  "Autumn, 88 species")
+plotMRF_hm(MRF_sub2_au,
+           main =  paste("Autumn, ", grep("tmean", colnames(full_med_mat_sub2_au)) - 1, " species"))
 
 # Spring:
 med_mat_sub2_sp <- med_raw %>%
@@ -107,11 +111,12 @@ rownames(full_med_mat_sub2_sp) <- make.unique(full_med_mat_sub2_sp$site, sep = "
 full_med_mat_sub2_sp <-  full_med_mat_sub2_sp %>% select(-c("site", "lon", "lat"))
 pres_abs_mat_sub2_sp <- full_med_mat_sub2_sp
 pres_abs_mat_sub2_sp[1:75] <- ifelse(pres_abs_mat_sub2_sp[1:75] > 0, 1, 0)
-MRF_sub2_sp <- MRFcov(data = full_med_mat_sub2_sp, n_nodes = 75, n_covariates = 3,
-                      family = "gaussian")
+MRF_sub2_sp <- MRFcov(data = full_med_mat_sub2_sp, n_nodes = grep("tmean", colnames(full_med_mat_sub2_sp)) - 1,
+                      n_covariates = 3, family = "gaussian")
 # MRF_PA_sub2_sp <- MRFcov(data = pres_abs_mat_sub2_sp, n_nodes = 75, n_covariates = 3, family = "binomial")
 
-plotMRF_hm(MRF_sub2_sp, main =  "Spring, 75 species")
+plotMRF_hm(MRF_sub2_sp,
+           main =  paste("Spring, ", grep("tmean", colnames(full_med_mat_sub2_sp)) - 1, " species"))
 
 #################################################################
 
@@ -137,9 +142,11 @@ full_med_mat_sub3 <-  full_med_mat_sub3 %>% select(-c("site", "lon", "lat"))
 # View(pres_abs_mat_sub3)
 
 # Run model
-MRF_sub3 <- MRFcov(data = full_med_mat_sub3, n_nodes = 97, n_covariates = 3, family = "gaussian")
+MRF_sub3 <- MRFcov(data = full_med_mat_sub3, n_nodes = grep("tmean", colnames(full_med_mat_sub3)) - 1,
+                   n_covariates = 3, family = "gaussian")
 # MRF_PA_sub3 <- MRFcov(data = pres_abs_mat_sub3, n_nodes = 97, n_covariates = 3, family = "binomial")
-plotMRF_hm(MRF_sub3, main = "Belmaker only, 97 species")
+plotMRF_hm(MRF_sub3,
+           main = paste("Belmaker only, ", grep("tmean", colnames(full_med_mat_sub3)) - 1, " species"))
 
 ##########################################################
 ## Considering temperature only as covariate:
@@ -167,6 +174,8 @@ full_med_mat_sub4 <-  full_med_mat_sub4 %>% select(-c("site", "lon", "lat"))
 # pres_abs_mat_sub4[1:54] <- ifelse(pres_abs_mat_sub4[1:54] > 0, 1, 0)
 # View(pres_abs_mat_sub4)
 
-MRF_sub4 <- MRFcov(data = full_med_mat_sub4, n_nodes = 54, n_covariates = 1, family = "gaussian")
+MRF_sub4 <- MRFcov(data = full_med_mat_sub4, n_nodes = grep("tmean", colnames(full_med_mat_sub4)) - 1,
+                   n_covariates = 1, family = "gaussian")
 # MRF_PA_sub4 <- MRFcov(data = pres_abs_mat_sub4, n_nodes = 54, n_covariates = 1, family = "binomial")
-plotMRF_hm(MRF_sub4, main = "Temperature only, sum of sp.n > 10; 54 species")
+plotMRF_hm(MRF_sub4,
+           main = paste("Temperature only, sum of sp.n > 10; ", grep("tmean", colnames(full_med_mat_sub4)) - 1, " species"))
