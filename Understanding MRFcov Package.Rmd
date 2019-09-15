@@ -1,0 +1,95 @@
+---
+title: "MRFcov trials"
+output: html_notebook
+---
+
+# Trials for MRF package with supplied data to decipher the syntax and data structure required!
+
+```{r load packages, message=FALSE, include=FALSE}
+library(MRFcov)
+library(igraph)
+library(tidyverse)
+
+```
+
+Data has to have the following structure:
+
+* rownames = sites
+* colnames = species
+
+## `MRFcov()` Markov Random Fields with covariates
+This function is the workhorse of the MRFcov package, running separate penalized regressions for
+each node to estimate parameters of Markov Random Fields (MRF) graphs. Covariates can be included
+(a class of models known as Conditional Random Fields; CRF), to estimate how interactions
+between nodes vary across covariate magnitudes.
+
+```{r MRFcov}
+birds_binary <- Bird.parasites[1:4] # data has to include only binary data to run with "binomial" family
+sym_mean <- MRFcov(data = Bird.parasites, n_nodes = 4, family = "binomial") # symmetrise = mean
+sym_min <- MRFcov(data = Bird.parasites, n_nodes = 4, family = "binomial", symmetrise = "min") # symmetrise = mean
+sym_max <- MRFcov(data = Bird.parasites, n_nodes = 4, family = "binomial", symmetrise = "max") # symmetrise = mean
+
+```
+
+`symmetrise`: The method to use for symmetrising corresponding parameter estimates (which are taken from separate regressions). Options are min (take the coefficient with the smallest absolute value), max (take the coefficient with the largest absolute value) or mean (take the mean of the two coefficients). Default is mean.
+
+## `plotMRF_hm` Plot MRF interaction parameters as a heatmap
+This function uses outputs from fitted MRFcov and bootstrap_MRF models to plot a heatmap of node interaction coefficients.
+
+```{r Create co-occurrence matrices to compare symmetrise}
+plotMRF_hm(sym_mean)
+plotMRF_hm(sym_min)
+plotMRF_hm(sym_max)
+
+```
+Cool! Next stage will be to understand the different meanings of these methods :)
+
+## `prep_MRF_covariates` Cross-multiply response and covariate variables
+This function performs the cross-multiplication necessary for prepping datasets to be used in MRFcov models. This function is called by several of the functions within the package.
+
+Now I have the co-occurence probabilities (I'll use the one based on mean symmetrise value), I'd like to add a covariate (relative abundance of host species):
+```{r Add a covariate}
+birds_cov <- prep_MRF_covariates(data = Bird.parasites, n_nodes = 4) # I use the full dataframe where the left-most columns are species and then afer them: covariates
+
+# now add this to MRFcov:
+mrf_birds_cov <- MRFcov(data = Bird.parasites, n_nodes = 4, prep_covariates = TRUE, family = "binomial")
+plotMRF_hm(mrf_birds_cov)
+
+```
+
+Incorporating a covariate yields the same looking grpah but I'm not sure which abundance this graph is relevant for..
+
+## `predict_MRF` Predict training observations from fitted MRFcov models
+This function calculates linear predictors for node observations using coefficients from an MRFcov or MRFcov_spatial object.
+
+```{r Predict MRFs: calculate linear predictors for species}
+bird_predictors <- predict_MRF(data = Bird.parasites, MRF_mod = sym_mean, prep_covariates = TRUE)
+
+```
+
+# `predict_MRFnetworks` Extract predicted network metrics for observations in a given dataset using equations from a fitted MRFcov object
+This function uses outputs from fitted MRFcov and bootstrap_MRF models to generate linear predictions for each observation in data and calculate probabilistic network metrics from weighted adjacency matrices.
+
+`bootstrap_MRF` Bootstrap observations to estimate MRF parameter coefficients
+This function runs MRFcov models multiple times to capture uncertainty in parameter esimates. The dataset is shuffled and missing values (if found) are imputed in each bootstrap iteration.
+
+```{r Networks prediction}
+boot <- bootstrap_MRF(data = Bird.parasites, n_nodes = 4, n_covariates = 1, family = "binomial")
+
+network <- predict_MRFnetworks(data = Bird.parasites, MRF_mod = mrf_birds_cov, cached_predictions = bird_predictors, prep_covariates = TRUE)
+
+```
+
+So looks like network will now work with igraph package to create a graphical representation of the data.
+
+```{r Graphics for network}
+network <- graph.adjacency(mrf_birds_cov$graph, weighted = T, mode = "undirected") # inside the MRFcov new variable there is a graph element which I'll need to use for igraph
+plot.igraph(network, layout = layout.circle(network),
+            edge.width = abs(E(network)$weight),
+            edge.color = ifelse(E(network)$weight < 0, 
+                                          'blue',
+                                          'red'))
+
+```
+
+Again, I don't know what's the covariate condition in this graph (what's the host relative abundance in this case)
