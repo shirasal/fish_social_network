@@ -1,9 +1,11 @@
 # Required packcages:
+library(igraph)
 library(tidyverse)
 library(MRFcov)
 
 med_raw <- read_csv("med_raw.csv")
 med_raw$depth <- as.numeric(med_raw$depth) # fix class issue (instead of logic, as is has been parsed)
+
 ## Create metadata tibbles:
 ## 1. Temperature:
 med_temp_mean <- med_raw %>% 
@@ -25,8 +27,9 @@ med_meta_env <- left_join(x = med_temp_mean, y = med_sal_mean, by = c("site", "l
 
 ## sub1 = species matrix where the count of fish > 10
 med_mat_sub1 <- med_raw %>%
+  filter(sp.n > 0) %>% # remove mistakes where species count is 0
   group_by(site, lon, lat, species) %>%
-  filter(sp.n > 10) %>% 
+  filter(sp.n > 10 & sp.n < 100) %>% 
   summarise(n = sum(sp.n)) %>% 
   spread(species, n, fill = 0)
 head(med_mat_sub1)
@@ -47,7 +50,7 @@ full_med_mat_sub1 <-  full_med_mat_sub1 %>% select(-c("site", "lon", "lat"))
 
 # Convert the abundance matrix to presence-absence matrix
 pres_abs_mat_sub1 <- full_med_mat_sub1
-pres_abs_mat_sub1[1:54] <- ifelse(pres_abs_mat_sub1[1:54] > 0, 1, 0)
+pres_abs_mat_sub1[1:49] <- ifelse(pres_abs_mat_sub1[1:49] > 0, 1, 0)
 # View(pres_abs_mat_sub1)
 
 MRF_sub1 <- MRFcov(data = full_med_mat_sub1, n_nodes = grep("tmean", colnames(full_med_mat_sub1)) - 1,
@@ -179,3 +182,20 @@ MRF_sub4 <- MRFcov(data = full_med_mat_sub4, n_nodes = grep("tmean", colnames(fu
 # MRF_PA_sub4 <- MRFcov(data = pres_abs_mat_sub4, n_nodes = 54, n_covariates = 1, family = "binomial")
 plotMRF_hm(MRF_sub4,
            main = paste("Temperature only, sum of sp.n > 10; ", grep("tmean", colnames(full_med_mat_sub4)) - 1, " species"))
+
+#################################################################
+######## MRFs with covariates (CRFs) using sub1 matrices ########
+#################################################################
+
+full_med_mat_sub1 # abundances
+pres_abs_mat_sub1 # presence absence
+MRF_sub1 <- MRFcov(data = full_med_mat_sub1, n_nodes = grep("tmean", colnames(full_med_mat_sub1)) - 1,
+                   n_covariates = 3, family = "gaussian")
+sub1_cov <- prep_MRF_covariates(data = full_med_mat_sub1, n_nodes = 49)
+sub1_MRF_cov <- MRFcov(data = full_med_mat_sub1, n_nodes = 49, prep_covariates = TRUE, family = "gaussian")
+plotMRF_hm(sub1_MRF_cov)
+# Calculate linear predictors for species:
+fish_predictors <- predict_MRF(data = full_med_mat_sub1, MRF_mod = MRF_sub1, prep_covariates = TRUE)
+boot <- bootstrap_MRF(data = full_med_mat_sub1, n_nodes = 49, n_covariates = 3, family = "gaussian")
+network <- predict_MRFnetworks(data = full_med_mat_sub1, MRF_mod = sub1_MRF_cov,
+                               cached_predictions = fish_predictors, prep_covariates = TRUE)
