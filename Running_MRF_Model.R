@@ -199,3 +199,10 @@ fish_predictors <- predict_MRF(data = full_med_mat_sub1, MRF_mod = MRF_sub1, pre
 boot <- bootstrap_MRF(data = full_med_mat_sub1, n_nodes = 49, n_covariates = 3, family = "gaussian")
 network <- predict_MRFnetworks(data = full_med_mat_sub1, MRF_mod = sub1_MRF_cov,
                                cached_predictions = fish_predictors, prep_covariates = TRUE)
+# Graphic networks
+graph_network <- graph.adjacency(sub1_MRF_cov$graph, weighted = T, mode = "undirected")
+plot.igraph(graph_network, layout = layout.circle(graph_network),
+            edge.width = abs(E(graph_network)$weight),
+            edge.color = ifelse(E(graph_network)$weight < 0, 
+                                'blue',
+                                'red'))
