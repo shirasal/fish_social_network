@@ -202,7 +202,13 @@ network <- predict_MRFnetworks(data = full_med_mat_sub1, MRF_mod = sub1_MRF_cov,
 # Graphic networks
 graph_network <- graph.adjacency(sub1_MRF_cov$graph, weighted = T, mode = "undirected")
 deg <- degree(graph_network, mode = "all")
+windowsFonts(Berlin = windowsFont("Berlin Sans FB"))
 plot.igraph(graph_network, layout = layout.circle(graph_network),
             edge.width = abs(E(graph_network)$weight),
-            edge.color = ifelse(E(graph_network)$weight < 0, 'blue', 'red'),
-            vertex.size = deg)
+            edge.color = ifelse(E(graph_network)$weight < 0, '#3399CC', '#FF3333'),
+            vertex.size = deg,
+            vertex.label.family = "Berlin",
+            vertex.label.font	= 3,
+            vertex.label.cex = 0.8,
+            vertex.label.color = adjustcolor("#333333", .6),
+            vertex.color = adjustcolor("#FFFFFF", .5))
