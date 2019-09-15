@@ -29,7 +29,7 @@ med_meta_env <- left_join(x = med_temp_mean, y = med_sal_mean, by = c("site", "l
 med_mat_sub1 <- med_raw %>%
   filter(sp.n > 0) %>% # remove mistakes where species count is 0
   group_by(site, lon, lat, species) %>%
-  filter(sp.n > 10 & sp.n < 100) %>% 
+  filter(sp.n > 10) %>% 
   summarise(n = sum(sp.n)) %>% 
   spread(species, n, fill = 0)
 head(med_mat_sub1)
