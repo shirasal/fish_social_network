@@ -29,6 +29,8 @@ write_csv(check_zeros, "Issues/zeros.csv")
 read_csv("Issues/zeros.csv")
 # TODO find out why there are 0s
 
+species_list <- raw_med %>% select(species) %>% distinct(.)
+
 ##### ========= CREATE SPECIES MATRIX ========= #####
 # Create a tibble of metadata
 med_meta <- raw_med %>% 
