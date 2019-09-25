@@ -26,83 +26,89 @@ med_meta_env <- left_join(x = med_temp_mean, y = med_sal_mean, by = c("site", "l
 ##### ==== CREATE SPECIES MATRIX from SUBSETTED DATA ==== #####
 
 ## herb: species matrix for herbivore fish species and similar
-med_mat_sub1 <- med_raw %>%
+herb <- med_raw %>%
   filter(data.origin != "azz_asi") %>% # azz_asi is only presence-absence
   group_by(site, lon, lat, species) %>%
   summarise(n = sum(sp.n)) %>% 
   spread(species, n, fill = 0) %>% 
   select(site, lon, lat, Sarpa.salpa, Siganus.luridus, Siganus.rivulatus, Diplodus.sargus, Thalassoma.pavo)
-head(med_mat_sub1)
+head(herb)
 
 ## Add environmental (meta) data
-full_med_mat_sub1 <- left_join(med_mat_sub1, med_meta_env, by = c("site", "lon", "lat"))
-# View(full_med_mat_sub1)
+full_herb <- left_join(herb, med_meta_env, by = c("site", "lon", "lat"))
+head(full_herb)
 
 # Preps for MRFcov analysis: 1. remove NAs
-full_med_mat_sub1 <- na.omit(full_med_mat_sub1)
-# unique(is.na(full_med_mat_sub1)) # check there are no NAs
+full_herb <- na.omit(full_herb)
+unique(is.na(full_herb)) # check there are no NAs
 
 # Preps for MRFcov analysis: 2. Sites to rownames
-full_med_mat_sub1 <- as.data.frame(full_med_mat_sub1) # required for changing row names
-rownames(full_med_mat_sub1) <- make.unique(full_med_mat_sub1$site, sep = "_")
-full_med_mat_sub1 <-  full_med_mat_sub1 %>% select(-c("site", "lon", "lat"))
-# View(full_med_mat_sub1)
+full_herb <- as.data.frame(full_herb) # required for changing row names
+rownames(full_herb) <- make.unique(full_herb$site, sep = "_")
+full_herb <-  full_herb %>% select(-c("site", "lon", "lat"))
+View(full_herb)
 
 # # Convert the abundance matrix to presence-absence matrix
-# pres_abs_mat_sub1 <- full_med_mat_sub1
-# pres_abs_mat_sub1[1:4] <- ifelse(pres_abs_mat_sub1[1:4] > 0, 1, 0)
-# # View(pres_abs_mat_sub1)
+# pres_abs_herb <- full_herb
+# pres_abs_herb[1:4] <- ifelse(pres_abs_herb[1:4] > 0, 1, 0)
+# # View(pres_abs_herb)
 
-MRF_sub1 <- MRFcov(data = full_med_mat_sub1, n_nodes = grep("tmean", colnames(full_med_mat_sub1)) - 1,
+MRF_herb <- MRFcov(data = full_herb, n_nodes = grep("tmean", colnames(full_herb)) - 1,
                    n_covariates = 3, family = "gaussian")
-# MRF_PA_sub1 <- MRFcov(data = pres_abs_mat_sub1, n_nodes = 4, n_covariates = 3, family = "binomial")
-plotMRF_hm(MRF_sub1,
-           main =  paste("Co-occurrence matrix of herbivores", grep("tmean", colnames(full_med_mat_sub1)) - 1, " species"))
-
-network_1 <- predict_MRFnetworks(data = full_med_mat_sub1, MRF_mod = MRF_sub1,
+# MRF_PA_herb <- MRFcov(data = pres_abs_herb, n_nodes = 4, n_covariates = 3, family = "binomial")
+# png(filename = "co-occurrence/herbivores_mrf.png")
+plotMRF_hm(MRF_herb,
+           main =  paste("Co-occurrence matrix of herbivore species and alike"))
+# dev.off()
+network_1 <- predict_MRFnetworks(data = full_herb, MRF_mod = MRF_herb,
                                cached_predictions = fish_predictors, prep_covariates = FALSE)
 
 # Graphic networks
-graph_network_1 <- graph.adjacency(MRF_sub1$graph, weighted = T, mode = "undirected")
-deg <- degree(graph_network, mode = "all")
-windowsFonts(Berlin = windowsFont("Berlin Sans FB"))
+graph_network_1 <- graph.adjacency(MRF_herb$graph, weighted = T, mode = "undirected")
+deg <- degree(graph_network_1, mode = "all")
+
+# png("networks/herbivores_mrf.png")
 plot.igraph(graph_network_1, layout = layout.circle(graph_network_1),
             edge.width = abs(E(graph_network_1)$weight),
             edge.color = ifelse(E(graph_network_1)$weight < 0, '#3399CC', '#FF3333'),
             vertex.size = deg,
-            vertex.label.family = "Berlin",
+            vertex.label.family = "sans",
             vertex.label.font	= 3,
-            vertex.label.cex = 0.8,
-            vertex.label.color = adjustcolor("#333333", .6),
+            vertex.label.cex = 2,
+            vertex.label.color = adjustcolor("#333333", 0.85),
             vertex.color = adjustcolor("#FFFFFF", .5))
+# dev.off()
+
 #################################################################
-######## MRFs with covariates (CRFs) using sub1 matrices ########
+######## MRFs with covariates (CRFs) using herb matrices ########
 #################################################################
 
-full_med_mat_sub1 # abundances
-pres_abs_mat_sub1 # presence absence
-MRF_sub1 <- MRFcov(data = full_med_mat_sub1, n_nodes = grep("tmean", colnames(full_med_mat_sub1)) - 1,
+# full_herb # abundances
+# pres_abs_herb # presence absence
+MRF_herb_cov <- MRFcov(data = full_herb, n_nodes = grep("tmean", colnames(full_herb)) - 1,
                    n_covariates = 3, family = "gaussian")
-sub1_cov <- prep_MRF_covariates(data = full_med_mat_sub1, n_nodes = 5)
-sub1_MRF_cov <- MRFcov(data = full_med_mat_sub1, n_nodes = 5, prep_covariates = TRUE, family = "gaussian")
-plotMRF_hm(sub1_MRF_cov)
+herb_cov <- prep_MRF_covariates(data = full_herb, n_nodes = 5)
+herb_MRF_cov <- MRFcov(data = full_herb, n_nodes = 5, prep_covariates = TRUE, family = "gaussian")
+# png(filename = "co-occurrence/herbivores_crf.png")
+plotMRF_hm(herb_MRF_cov)
+# dev.off()
 # Calculate linear predictors for species:
-fish_predictors <- predict_MRF(data = full_med_mat_sub1, MRF_mod = MRF_sub1, prep_covariates = TRUE)
-boot <- bootstrap_MRF(data = full_med_mat_sub1, n_nodes = 5, n_covariates = 3, family = "gaussian")
-network_2 <- predict_MRFnetworks(data = full_med_mat_sub1, MRF_mod = sub1_MRF_cov,
+fish_predictors <- predict_MRF(data = full_herb, MRF_mod = MRF_herb, prep_covariates = TRUE)
+boot <- bootstrap_MRF(data = full_herb, n_nodes = 5, n_covariates = 3, family = "gaussian")
+network_2 <- predict_MRFnetworks(data = full_herb, MRF_mod = herb_MRF_cov,
                                cached_predictions = fish_predictors, prep_covariates = TRUE)
 # Graphic networks
-graph_network_2 <- graph.adjacency(sub1_MRF_cov$graph, weighted = T, mode = "undirected")
+graph_network_2 <- graph.adjacency(herb_MRF_cov$graph, weighted = T, mode = "undirected")
 deg <- degree(graph_network_2, mode = "all")
-windowsFonts(Berlin = windowsFont("Berlin Sans FB"))
+png("networks/herbivores_crf.png")
 plot.igraph(graph_network_2, layout = layout.circle(graph_network_2),
             edge.width = abs(E(graph_network_2)$weight),
             edge.color = ifelse(E(graph_network_2)$weight < 0, '#3399CC', '#FF3333'),
             vertex.size = deg,
-            vertex.label.family = "Berlin",
+            vertex.label.family = "sans",
             vertex.label.font	= 3,
-            vertex.label.cex = 0.8,
-            vertex.label.color = adjustcolor("#333333", .6),
+            vertex.label.cex = 2,
+            vertex.label.color = adjustcolor("#333333", .85),
             vertex.color = adjustcolor("#FFFFFF", .5))
-
+dev.off()
 ############# SUMMARY so far: The covariates changed the relationship! Hurray! ##########
