@@ -4,7 +4,7 @@ library(tidyverse)
 library(MRFcov)
 
 med_raw <- read_csv("med_raw.csv")
-med_raw$depth <- as.numeric(med_raw$depth) # fix class issue (instead of logic, as is has been parsed)
+str(med_raw)
 
 ## Create metadata tibbles:
 ## 1. Temperature:
@@ -92,6 +92,7 @@ herb_MRF_cov <- MRFcov(data = full_herb, n_nodes = 5, prep_covariates = TRUE, fa
 # png(filename = "co-occurrence/herbivores_crf.png")
 plotMRF_hm(herb_MRF_cov)
 # dev.off()
+
 # Calculate linear predictors for species:
 fish_predictors <- predict_MRF(data = full_herb, MRF_mod = MRF_herb, prep_covariates = TRUE)
 boot <- bootstrap_MRF(data = full_herb, n_nodes = 5, n_covariates = 3, family = "gaussian")
@@ -100,7 +101,7 @@ network_2 <- predict_MRFnetworks(data = full_herb, MRF_mod = herb_MRF_cov,
 # Graphic networks
 graph_network_2 <- graph.adjacency(herb_MRF_cov$graph, weighted = T, mode = "undirected")
 deg <- degree(graph_network_2, mode = "all")
-png("networks/herbivores_crf.png")
+# png("networks/herbivores_crf.png")
 plot.igraph(graph_network_2, layout = layout.circle(graph_network_2),
             edge.width = abs(E(graph_network_2)$weight),
             edge.color = ifelse(E(graph_network_2)$weight < 0, '#3399CC', '#FF3333'),
@@ -110,5 +111,103 @@ plot.igraph(graph_network_2, layout = layout.circle(graph_network_2),
             vertex.label.cex = 2,
             vertex.label.color = adjustcolor("#333333", .85),
             vertex.color = adjustcolor("#FFFFFF", .5))
-dev.off()
+# dev.off()
 ############# SUMMARY so far: The covariates changed the relationship! Hurray! ##########
+
+#########################################################################################
+#########################################################################################
+
+# 01/10/2019
+
+# Create known networks with only temperature
+
+# Metadata tibble - mean annual temperature
+med_temp <- med_raw %>% 
+  distinct(site, lon, lat, tmean)
+
+# Subset data (1) Herbivores
+herb <- med_raw %>%
+  filter(data.origin != "azz_asi") %>% # azz_asi is only presence-absence
+  group_by(site, lon, lat, species) %>%
+  summarise(n = mean(sp.n)) %>% # mean abundance within transects in the same location
+  spread(species, n, fill = 0) %>% 
+  select(site, lon, lat, Sarpa.salpa, Siganus.luridus, Siganus.rivulatus, Diplodus.sargus, Thalassoma.pavo)
+head(herb)
+
+# Add environmental (meta) data
+herb_env <- left_join(herb, med_temp, by = c("site", "lon", "lat"))
+head(herb_env)
+
+# Preps for MRFcov analysis
+# (1) Remove NAs:
+herb_env <- na.omit(herb_env)
+unique(is.na(herb_env)) # check that there are no NAs
+# (2) Sites to rownames
+herb_env <- as.data.frame(herb_env) # required for changing row names
+rownames(herb_env) <- make.unique(herb_env$site, sep = "_") # create unique row names
+herb_env <-  herb_env %>% select(-c("site", "lon", "lat"))
+View(herb_env)
+
+# Run MRF:
+MRF_herb <- MRFcov(data = herb_env, n_nodes = grep("tmean", colnames(herb_env)) - 1, family = "gaussian")
+
+# Plot co-occurrence calculated from MRF
+# png(filename = "co-occurrence/herbivores_mrf_temp_only.png")
+plotMRF_hm(MRF_herb,
+           main = "Co-occurrence matrix of herbivore species")
+# dev.off()
+# file.show("co-occurrence/herbivores_mrf_temp_only.png")
+
+herb_cov <- prep_MRF_covariates(data = herb_env, n_nodes = 5) 
+MRF_mrf_temp_network <- predict_MRFnetworks(data = herb_env, MRF_mod = MRF_herb)
+
+# Graphic networks
+herb_temp_graph <- graph.adjacency(MRF_herb$graph, weighted = T, mode = "undirected") # MRF_herb$graph = association matrix between species
+deg <- degree(herb_temp_graph, mode = "all") # analising a property of the graph: the number of the graph's edges (species)
+
+# png("networks/herbivores_mrf_temp.png")
+plot.igraph(herb_temp_graph, layout = layout.circle(herb_temp_graph),
+            edge.width = abs(E(herb_temp_graph)$weight),
+            edge.color = ifelse(E(herb_temp_graph)$weight < 0, '#3399CC', '#FF3333'),
+            vertex.size = deg,
+            vertex.label.family = "sans",
+            vertex.label.font	= 3,
+            vertex.label.cex = 2,
+            vertex.label.color = adjustcolor("#333333", 0.85),
+            vertex.color = adjustcolor("#FFFFFF", .5))
+# dev.off()
+# file.show("networks/herbivores_mrf_temp.png")
+
+# ---- interim summary of variables ---- #
+# MRF_herb = MRF co-occurrence model
+# herb_env = Full species matrix with covariate; 5 species; 1 covariate
+# herb_cov = ?
+
+# Run CRFs (with temperature as covariate)
+CRF_herb <- MRFcov(data = herb_env, n_nodes = 5, prep_covariates = TRUE, n_covariates = 1,
+                   family = "gaussian", bootstrap = FALSE)
+# png(filename = "co-occurrence/herbivores_crf_temp.png")
+plotMRF_hm(CRF_herb, main = "Co-occurrence matrix for herbivores with temperature as covariate")
+# dev.off()
+file.show("co-occurrence/herbivores_crf_temp.png")
+
+# Calculate linear predictors for species:
+fish_predictors <- predict_MRF(data = herb_env, MRF_mod = CRF_herb, prep_covariates = TRUE)
+CRF_herb_temp_net <- predict_MRFnetworks(data = herb_env, MRF_mod = CRF_herb,
+                                 cached_predictions = fish_predictors, prep_covariates = TRUE)
+
+# Graphic networks
+CRF_herb_temp_graph <- graph.adjacency(CRF_herb$graph, weighted = T, mode = "undirected")
+deg <- degree(CRF_herb_temp_graph, mode = "all")
+# png("networks/herbivores_crf_temp.png")
+plot.igraph(CRF_herb_temp_graph, layout = layout.circle(CRF_herb_temp_graph),
+            edge.width = abs(E(CRF_herb_temp_graph)$weight),
+            edge.color = ifelse(E(CRF_herb_temp_graph)$weight < 0, '#3399CC', '#FF3333'),
+            vertex.size = deg,
+            vertex.label.family = "sans",
+            vertex.label.font	= 3,
+            vertex.label.cex = 2,
+            vertex.label.color = adjustcolor("#333333", .85),
+            vertex.color = adjustcolor("#FFFFFF", .5))
+# dev.off()
+file.show("co-occurrence/herbivores_crf_temp.png")
