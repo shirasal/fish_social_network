@@ -6,6 +6,7 @@ library(MRFcov)
 med_raw <- read_csv("med_raw.csv")
 str(med_raw)
 
+
 ## Create metadata tibbles:
 ## 1. Temperature:
 med_temp_mean <- med_raw %>% 
@@ -23,19 +24,17 @@ med_pp_mean <- med_raw %>%
 med_meta_env <- left_join(x = med_temp_mean, y = med_sal_mean, by = c("site", "lon", "lat")) %>% 
   left_join(., med_pp_mean, by = c("site", "lon", "lat"))
 
-##### ==== CREATE SPECIES MATRIX from SUBSETTED DATA ==== #####
-
-## herb: species matrix for herbivore fish species and similar
-herb <- med_raw %>%
+## lrg: species matrix for herbivore fish species and similar
+lrg <- med_raw %>%
   filter(data.origin != "azz_asi") %>% # azz_asi is only presence-absence
   group_by(site, lon, lat, species) %>%
   summarise(n = sum(sp.n)) %>% 
   spread(species, n, fill = 0) %>% 
   select(site, lon, lat, Sarpa.salpa, Siganus.luridus, Siganus.rivulatus, Diplodus.sargus, Thalassoma.pavo)
-head(herb)
+head(lrg)
 
 ## Add environmental (meta) data
-full_herb <- left_join(herb, med_meta_env, by = c("site", "lon", "lat"))
+full_herb <- left_join(lrg, med_meta_env, by = c("site", "lon", "lat"))
 head(full_herb)
 
 # Preps for MRFcov analysis: 1. remove NAs
@@ -79,9 +78,7 @@ plot.igraph(graph_network_1, layout = layout.circle(graph_network_1),
             vertex.color = adjustcolor("#FFFFFF", .5))
 # dev.off()
 
-#################################################################
-######## MRFs with covariates (CRFs) using herb matrices ########
-#################################################################
+# MRFs with covariates (CRFs) using lrg matrices
 
 # full_herb # abundances
 # pres_abs_herb # presence absence
@@ -112,7 +109,7 @@ plot.igraph(graph_network_2, layout = layout.circle(graph_network_2),
             vertex.label.color = adjustcolor("#333333", .85),
             vertex.color = adjustcolor("#FFFFFF", .5))
 # dev.off()
-############# SUMMARY so far: The covariates changed the relationship! Hurray! ##########
+# The covariates changed the relationship! Hurray! #
 
 #########################################################################################
 #########################################################################################
@@ -125,7 +122,7 @@ plot.igraph(graph_network_2, layout = layout.circle(graph_network_2),
 med_temp <- med_raw %>% 
   distinct(site, lon, lat, tmean)
 
-# Subset data (1) Herbivores
+##### Subset data (1) Herbivores #####
 herb <- med_raw %>%
   filter(data.origin != "azz_asi") %>% # azz_asi is only presence-absence
   group_by(site, lon, lat, species) %>%
@@ -159,7 +156,7 @@ plotMRF_hm(MRF_herb,
 # file.show("co-occurrence/herbivores_mrf_temp_only.png")
 
 herb_cov <- prep_MRF_covariates(data = herb_env, n_nodes = 5) 
-MRF_mrf_temp_network <- predict_MRFnetworks(data = herb_env, MRF_mod = MRF_herb)
+MRF_temp_network <- predict_MRFnetworks(data = herb_env, MRF_mod = MRF_herb)
 
 # Graphic networks
 herb_temp_graph <- graph.adjacency(MRF_herb$graph, weighted = T, mode = "undirected") # MRF_herb$graph = association matrix between species
@@ -211,3 +208,106 @@ plot.igraph(CRF_herb_temp_graph, layout = layout.circle(CRF_herb_temp_graph),
             vertex.color = adjustcolor("#FFFFFF", .5))
 # dev.off()
 file.show("co-occurrence/herbivores_crf_temp.png")
+
+# ---- summary of variables ---- #
+# med_raw = raw mediterranean UVC data (post-cleaning)
+# MRF_herb = MRF co-occurrence model
+# herb_env = Full species matrix with covariate; 5 species; 1 covariate
+# herb_cov = ? Calculated tmean for each species..?
+# MRF_temp_network = Network of herbivore species from MRF (no cov.)
+# herb_temp_graph = Visualisation of MRF_temp_network
+# CRF_herb = CRF co-occurrence model
+# fish_predictors = ? Used for CRF network
+# CRF_herb_temp_net = Network of herbivore species from CRF (with temp. as cov.)
+# CRF_herb_temp_graph = Visualisation of CRF_herb_temp_net
+
+##### Subset data (2) Large predatory fish #####
+all_traits <- read_csv("species_traits.csv")
+large_predators <- all_traits %>% 
+  filter(size_class_1 > "S5") %>% # large species
+  filter(troph > 4) %>% # high trophic level
+  select(species) %>% 
+  distinct()
+
+lrg <- med_raw %>%
+  filter(data.origin != "azz_asi") %>% # azz_asi is only presence-absence
+  group_by(site, lon, lat, species) %>%
+  summarise(n = sum(sp.n)) %>% # total abundance within transects in the same location
+  spread(species, n, fill = 0) %>% 
+  select(site, lon, lat, large_predators$species)
+head(lrg)
+
+# Add environmental (meta) data
+lrg_env <- left_join(lrg, med_temp, by = c("site", "lon", "lat"))
+head(lrg_env)
+
+# Preps for MRFcov analysis
+# (1) Remove NAs:
+lrg_env <- na.omit(lrg_env)
+unique(is.na(lrg_env)) # check that there are no NAs
+# (2) Sites to rownames
+lrg_env <- as.data.frame(lrg_env) # required for changing row names
+rownames(lrg_env) <- make.unique(lrg_env$site, sep = "_") # create unique row names
+lrg_env <-  lrg_env %>% select(-c("site", "lon", "lat"))
+View(lrg_env)
+
+# Run MRF:
+MRF_lrg <- MRFcov(data = lrg_env, n_nodes = grep("tmean", colnames(lrg_env)) - 1, family = "gaussian")
+
+# Plot co-occurrence calculated from MRF
+# png(filename = "co-occurrence/large_mrf.png")
+plotMRF_hm(MRF_lrg,
+           main = "Co-occurrence matrix of large predators")
+# dev.off()
+file.show("co-occurrence/large_mrf.png")
+
+# Calculate network
+lrg_network <- predict_MRFnetworks(data = lrg_env, MRF_mod = MRF_lrg)
+
+# Graphic networks
+lrg_graph <- graph.adjacency(MRF_lrg$graph, weighted = T, mode = "undirected") # MRF_lrg$graph = association matrix between species
+deg <- degree(lrg_graph, mode = "all") # analising a property of the graph: the number of the graph's edges (species)
+
+# png("networks/large_mrf.png")
+plot.igraph(lrg_graph, layout = layout.circle(lrg_graph),
+            edge.width = abs(E(lrg_graph)$weight),
+            edge.color = ifelse(E(lrg_graph)$weight < 0, '#3399CC', '#FF3333'),
+            vertex.size = deg,
+            vertex.label.family = "sans",
+            vertex.label.font	= 3,
+            vertex.label.cex = 1.5,
+            vertex.label.color = adjustcolor("#333333", 0.85),
+            vertex.color = adjustcolor("#FFFFFF", .5))
+# dev.off()
+file.show("networks/large_mrf.png")
+
+# Run CRFs (with temperature as covariate)
+CRF_lrg <- MRFcov(data = lrg_env, n_nodes = grep("tmean", colnames(lrg_env)) - 1,
+                  prep_covariates = TRUE, n_covariates = 1, family = "gaussian", bootstrap = FALSE)
+
+# png(filename = "co-occurrence/large_crf.png")
+plotMRF_hm(CRF_lrg, main = "Co-occurrence matrix for large predators with temperature as covariate")
+# dev.off()
+file.show("co-occurrence/large_crf.png")
+
+# Calculate linear predictors for species:
+lrg_cov <- prep_MRF_covariates(data = lrg_env, n_nodes = grep("tmean", colnames(lrg_env)) - 1) 
+fish_predictors_lrg <- predict_MRF(data = lrg_env, MRF_mod = CRF_lrg, prep_covariates = TRUE)
+CRF_lrg_temp_net <- predict_MRFnetworks(data = lrg_env, MRF_mod = CRF_lrg,
+                                         cached_predictions = fish_predictors_lrg, prep_covariates = TRUE)
+
+# Graphic networks
+CRF_lrg_graph <- graph.adjacency(CRF_lrg$graph, weighted = T, mode = "undirected")
+deg <- degree(CRF_lrg_graph, mode = "all")
+# png("networks/large_crf_net.png")
+plot.igraph(CRF_lrg_graph, layout = layout.circle(CRF_lrg_graph),
+            edge.width = abs(E(CRF_lrg_graph)$weight),
+            edge.color = ifelse(E(CRF_lrg_graph)$weight < 0, '#3399CC', '#FF3333'),
+            vertex.size = deg,
+            vertex.label.family = "sans",
+            vertex.label.font	= 3,
+            vertex.label.cex = 1.5,
+            vertex.label.color = adjustcolor("#333333", .85),
+            vertex.color = adjustcolor("#FFFFFF", .5))
+# dev.off()
+file.show("networks/large_crf_net.png")
