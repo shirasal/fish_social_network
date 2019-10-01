@@ -3,43 +3,42 @@ library(tidyverse)
 # Upload file as tibble and check it:
 list.files()
 
-raw_med <- read_csv("med_raw.csv", na = "NA")
-spec(raw_med) # lists all the columns and their types
-raw_med <- raw_med %>% 
+med_raw <- read_csv("med_raw.csv", na = "NA")
+spec(med_raw) # lists all the columns and their types
+med_raw <- med_raw %>% 
   mutate(protection = if_else(protection == "YES", TRUE, FALSE))
 
-check_single_a_boyeri <- raw_med %>% 
+##### ========= CHECK DATA ========= #####
+
+check_single_a_boyeri <- med_raw %>% 
   select(site, species, sp.n) %>% 
   filter(species == "Atherina.boyeri") %>% 
   filter(!(sp.n > 1))
 # ASINARA_add looks like presence-absence data (because of A. boyeri being only 1 in all observations in this site)
 # Also Linosa has some lone Atherines, Kornati has one too and Haboanim has 0 Atherines?
 
-write_csv(check_single_a_boyeri, "Issues/a_boyeri_sing.csv")
-read_csv("Issues/a_boyeri_sing.csv")
+# write_csv(check_single_a_boyeri, "Issues/a_boyeri_sing.csv")
+# read_csv("Issues/a_boyeri_sing.csv")
 # Which other species shpuld be seen with more that one individual?
-# TODO Make a list and repeat above code for each one of the species
 
-check_zeros <- raw_med %>% 
+check_zeros <- med_raw %>% 
   select(site, species, sp.n) %>% 
   filter(sp.n == 0) %>% 
   group_by(site, species) %>% 
   summarise(.)
-write_csv(check_zeros, "Issues/zeros.csv")
-read_csv("Issues/zeros.csv")
-# TODO find out why there are 0s
+# write_csv(check_zeros, "Issues/zeros.csv")
+# read_csv("Issues/zeros.csv")
 
-species_list <- raw_med %>% select(species) %>% distinct(.)
+species_list <- med_raw %>% select(species) %>% distinct(.)
 
 ##### ========= CREATE SPECIES MATRIX ========= #####
 # Create a tibble of metadata
-med_meta <- raw_med %>% 
+med_meta <- med_raw %>% 
   distinct(country, site, lon, lat, season, protection, enforcement, total.mpa.ha, size.notake, 
            yr.creation, age.reserve.yr, tmean, trange, sal_mean, pp_mean, pp_range)
 
 # Create a species matrix with summation of each species in each site (abundance)
-# TODO is this the correct way to do this?
-med_mat <- raw_med %>% 
+med_mat <- med_raw %>% 
   group_by(site, lon, lat, species) %>% # Note it only shows sites and species (with coordinate-locations)
   summarise(n = sum(sp.n)) %>% 
   spread(species, n, fill = 0)
@@ -56,3 +55,11 @@ pres_abs_mat <- full_med_mat
 pres_abs_mat[17:ncol(pres_abs_mat)] <- ifelse(pres_abs_mat[17:ncol(pres_abs_mat)] > 0, 1, 0)
 View(pres_abs_mat)
 write_csv(pres_abs_mat, "presence_absence_med_mat.csv")
+
+##### ========= CREATE SPECIES LIST ========= #####
+spp_list <- med_raw %>% 
+  select(species) %>% 
+  distinct()
+spp_list$sci_name <- gsub(pattern = "\\.",replacement = " ", x = spp_list$species)
+write_csv(spp_list, path = "species_list.csv", col_names = TRUE)
+list.files()
