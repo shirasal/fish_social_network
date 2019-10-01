@@ -6,7 +6,6 @@ library(MRFcov)
 med_raw <- read_csv("med_raw.csv")
 str(med_raw)
 
-
 ## Create metadata tibbles:
 ## 1. Temperature:
 med_temp_mean <- med_raw %>% 
@@ -24,17 +23,17 @@ med_pp_mean <- med_raw %>%
 med_meta_env <- left_join(x = med_temp_mean, y = med_sal_mean, by = c("site", "lon", "lat")) %>% 
   left_join(., med_pp_mean, by = c("site", "lon", "lat"))
 
-## lrg: species matrix for herbivore fish species and similar
-lrg <- med_raw %>%
+## herb: species matrix for herbivore fish species and similar
+herb <- med_raw %>%
   filter(data.origin != "azz_asi") %>% # azz_asi is only presence-absence
   group_by(site, lon, lat, species) %>%
   summarise(n = sum(sp.n)) %>% 
   spread(species, n, fill = 0) %>% 
   select(site, lon, lat, Sarpa.salpa, Siganus.luridus, Siganus.rivulatus, Diplodus.sargus, Thalassoma.pavo)
-head(lrg)
+head(herb)
 
 ## Add environmental (meta) data
-full_herb <- left_join(lrg, med_meta_env, by = c("site", "lon", "lat"))
+full_herb <- left_join(herb, med_meta_env, by = c("site", "lon", "lat"))
 head(full_herb)
 
 # Preps for MRFcov analysis: 1. remove NAs
