@@ -6,6 +6,7 @@ library(tidyverse)
 
 # upload the raw mediterranean data and create a species matrix
 all_traits <- read_csv("species_traits.csv")
+
 traits <- all_traits %>% 
   group_by(species) %>%
   summarise(max_size = max(size_1, size_2), mean_troph = mean(troph)) %>% 
