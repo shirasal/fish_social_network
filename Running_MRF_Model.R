@@ -42,7 +42,7 @@ unique(is.na(full_herb)) # check there are no NAs
 
 # Preps for MRFcov analysis: 2. Sites to rownames
 full_herb <- as.data.frame(full_herb) # required for changing row names
-rownames(full_herb) <- make.unique(full_herb$site, sep = "_")
+rownames(full_herb) <- make.unique(full_herb$site, sep = "_") # TODO don't make unique, make sure all sites/transects are deifned properly
 full_herb <-  full_herb %>% select(-c("site", "lon", "lat"))
 View(full_herb)
 
