@@ -3,7 +3,7 @@ library(igraph)
 library(tidyverse)
 library(MRFcov)
 
-med_raw <- read_csv("med_raw.csv")
+med_raw <- read_csv("data/med_raw.csv")
 str(med_raw)
 
 ## Create metadata tibbles:
