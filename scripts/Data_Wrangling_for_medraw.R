@@ -3,31 +3,27 @@ library(tidyverse)
 # Upload file as tibble and check it:
 list.files()
 
-med_raw <- read_csv("med_raw.csv", na = "NA")
+med_raw <- read_csv("data/med_raw.csv", na = "NA")
 spec(med_raw) # lists all the columns and their types
+# Change 'protection' to logical
 med_raw <- med_raw %>% 
   mutate(protection = if_else(protection == "YES", TRUE, FALSE))
 
 ##### ========= CHECK DATA ========= #####
 
-check_single_a_boyeri <- med_raw %>% 
+# Which sites have counts of 1 of A. boyeri?
+med_raw %>% 
   select(site, species, sp.n) %>% 
   filter(species == "Atherina.boyeri") %>% 
-  filter(!(sp.n > 1))
-# ASINARA_add looks like presence-absence data (because of A. boyeri being only 1 in all observations in this site)
-# Also Linosa has some lone Atherines, Kornati has one too and Haboanim has 0 Atherines?
+  filter(!(sp.n > 1)) %>% distinct(site)
+# TODO Which other species shpuld be seen with more that one individual?
 
-# write_csv(check_single_a_boyeri, "Issues/a_boyeri_sing.csv")
-# read_csv("Issues/a_boyeri_sing.csv")
-# Which other species shpuld be seen with more that one individual?
-
-check_zeros <- med_raw %>% 
+# Where are some unnessesary zeros?
+med_raw %>% 
   select(site, species, sp.n) %>% 
   filter(sp.n == 0) %>% 
   group_by(site, species) %>% 
-  summarise(.)
-# write_csv(check_zeros, "Issues/zeros.csv")
-# read_csv("Issues/zeros.csv")
+  summarise(.) %>% distinct(species)
 
 species_list <- med_raw %>% select(species) %>% distinct(.)
 
@@ -46,8 +42,8 @@ head(med_mat)
 
 # Put the 2 data sets together (species and metadata)
 full_med_mat <- left_join(med_meta, med_mat, by = c("site", "lon", "lat"))
-write_csv(full_med_mat, "med_species_matrix.csv")
-read_csv("med_species_matrix.csv")
+# write_csv(full_med_mat, "data/med_species_matrix.csv")
+# read_csv("data/med_species_matrix.csv")
 View(full_med_mat)
 
 # Convert the abundance matrix to presence-absence matrix
@@ -61,5 +57,5 @@ spp_list <- med_raw %>%
   select(species) %>% 
   distinct()
 spp_list$sci_name <- gsub(pattern = "\\.",replacement = " ", x = spp_list$species)
-write_csv(spp_list, path = "species_list.csv", col_names = TRUE)
-list.files()
+write_csv(spp_list, path = "data/species_list.csv", col_names = TRUE)
+list.files("data")
