@@ -80,7 +80,7 @@ network <- predict_MRFnetworks(data = Bird.parasites, MRF_mod = mrf_birds_cov, c
 
 ```
 
-So looks like network will now work with igraph package to create a graphical representation of the data.
+work with igraph package to create a graphical representation of the data:
 
 ```{r Graphics for network}
 network <- graph.adjacency(mrf_birds_cov$graph, weighted = T, mode = "undirected") # inside the MRFcov new variable there is a graph element which I'll need to use for igraph
@@ -92,4 +92,4 @@ plot.igraph(network, layout = layout.circle(network),
 
 ```
 
-Again, I don't know what's the covariate condition in this graph (what's the host relative abundance in this case)
+
