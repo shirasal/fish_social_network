@@ -3,7 +3,8 @@ library(tidyverse)
 library(MRFcov)
 
 # load MEData
-med_raw <- read_csv("data/med_raw.csv", col_types = cols(depth = col_double()))
+med_raw <- read_csv("data/med_raw.csv", col_types = cols(depth = col_double())) %>%
+  mutate(tmean_reg = scale(tmean)) # regularise temperature covariate
 str(med_raw)
 
 # Find species names in the dataset:
@@ -21,7 +22,6 @@ med_raw %>%
   filter(species %in% spp)
 
 
-
 ### Network 1: Groupers and combers
 # list the species (easier to work with vectors)
 groupers <- c("Epinephelus.costae", "Epinephelus.marginatus",
@@ -33,12 +33,12 @@ groupers <- c("Epinephelus.costae", "Epinephelus.marginatus",
 Serranidae <- med_raw %>%
   filter(data.origin != "azz_asi") %>% # azz_asi is only presence-absence
   mutate(loc = paste0(site, "_", trans)) %>% 
-  group_by(loc, species, tmean) %>%
+  group_by(loc, species, tmean_reg) %>%
   summarise(n = sum(sp.n)) %>% 
   spread(species, n, fill = 0) %>% 
   as.data.frame() %>% 
   `rownames<-`(make.unique(.$loc)) %>%
-  select(groupers[1:5], tmean)
+  select(groupers[1:5], tmean_reg)
 str(Serranidae)
 
 # Run MRF with tmean as covariate
@@ -64,8 +64,6 @@ plot.igraph(serr_graph, layout = layout.circle(serr_graph),
 
 
 
-
-
 ### Network 2: Diplodus
 
 # Find species names in the dataset:
@@ -78,12 +76,12 @@ diplodus <- c("Diplodus.annularis", "Diplodus.puntazzo", "Diplodus.sargus",
 Diplodus <- med_raw %>%
   filter(data.origin != "azz_asi") %>% # azz_asi is only presence-absence
   mutate(loc = paste0(site, "_", trans)) %>% 
-  group_by(loc, species, tmean) %>%
+  group_by(loc, species, tmean_reg) %>%
   summarise(n = sum(sp.n)) %>% 
   spread(species, n, fill = 0) %>% 
   as.data.frame() %>% 
   `rownames<-`(make.unique(.$loc)) %>%
-  select(diplodus[1:5], tmean)
+  select(diplodus[1:5], tmean_reg)
 
 dip_mrf <- MRFcov(data = Diplodus, n_nodes = 5, prep_covariates = TRUE, n_covariates = 1,
                    family = "gaussian")
@@ -106,8 +104,6 @@ plot.igraph(dip_graph, layout = layout.circle(dip_graph),
 
 
 
-
-
 ### Network 3: Herbivores
 
 herb <- c("Siganus.rivulatus", "Siganus.luridus", "Sarpa.salpa",
@@ -117,12 +113,12 @@ herb <- c("Siganus.rivulatus", "Siganus.luridus", "Sarpa.salpa",
 Herbiv <- med_raw %>%
   filter(data.origin != "azz_asi") %>% # azz_asi is only presence-absence
   mutate(loc = paste0(site, "_", trans)) %>% 
-  group_by(loc, species, tmean) %>%
+  group_by(loc, species, tmean_reg) %>%
   summarise(n = sum(sp.n)) %>% 
   spread(species, n, fill = 0) %>% 
   as.data.frame() %>% 
   `rownames<-`(make.unique(.$loc)) %>%
-  select(herb[1:5], tmean)
+  select(herb[1:5], tmean_reg)
 
 herb_mrf <- MRFcov(data = Herbiv, n_nodes = 5, prep_covariates = TRUE, n_covariates = 1,
                   family = "gaussian")
