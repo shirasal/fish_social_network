@@ -45,6 +45,14 @@ plotMRF_hm(sym_max)
 from the vignette:
 > These represent predicted interactions when the covariate is set to its mean (i.e. in this case, when scale.prop.zos = 0). If we had included other covariates, then this graph would represent interactions predicted when all covariates were set at their means
 
+> Regression coefficients and their relative importances can be accessed as well. This call returns a matrix of the raw coefficient, as well as standardised coefficients (standardised by the sd of the covariate). Standardisation in this way helps to compare the relative influences of each parameter on the target species’ occurrence probability, but in general the two coefficients will be identical (unless users have not pre-scaled their covariates). The list also contains contains each variable’s relative importance (calculated using the formula B^2 / sum(B^2), where the vector of Bs represents regression coefficients for predictor variables). Variables with an underscore (_) indicate an interaction between a covariate and another node, suggesting that conditional dependencies of the two nodes vary across environmental gradients. Because of this, it is recommended to avoid using column names with _ in them
+
+```{r}
+sym_mean$key_coefs$Hzosteropis
+```
+
+`scale.prop.zos_Microfilaria` = conditional dependency between them.
+
 ## `prep_MRF_covariates` Cross-multiply response and covariate variables
 This function performs the cross-multiplication necessary for prepping datasets to be used in MRFcov models. This function is called by several of the functions within the package.
 
