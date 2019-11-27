@@ -1,7 +1,9 @@
+library(parallel)
 library(igraph)
 library(tidyverse)
 library(MRFcov)
 
+parallel::detectCores() # in case I'd like to speed up MRFcov by spreading processing over >1 core
 # load MEData
 med_raw <- read_csv("data/med_raw.csv", col_types = cols(depth = col_double())) %>%
   mutate(tmean_reg = scale(tmean)) # regularise temperature covariate
