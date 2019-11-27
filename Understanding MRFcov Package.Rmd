@@ -42,7 +42,8 @@ plotMRF_hm(sym_min)
 plotMRF_hm(sym_max)
 
 ```
-Cool! Next stage will be to understand the different meanings of these methods :)
+from the vignette:
+> These represent predicted interactions when the covariate is set to its mean (i.e. in this case, when scale.prop.zos = 0). If we had included other covariates, then this graph would represent interactions predicted when all covariates were set at their means
 
 ## `prep_MRF_covariates` Cross-multiply response and covariate variables
 This function performs the cross-multiplication necessary for prepping datasets to be used in MRFcov models. This function is called by several of the functions within the package.
@@ -63,8 +64,13 @@ Incorporating a covariate yields the same looking grpah but I'm not sure which a
 This function calculates linear predictors for node observations using coefficients from an MRFcov or MRFcov_spatial object.
 
 ```{r Predict MRFs: calculate linear predictors for species}
-bird_predictors <- predict_MRF(data = Bird.parasites, MRF_mod = sym_mean, prep_covariates = TRUE)
+boot <- bootstrap_MRF(data = Bird.parasites, n_nodes = 4, n_covariates = 1, family = "binomial")
 
+bird_predictors <- predict_MRFnetworks(data = Bird.parasites,
+                                MRF_mod = boot)
+colnames(bird_predictors) <- colnames(Bird.parasites[, 1:4])
+apply(bird_predictors, 2, summary)
+plotMRF_hm(boot)
 ```
 
 # `predict_MRFnetworks` Extract predicted network metrics for observations in a given dataset using equations from a fitted MRFcov object
@@ -74,7 +80,6 @@ This function uses outputs from fitted MRFcov and bootstrap_MRF models to genera
 This function runs MRFcov models multiple times to capture uncertainty in parameter esimates. The dataset is shuffled and missing values (if found) are imputed in each bootstrap iteration.
 
 ```{r Networks prediction}
-boot <- bootstrap_MRF(data = Bird.parasites, n_nodes = 4, n_covariates = 1, family = "binomial")
 
 network <- predict_MRFnetworks(data = Bird.parasites, MRF_mod = mrf_birds_cov, cached_predictions = bird_predictors, prep_covariates = TRUE)
 
