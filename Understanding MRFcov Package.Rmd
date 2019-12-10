@@ -47,11 +47,44 @@ from the vignette:
 
 > Regression coefficients and their relative importances can be accessed as well. This call returns a matrix of the raw coefficient, as well as standardised coefficients (standardised by the sd of the covariate). Standardisation in this way helps to compare the relative influences of each parameter on the target species’ occurrence probability, but in general the two coefficients will be identical (unless users have not pre-scaled their covariates). The list also contains contains each variable’s relative importance (calculated using the formula B^2 / sum(B^2), where the vector of Bs represents regression coefficients for predictor variables). Variables with an underscore (_) indicate an interaction between a covariate and another node, suggesting that conditional dependencies of the two nodes vary across environmental gradients. Because of this, it is recommended to avoid using column names with _ in them
 
+
 ```{r}
 sym_mean$key_coefs$Hzosteropis
 ```
 
 `scale.prop.zos_Microfilaria` = conditional dependency between them.
+
+> Finally, a useful capability is to generate some fake data and test predictions. For instance, say we want to know how frequently malaria parasite infections are predicted to occur in sites with high occurrence of microfilaria.
+
+```{r}
+fake.dat <- Bird.parasites
+fake.dat$Microfilaria <- rbinom(nrow(Bird.parasites), 1, 0.8)
+fake.preds <- predict_MRF(data = fake.dat, MRF_mod = MRF_mod)
+plotMRF_hm(MRF_mod)
+
+# Retrieve an object from `predictMRF` (depends on the model family):
+H.zos.pred.prev <- sum(fake.preds$Binary_predictions[, 'Hzosteropis']) / nrow(fake.preds$Binary_predictions)
+H.zos.pred.prev
+
+Plas.pred.prev <- sum(fake.preds$Binary_predictions[, 'Plas']) /
+nrow(fake.preds$Binary_predictions)
+Plas.pred.prev
+
+```
+
+> Finally, we can explore regression coefficients to get a better understanding of just how important interactions are for predicting species’ occurrence probabilities (in comparison to other covariates).
+
+First we need to bootstrap the data, then check the coefficients:
+```{r}
+booted_MRF <- bootstrap_MRF(data = Bird.parasites, n_nodes = 4, family = 'binomial', n_bootstraps
+= 10, n_cores = 4)
+
+booted_MRF$mean_key_coefs$Hzosteropis
+booted_MRF$mean_key_coefs$Hkillangoi
+booted_MRF$mean_key_coefs$Plas
+booted_MRF$mean_key_coefs$Microfilaria
+
+```
 
 ## `prep_MRF_covariates` Cross-multiply response and covariate variables
 This function performs the cross-multiplication necessary for prepping datasets to be used in MRFcov models. This function is called by several of the functions within the package.
@@ -79,6 +112,7 @@ bird_predictors <- predict_MRFnetworks(data = Bird.parasites,
 colnames(bird_predictors) <- colnames(Bird.parasites[, 1:4])
 apply(bird_predictors, 2, summary)
 plotMRF_hm(boot)
+
 ```
 
 # `predict_MRFnetworks` Extract predicted network metrics for observations in a given dataset using equations from a fitted MRFcov object

@@ -161,3 +161,5 @@ plot.igraph(herb_graph, layout = layout.circle(herb_graph),
             vertex.label.cex = 1,
             vertex.label.color = adjustcolor("#333333", 0.85),
             vertex.color = adjustcolor("#FFFFFF", .5))
+
+
