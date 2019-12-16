@@ -15,6 +15,16 @@ traits_data$activity <- relevel(traits_data$activity, "day", "both", "night")
 head(traits_data)
 
 nmds_traits <- metaMDS(comm = traits_data, distance = "gower")
-nmds_traits <- isoMDS(traits_data)
+nmds_traits <- isoMDS(d = traits_data)
 is.list(traits_data)
+is.na(traits_data)
 
+myFun <- function(data) {
+  temp1 <- sapply(data, is.list)
+  temp2 <- do.call(
+    cbind, lapply(data[temp1], function(x) 
+      data.frame(do.call(rbind, x), check.names = FALSE)))
+  cbind(data[!temp1], temp2)
+}
+
+myFun(traits_data)
