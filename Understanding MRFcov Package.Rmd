@@ -72,7 +72,7 @@ Plas.pred.prev
 
 ```
 
-> Finally, we can explore regression coefficients to get a better understanding of just how important interactions are for predicting species’ occurrence probabilities (in comparison to other covariates).
+> We can explore regression coefficients to get a better understanding of just how important interactions are for predicting species’ occurrence probabilities (in comparison to other covariates).
 
 First we need to bootstrap the data, then check the coefficients:
 ```{r}
@@ -120,12 +120,6 @@ This function uses outputs from fitted MRFcov and bootstrap_MRF models to genera
 
 `bootstrap_MRF` Bootstrap observations to estimate MRF parameter coefficients
 This function runs MRFcov models multiple times to capture uncertainty in parameter esimates. The dataset is shuffled and missing values (if found) are imputed in each bootstrap iteration.
-
-```{r Networks prediction}
-
-network <- predict_MRFnetworks(data = Bird.parasites, MRF_mod = mrf_birds_cov, cached_predictions = bird_predictors, prep_covariates = TRUE)
-
-```
 
 work with igraph package to create a graphical representation of the data:
 
