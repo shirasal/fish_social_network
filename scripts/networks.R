@@ -13,6 +13,10 @@ str(med_raw)
 # Find species names in the dataset:
 med_raw %>% filter(grepl(pattern = "cretense", x = .$species)) %>% distinct(species)
 
+(min_temp <- min(med_raw$tmean)) # 16.8
+(med_temp <- median(med_raw$tmean)) # 20
+(max_temp <- max(med_raw$tmean)) # 23
+
 # Check abundance of species I'm interested in:
 spp <- list("Epinephelus.costae", "Epinephelus.marginatus", "Epinephelus.caninus",
               "Epinephelus.aeneus", "Mycteroperca.rubra", "Serranus.cabrilla", "Serranus.scriba",
@@ -55,11 +59,24 @@ serr_mrf$key_coefs$Mycteroperca.rubra
 serr_mrf$key_coefs$Serranus.cabrilla
 serr_mrf$key_coefs$Serranus.scriba
 
+serr_mrf$direct_coefs
+serr_mrf$graph
+serr_mrf$param_names
+
 # Look at co occurrence
 plotMRF_hm(serr_mrf)
 
+serr_predict <- predict_MRF(data = Serranidae, MRF_mod = serr_mrf, prep_covariates = FALSE)
+head(serr_predict)
+
+colnames(serr_predict)
+sum(serr_predict[, 'Epinephelus.marginatus']) / nrow(serr_predict)
+
+booted_serr <- bootstrap_MRF(data = Serranidae, n_nodes = 5, family = 'gaussian')
+booted_serr$mean_key_coefs$Epinephelus.costae
+
 # Create a network and a graph
-serr_net <- predict_MRFnetworks(data = Serranidae, MRF_mod = serr_mrf, prep_covariates = TRUE)
+serr_net <- predict_MRFnetworks(data = Serranidae, MRF_mod = booted_serr, prep_covariates = TRUE)
 serr_graph <- graph.adjacency(serr_mrf$graph, weighted = T, mode = "undirected")
 deg <- degree(serr_graph, mode = "all")
 plot.igraph(serr_graph, layout = layout.circle(serr_graph),
