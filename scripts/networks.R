@@ -66,13 +66,34 @@ serr_mrf$param_names
 # Look at co occurrence
 plotMRF_hm(serr_mrf)
 
-serr_predict <- predict_MRF(data = Serranidae, MRF_mod = serr_mrf, prep_covariates = FALSE)
-head(serr_predict)
+min(Serranidae$tmean_reg)
+median(Serranidae$tmean_reg)
+max(Serranidae$tmean_reg)
 
-colnames(serr_predict)
-sum(serr_predict[, 'Epinephelus.marginatus']) / nrow(serr_predict)
+Serr_temp_low <- Serranidae %>% select(-tmean_reg) %>% mutate(tmean_reg = -1.5)
+str(Serr_temp_low)
 
-booted_serr <- bootstrap_MRF(data = Serranidae, n_nodes = 5, family = 'gaussian')
+boot_serr_low <- bootstrap_MRF(data = Serr_temp_low, n_nodes = 5, family = 'gaussian')
+serr_predict_low <- predict_MRF(data = Serr_temp_low, MRF_mod = serr_mrf, prep_covariates = TRUE)
+serr_net_low <- predict_MRFnetworks(data = serr_predict_low, MRF_mod = boot_serr_low, prep_covariates = TRUE)
+serr_graph_low <- graph.adjacency(boot_serr_low$graph, weighted = T, mode = "undirected")
+deg <- degree(serr_graph, mode = "all")
+plot.igraph(serr_net_low, layout = layout.circle(serr_graph),
+            edge.width = abs(E(serr_graph)$weight),
+            edge.color = ifelse(E(serr_graph)$weight < 0, '#3399CC', '#FF3333'),
+            vertex.size = deg,
+            vertex.label.family = "sans",
+            vertex.label.font	= 3,
+            vertex.label.cex = 1,
+            vertex.label.color = adjustcolor("#333333", 0.85),
+            vertex.color = adjustcolor("#FFFFFF", .5))
+
+Serr_temp_med <- Serranidae %>% select(-tmean_reg) %>% mutate(tmean_reg = 0.18)
+serr_predict_med <- predict_MRF(data = Serr_temp_med, MRF_mod = serr_mrf, prep_covariates = TRUE)
+
+Serr_temp_hi <- Serranidae %>% select(-tmean_reg) %>% mutate(tmean_reg = 1.4)
+serr_predict_hi <- predict_MRF(data = Serr_temp_hi, MRF_mod = serr_mrf, prep_covariates = TRUE)
+
 booted_serr$mean_key_coefs$Epinephelus.costae
 
 # Create a network and a graph
@@ -134,7 +155,6 @@ plot.igraph(dip_graph, layout = layout.circle(dip_graph),
             vertex.label.cex = 1,
             vertex.label.color = adjustcolor("#333333", 0.85),
             vertex.color = adjustcolor("#FFFFFF", .5))
-
 
 
 
