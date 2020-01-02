@@ -1,0 +1,75 @@
+---
+title: "Results"
+output: html_notebook
+---
+
+```{r Average networks results}
+source("scripts/networks.R")
+
+```
+
+# Averaged networks
+
+## Coefficients of each node (species)
+Which predictors determine it's likelihood of occurrence
+
+### Serranidae network
+```{r}
+S.cab.coeffs
+S.scrib.coeffs
+
+```
+
+*Serranus cabrilla* and *Serranus scriba* are mostly affected by temperature.
+
+```{r}
+E.costae.coeffs
+E.margin.coeffs
+
+```
+
+*Epinephelus marginatus* is mostly affected by *Epinephelus costae* but not the other way around.
+
+```{r}
+serr_effects
+```
+
+```{r}
+serr_dists
+```
+
+### Diplodus network
+
+```{r}
+D.annu.coeffs
+D.punt.coeffs
+D.vulg.coeffs
+
+```
+
+*Diplodus annularis* is mostly affected by the interaction between temperature and the presence of *D. sargus*.
+
+*Diplodus puntazzo* is mostly affected by the presence of *D. vulgaris*.
+
+*Diplodus vulgaris* is strongly affected by temperature.
+
+*Diplodus cervinus* is **only** affected by *D. sargus*.
+
+### Herbivore network
+```{r}
+S.rev.coeffs
+S.salpa.coeffs
+S.ghob.coeffs
+S.cret.coeffs
+```
+
+*Siganus rivulatus* is **only** affected by temperature, as is *Sarpa salpa*.
+*Scarus ghobban* is affected by the interaction of temperature and the presence of *Siganus rivulatus*, as is *Sparisoma cretense*.
+
+# Predicted networks
+
+```{r Predicted networks results}
+source("scripts/predict_nets.R")
+
+```
+
