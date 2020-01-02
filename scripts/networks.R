@@ -67,7 +67,7 @@ serr_mrf$param_names
 plotMRF_hm(serr_mrf)
 
 # Create a network and a graph
-serr_net <- predict_MRFnetworks(data = Serranidae, MRF_mod = booted_serr, prep_covariates = TRUE)
+serr_net <- predict_MRFnetworks(data = Serranidae, MRF_mod = serr_mrf, prep_covariates = TRUE)
 serr_graph <- graph.adjacency(serr_mrf$graph, weighted = T, mode = "undirected")
 deg <- degree(serr_graph, mode = "all")
 plot.igraph(serr_graph, layout = layout.circle(serr_graph),
@@ -79,7 +79,6 @@ plot.igraph(serr_graph, layout = layout.circle(serr_graph),
             vertex.label.cex = 1,
             vertex.label.color = adjustcolor("#333333", 0.85),
             vertex.color = adjustcolor("#FFFFFF", .5))
-
 
 
 ### Network 2: Diplodus
