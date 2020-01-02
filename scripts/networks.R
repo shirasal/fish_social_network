@@ -53,15 +53,11 @@ serr_mrf <- MRFcov(data = Serranidae, n_nodes = 5, prep_covariates = TRUE, n_cov
                    family = "gaussian")
 
 # check out the coefficients of each node to see which predictors determine it's likelihood of occurrence:
-serr_mrf$key_coefs$Epinephelus.costae
-serr_mrf$key_coefs$Epinephelus.marginatus
-serr_mrf$key_coefs$Mycteroperca.rubra
-serr_mrf$key_coefs$Serranus.cabrilla
-serr_mrf$key_coefs$Serranus.scriba
-
-serr_mrf$direct_coefs
-serr_mrf$graph
-serr_mrf$param_names
+E.costae.coeffs <- serr_mrf$key_coefs$Epinephelus.costae
+E.margin.coeffs <- serr_mrf$key_coefs$Epinephelus.marginatus
+M.rubra.coeffs <- serr_mrf$key_coefs$Mycteroperca.rubra
+S.cab.coeffs <- serr_mrf$key_coefs$Serranus.cabrilla
+S.scrib.coeffs <- serr_mrf$key_coefs$Serranus.scriba
 
 # Look at co occurrence
 plotMRF_hm(serr_mrf)
@@ -103,12 +99,12 @@ Diplodus <- med_raw %>%
 dip_mrf <- MRFcov(data = Diplodus, n_nodes = 5, prep_covariates = TRUE, n_covariates = 1,
                    family = "gaussian")
 
-# check out the coefficients of each node to see which predictors determine it's likelihood of occurrence:
-dip_mrf$key_coefs$Diplodus.annularis
-dip_mrf$key_coefs$Diplodus.puntazzo
+# check the coefficients of each node to see which predictors determine it's likelihood of occurrence:
+D.annu.coeffs <- dip_mrf$key_coefs$Diplodus.annularis
+D.punt.coeffs <- dip_mrf$key_coefs$Diplodus.puntazzo
 dip_mrf$key_coefs$Diplodus.sargus
-dip_mrf$key_coefs$Diplodus.vulgaris
-dip_mrf$key_coefs$Diplodus.cervinus
+D.vulg.coeffs <- dip_mrf$key_coefs$Diplodus.vulgaris
+D.cerv.coeffs <- dip_mrf$key_coefs$Diplodus.cervinus
 
 plotMRF_hm(dip_mrf)
 
@@ -147,11 +143,11 @@ herb_mrf <- MRFcov(data = Herbiv, n_nodes = 5, prep_covariates = TRUE, n_covaria
                   family = "gaussian")
 
 # check out the coefficients of each node to see which predictors determine it's likelihood of occurrence:
-herb_mrf$key_coefs$Siganus.rivulatus
+S.rev.coeffs <- herb_mrf$key_coefs$Siganus.rivulatus
 herb_mrf$key_coefs$Siganus.luridus
-herb_mrf$key_coefs$Sarpa.salpa
-herb_mrf$key_coefs$Scarus.ghobban
-herb_mrf$key_coefs$Sparisoma.cretense
+S.salpa.coeffs <- herb_mrf$key_coefs$Sarpa.salpa
+S.ghob.coeffs <- herb_mrf$key_coefs$Scarus.ghobban
+S.cret.coeffs <- herb_mrf$key_coefs$Sparisoma.cretense
 
 plotMRF_hm(herb_mrf)
 
