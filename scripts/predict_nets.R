@@ -5,33 +5,16 @@ med_raw <- read_csv("data/med_raw.csv", col_types = cols(depth = col_double())) 
   mutate(tmean_reg = scale(tmean)) # regularise temperature covariate
 str(med_raw)
 
-# Find species names in the dataset:
-med_raw %>% filter(grepl(pattern = "cretense", x = .$species)) %>% distinct(species)
-
 (min_temp <- min(med_raw$tmean)) # 16.8
 (med_temp <- median(med_raw$tmean)) # 20
 (max_temp <- max(med_raw$tmean)) # 23
 
-# Check abundance of species I'm interested in:
-spp <- list("Epinephelus.costae", "Epinephelus.marginatus", "Epinephelus.caninus",
-            "Epinephelus.aeneus", "Mycteroperca.rubra", "Serranus.cabrilla", "Serranus.scriba",
-            "Serranus.hepatus", "Diplodus.annularis", "Diplodus.puntazzo", "Diplodus.sargus",
-            "Diplodus.vulgaris", "Diplodus.cervinus")
-
-med_raw %>% 
-  group_by(species) %>% 
-  summarise(n = sum(sp.n)) %>% 
-  filter(species %in% spp)
-
 
 ### Network 1: Groupers and combers
-# list the species (easier to work with vectors)
 groupers <- c("Epinephelus.costae", "Epinephelus.marginatus",
               "Mycteroperca.rubra", "Serranus.cabrilla", "Serranus.scriba")
-# I didn't include species that appear only a few times in the dataset
 
-# Create a species matrix of 'groupers' species with rownames = sites, tmean as covariate
-# this is the format that works with MRF function
+# Create a species matrix of 'groupers'
 Serranidae <- med_raw %>%
   filter(data.origin != "azz_asi") %>% # azz_asi is only presence-absence
   mutate(loc = paste0(site, "_", trans)) %>% 
@@ -43,45 +26,36 @@ Serranidae <- med_raw %>%
   select(groupers[1:5], tmean_reg)
 str(Serranidae)
 
-# Run MRF with tmean as covariate
-serr_mrf <- MRFcov(data = Serranidae, n_nodes = 5, prep_covariates = TRUE, n_covariates = 1,
-                   family = "gaussian")
+serr_mrf_mod <- MRFcov(data = Serranidae, n_nodes = 5, n_covariates = 1, family = "gaussian")
+serr_pred <- predict_MRF(data = Serranidae, MRF_mod = serr_mrf_mod)
+head(serr_pred)
 
-# check out the coefficients of each node to see which predictors determine it's likelihood of occurrence:
-serr_mrf$key_coefs$Epinephelus.costae
-serr_mrf$key_coefs$Epinephelus.marginatus
-serr_mrf$key_coefs$Mycteroperca.rubra
-serr_mrf$key_coefs$Serranus.cabrilla
-serr_mrf$key_coefs$Serranus.scriba
+# serr_boot <- bootstrap_MRF(data = Serranidae, n_nodes = 5, n_covariates = 1, family = "gaussian")
+# serr_pred <- predict_MRF(data = Serranidae, MRF_mod = serr_boot)
+serr_net <- predict_MRFnetworks(data = Serranidae, MRF_mod = serr_mrf_mod)
 
-serr_mrf$direct_coefs
-serr_mrf$graph
-serr_mrf$param_names
-
-# Look at co occurrence
-plotMRF_hm(serr_mrf)
-
-min(Serranidae$tmean_reg)
-median(Serranidae$tmean_reg)
-max(Serranidae$tmean_reg)
+min(Serranidae$tmean_reg) # -1.62
+median(Serranidae$tmean_reg) # 0.18
+max(Serranidae$tmean_reg) # 1.49
 
 Serr_temp_low <- Serranidae %>% select(-tmean_reg) %>% mutate(tmean_reg = -1.5)
 str(Serr_temp_low)
 
-boot_serr_low <- bootstrap_MRF(data = Serr_temp_low, n_nodes = 5, family = 'gaussian')
-serr_predict_low <- predict_MRF(data = Serr_temp_low, MRF_mod = serr_mrf, prep_covariates = TRUE)
-serr_net_low <- predict_MRFnetworks(data = serr_predict_low, MRF_mod = boot_serr_low, prep_covariates = TRUE)
-serr_graph_low <- graph.adjacency(boot_serr_low$graph, weighted = T, mode = "undirected")
-deg <- degree(serr_graph, mode = "all")
-plot.igraph(serr_net_low, layout = layout.circle(serr_graph),
-            edge.width = abs(E(serr_graph)$weight),
-            edge.color = ifelse(E(serr_graph)$weight < 0, '#3399CC', '#FF3333'),
+serr_predict_low <- predict_MRF(data = Serr_temp_low, MRF_mod = serr_mrf_mod)
+head(serr_predict_low)
+
+serr_graph_low <- graph.adjacency(serr_predict_low, weighted = T, mode = "undirected")
+deg <- degree(serr_graph_low, mode = "all")
+plot.igraph(serr_graph_low, layout = layout.circle(serr_graph_low),
+            edge.width = abs(E(serr_graph_low)$weight),
+            edge.color = ifelse(E(serr_graph_low)$weight < 0, '#3399CC', '#FF3333'),
             vertex.size = deg,
             vertex.label.family = "sans",
             vertex.label.font	= 3,
             vertex.label.cex = 1,
             vertex.label.color = adjustcolor("#333333", 0.85),
             vertex.color = adjustcolor("#FFFFFF", .5))
+
 
 Serr_temp_med <- Serranidae %>% select(-tmean_reg) %>% mutate(tmean_reg = 0.18)
 serr_predict_med <- predict_MRF(data = Serr_temp_med, MRF_mod = serr_mrf, prep_covariates = TRUE)
