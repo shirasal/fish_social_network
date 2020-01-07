@@ -30,9 +30,16 @@ serr_mrf_mod <- MRFcov(data = Serranidae, n_nodes = 5, n_covariates = 1, family 
 serr_pred <- predict_MRF(data = Serranidae, MRF_mod = serr_mrf_mod)
 head(serr_pred)
 
-# serr_boot <- bootstrap_MRF(data = Serranidae, n_nodes = 5, n_covariates = 1, family = "gaussian")
-# serr_pred <- predict_MRF(data = Serranidae, MRF_mod = serr_boot)
+serr_boot <- bootstrap_MRF(data = Serranidae, n_nodes = 5, n_covariates = 1, family = "gaussian", n_cores = 3)
+serr_pred <- predict_MRF(data = Serranidae, MRF_mod = serr_boot)
+head(serr_pred)
+
 serr_net <- predict_MRFnetworks(data = Serranidae, MRF_mod = serr_mrf_mod)
+
+cv_MRF_diag(data = Serranidae, n_nodes = 5, family = "gaussian")
+cv_MRF_diag_rep(data = Serranidae, n_nodes = 5, family = "gaussian")
+
+########################################################################################################################################
 
 min(Serranidae$tmean_reg) # -1.62
 median(Serranidae$tmean_reg) # 0.18
