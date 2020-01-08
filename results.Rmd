@@ -73,11 +73,78 @@ source("scripts/predict_nets.R")
 
 ```
 
-
 Use bootstrapped model (`bootstrap_MRF`) for predicting log odds (logit) of occurrence for species per site (`predict_MRF`). These log odds can be transformed into probabilities using `LaplacesDemon::invlogit` function. These can be "checked" using subsets of the data by covariate levels (e.g. low/mid/hi temp) to create separate networks - not with the predict function but with the `MRFcov` function. ????
 
 `bootstrap_MRF` creates distribution of data permutations and helps in eliminating uncertainties. Part of its output is 95% confidence interval for each one of the predictors, which I can use to evaluate the predictors effect.
 
+## Serranidae + Temperatures
+
+```{r}
+# Low
+plot.igraph(serr_graph_low, layout = layout.circle(serr_graph_low),
+            edge.width = abs(E(serr_graph_low)$weight),
+            edge.color = ifelse(E(serr_graph_low)$weight < 0, '#3399CC', '#FF3333'),
+            vertex.size = deg,
+            vertex.label.family = "sans",
+            vertex.label.font	= 3,
+            vertex.label.cex = 1,
+            vertex.label.color = adjustcolor("#333333", 0.85),
+            vertex.color = adjustcolor("#FFFFFF", .5),
+            main = "Serranidae network in low temperatures")
+
+# Med
+serr_med <- plot.igraph(serr_graph_med, layout = layout.circle(serr_graph_med),
+            edge.width = abs(E(serr_graph_med)$weight),
+            edge.color = ifelse(E(serr_graph_med)$weight < 0, '#3399CC', '#FF3333'),
+            vertex.size = deg,
+            vertex.label.family = "sans",
+            vertex.label.font	= 3,
+            vertex.label.cex = 1,
+            vertex.label.color = adjustcolor("#333333", 0.85),
+            vertex.color = adjustcolor("#FFFFFF", .5),
+            main = "Serranidae network in median temperatures")
+
+# High
+plot.igraph(serr_graph_hi, layout = layout.circle(serr_graph_hi),
+            edge.width = abs(E(serr_graph_hi)$weight),
+            edge.color = ifelse(E(serr_graph_hi)$weight < 0, '#3399CC', '#FF3333'),
+            vertex.size = deg,
+            vertex.label.family = "sans",
+            vertex.label.font	= 3,
+            vertex.label.cex = 1,
+            vertex.label.color = adjustcolor("#333333", 0.85),
+            vertex.color = adjustcolor("#FFFFFF", .5),
+            main = "Serranidae network in high temperatures")
+
+```
+
+## Serranidae + MPAs
+
+```{r}
+# Inside MPAs
+plot.igraph(serr_graph_MPA, layout = layout.circle(serr_graph_MPA),
+            edge.width = abs(E(serr_graph_MPA)$weight),
+            edge.color = ifelse(E(serr_graph_MPA)$weight < 0, '#3399CC', '#FF3333'),
+            vertex.size = deg,
+            vertex.label.family = "sans",
+            vertex.label.font	= 3,
+            vertex.label.cex = 1,
+            vertex.label.color = adjustcolor("#333333", 0.85),
+            vertex.color = adjustcolor("#FFFFFF", .5),
+            main = "Serranidae network inside MPAs")
+
+plot.igraph(serr_graph_noMPA, layout = layout.circle(serr_graph_noMPA),
+            edge.width = abs(E(serr_graph_noMPA)$weight),
+            edge.color = ifelse(E(serr_graph_noMPA)$weight < 0, '#3399CC', '#FF3333'),
+            vertex.size = deg,
+            vertex.label.family = "sans",
+            vertex.label.font	= 3,
+            vertex.label.cex = 1,
+            vertex.label.color = adjustcolor("#333333", 0.85),
+            vertex.color = adjustcolor("#FFFFFF", .5),
+            main = "Serranidae network outside MPAs")
+
+```
 
 
 
