@@ -11,7 +11,7 @@ source("scripts/networks.R")
 # Averaged networks
 
 ## Coefficients of each node (species)
-Which predictors determine it's likelihood of occurrence
+Which predictors determine it's odds of occurrence
 
 ### Serranidae network
 ```{r}
@@ -77,7 +77,9 @@ Use bootstrapped model (`bootstrap_MRF`) for predicting log odds (logit) of occu
 
 `bootstrap_MRF` creates distribution of data permutations and helps in eliminating uncertainties. Part of its output is 95% confidence interval for each one of the predictors, which I can use to evaluate the predictors effect.
 
-## Serranidae + Temperatures
+## Serranidae networks
+
+### Temperature effect
 
 ```{r}
 # Low
@@ -118,7 +120,7 @@ plot.igraph(serr_graph_hi, layout = layout.circle(serr_graph_hi),
 
 ```
 
-## Serranidae + MPAs
+### MPAs effect
 
 ```{r}
 # Inside MPAs
@@ -147,13 +149,145 @@ plot.igraph(serr_graph_noMPA, layout = layout.circle(serr_graph_noMPA),
 ```
 
 
+## Diplodus networks
+
+### Temperature effect
+
+```{r}
+# Low
+plot.igraph(dip_graph_low, layout = layout.circle(dip_graph_low),
+            edge.width = abs(E(dip_graph_low)$weight),
+            edge.color = ifelse(E(dip_graph_low)$weight < 0, '#3399CC', '#FF3333'),
+            vertex.size = deg,
+            vertex.label.family = "sans",
+            vertex.label.font	= 3,
+            vertex.label.cex = 1,
+            vertex.label.color = adjustcolor("#333333", 0.85),
+            vertex.color = adjustcolor("#FFFFFF", .5),
+            main = "Diplodus network in low temperatures")
+
+# Med
+plot.igraph(dip_graph_med, layout = layout.circle(dip_graph_med),
+            edge.width = abs(E(dip_graph_med)$weight),
+            edge.color = ifelse(E(dip_graph_med)$weight < 0, '#3399CC', '#FF3333'),
+            vertex.size = deg,
+            vertex.label.family = "sans",
+            vertex.label.font	= 3,
+            vertex.label.cex = 1,
+            vertex.label.color = adjustcolor("#333333", 0.85),
+            vertex.color = adjustcolor("#FFFFFF", .5),
+            main = "Diplodus network in median temperatures")
+
+# High
+plot.igraph(dip_graph_hi, layout = layout.circle(dip_graph_hi),
+            edge.width = abs(E(dip_graph_hi)$weight),
+            edge.color = ifelse(E(dip_graph_hi)$weight < 0, '#3399CC', '#FF3333'),
+            vertex.size = deg,
+            vertex.label.family = "sans",
+            vertex.label.font	= 3,
+            vertex.label.cex = 1,
+            vertex.label.color = adjustcolor("#333333", 0.85),
+            vertex.color = adjustcolor("#FFFFFF", .5),
+            main = "Diplodus network in high temperatures")
+```
+
+### MPAs effect
+
+```{r}
+# Within
+plot.igraph(dip_graph_MPA, layout = layout.circle(dip_graph_MPA),
+            edge.width = abs(E(dip_graph_MPA)$weight),
+            edge.color = ifelse(E(dip_graph_MPA)$weight < 0, '#3399CC', '#FF3333'),
+            vertex.size = deg,
+            vertex.label.family = "sans",
+            vertex.label.font	= 3,
+            vertex.label.cex = 1,
+            vertex.label.color = adjustcolor("#333333", 0.85),
+            vertex.color = adjustcolor("#FFFFFF", .5),
+            main = "Diplodus network inside MPAs")
+
+# Outside
+plot.igraph(dip_graph_noMPA, layout = layout.circle(dip_graph_noMPA),
+            edge.width = abs(E(dip_graph_noMPA)$weight),
+            edge.color = ifelse(E(dip_graph_noMPA)$weight < 0, '#3399CC', '#FF3333'),
+            vertex.size = deg,
+            vertex.label.family = "sans",
+            vertex.label.font	= 3,
+            vertex.label.cex = 1,
+            vertex.label.color = adjustcolor("#333333", 0.85),
+            vertex.color = adjustcolor("#FFFFFF", .5),
+            main = "Diplodus network outside MPAs")
+
+```
 
 
+## Herbivores
+
+### Temperature effect
+
+```{r}
+# Low
+plot.igraph(herb_graph_low, layout = layout.circle(herb_graph_low),
+            edge.width = abs(E(herb_graph_low)$weight),
+            edge.color = ifelse(E(herb_graph_low)$weight < 0, '#3399CC', '#FF3333'),
+            vertex.size = deg,
+            vertex.label.family = "sans",
+            vertex.label.font	= 3,
+            vertex.label.cex = 1,
+            vertex.label.color = adjustcolor("#333333", 0.85),
+            vertex.color = adjustcolor("#FFFFFF", .5),
+            main = "Herbivore network in low temperatures")
+# Med
+plot.igraph(herb_graph_med, layout = layout.circle(herb_graph_med),
+            edge.width = abs(E(herb_graph_med)$weight),
+            edge.color = ifelse(E(herb_graph_med)$weight < 0, '#3399CC', '#FF3333'),
+            vertex.size = deg,
+            vertex.label.family = "sans",
+            vertex.label.font	= 3,
+            vertex.label.cex = 1,
+            vertex.label.color = adjustcolor("#333333", 0.85),
+            vertex.color = adjustcolor("#FFFFFF", .5),
+            main = "Herbivore network in median temperatures")
+# High
+plot.igraph(herb_graph_hi, layout = layout.circle(herb_graph_hi),
+            edge.width = abs(E(herb_graph_hi)$weight),
+            edge.color = ifelse(E(herb_graph_hi)$weight < 0, '#3399CC', '#FF3333'),
+            vertex.size = deg,
+            vertex.label.family = "sans",
+            vertex.label.font	= 3,
+            vertex.label.cex = 1,
+            vertex.label.color = adjustcolor("#333333", 0.85),
+            vertex.color = adjustcolor("#FFFFFF", .5),
+            main = "Herbivore network in high temperatures")
+```
 
 
+### MPAs effect
+```{r}
+# Within
+plot.igraph(herb_graph_MPA, layout = layout.circle(herb_graph_MPA),
+            edge.width = abs(E(herb_graph_MPA)$weight),
+            edge.color = ifelse(E(herb_graph_MPA)$weight < 0, '#3399CC', '#FF3333'),
+            vertex.size = deg,
+            vertex.label.family = "sans",
+            vertex.label.font	= 3,
+            vertex.label.cex = 1,
+            vertex.label.color = adjustcolor("#333333", 0.85),
+            vertex.color = adjustcolor("#FFFFFF", .5),
+            main = "Herbivore network inside MPAs")
 
-
-
+# Outside
+plot.igraph(herb_graph_noMPA, layout = layout.circle(herb_graph_noMPA),
+            edge.width = abs(E(herb_graph_noMPA)$weight),
+            edge.color = ifelse(E(herb_graph_noMPA)$weight < 0, '#3399CC', '#FF3333'),
+            vertex.size = deg,
+            vertex.label.family = "sans",
+            vertex.label.font	= 3,
+            vertex.label.cex = 1,
+            vertex.label.color = adjustcolor("#333333", 0.85),
+            vertex.color = adjustcolor("#FFFFFF", .5),
+            main = "Herbivore network outside MPAs")
+```
 
 
 
