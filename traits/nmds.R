@@ -1,5 +1,6 @@
 library(vegan)
 library(tidyverse)
+library(ggrepel)
 
 traits_data <- read.csv("traits/traits.csv", stringsAsFactors = TRUE, row.names = 1) %>% 
   dplyr::select(c(-depth_min, -depth_max))
@@ -14,12 +15,13 @@ traits_data$activity <- relevel(traits_data$activity, "day", "both", "night")
 head(traits_data)
 
 trait_data_num <- traits_data %>% 
-  mutate_all(.funs = as.numeric)
+  mutate_all(.funs = as.numeric) %>% 
+  as.data.frame()
 
+rownames(trait_data_num) <- rownames(traits_data)
 head(trait_data_num)
 
 nmds_traits <- metaMDS(comm = trait_data_num, distance = "gower")
-
 
 data.scores <- as.data.frame(scores(nmds_traits))  #Using the scores function from vegan to extract the site scores and convert to a data.frame
 data.scores$site <- rownames(traits_data)  # create a column of site names, from the rownames of data.scores
@@ -32,9 +34,9 @@ data.scores$diet <- traits_data$diet
 
 head(data.scores)  #look at the data
 
-species.scores <- as.data.frame(scores(nmds_traits, "species"))  #Using the scores function from vegan to extract the species scores and convert to a data.frame
-species.scores$species <- rownames(species.scores)  # create a column of species, from the rownames of species.scores
-head(species.scores)  #look at the data
+# species.scores <- as.data.frame(scores(nmds_traits, "species"))  #Using the scores function from vegan to extract the species scores and convert to a data.frame
+# species.scores$species <- rownames(data.s)  # create a column of species, from the rownames of species.scores
+# head(species.scores)  #look at the data
 
 school.a <- data.scores[data.scores$schooling == "sol", ][chull(data.scores[data.scores$schooling == "sol", c("NMDS1", "NMDS2")]), ]  # hull values for grp A
 school.b <- data.scores[data.scores$schooling == "small", ][chull(data.scores[data.scores$schooling == "small", c("NMDS1", "NMDS2")]), ]  # hull values for grp B
@@ -66,30 +68,115 @@ diet.p <- data.scores[data.scores$diet == "nekton", ][chull(data.scores[data.sco
 diet.z <- data.scores[data.scores$diet == "plank", ][chull(data.scores[data.scores$diet == "plank", c("NMDS1", "NMDS2")]), ]
 
 hull.data <- rbind(school.a, school.b, school.c, school.d)  #combine grp.a and grp.b
-hull.data <- rbind(mob.a, mob.b, mob.c)
-hull.data <- rbind(lev.a, lev.b, lev.c)
-hull.data <- rbind(act.a, act.b)
-hull.data <- rbind(size.b, size.c, size.d, size.e, size.f)
-hull.data <- rbind(diet.h, diet.c, diet.d, diet.p, diet.z)
-hull.data
-
-ggplot() + 
-  geom_polygon(data = hull.data, aes(x = NMDS1, y = NMDS2, fill = diet, group = diet),
-               alpha = 0.30) + # add the convex hulls
-  geom_text(data = species.scores,aes(x = NMDS1, y = NMDS2, label = species),
-            alpha = 0.5) +  # add the species labels
-  geom_point(data = data.scores, aes(x = NMDS1, y = NMDS2, shape = diet,
-                                     colour = diet), size = 4) + # add the point markers
+school_nmds <- ggplot() + 
+  geom_polygon(data = hull.data, aes(x = NMDS1, y = NMDS2, fill = schooling, group = schooling), alpha = 0.30) + # add the convex hulls
+  geom_text_repel(data = data.scores, aes(x = NMDS1, y = NMDS2, label =  site), alpha = 0.5) +  # add the species labels
+  geom_point(data = data.scores, aes(x = NMDS1, y = NMDS2, shape = schooling, colour = schooling), size = 4) + # add the point markers
   coord_equal() +
   theme_bw() + 
   theme(axis.text.x = element_blank(),  # remove x-axis text
         axis.text.y = element_blank(), # remove y-axis text
         axis.ticks = element_blank(),  # remove axis ticks
-        axis.title.x = element_text(size = 18), # remove x-axis labels
-        axis.title.y = element_text(size = 18), # remove y-axis labels
+        axis.title.x = element_text(size = 10), # remove x-axis labels
+        axis.title.y = element_text(size = 10), # remove y-axis labels
         panel.background = element_blank(), 
         panel.grid.major = element_blank(),  #remove major-grid labels
         panel.grid.minor = element_blank(),  #remove minor-grid labels
         plot.background = element_blank())
+school_nmds
 
+
+hull.data <- rbind(mob.a, mob.b, mob.c)
+mob_nmds <- ggplot() + 
+  geom_polygon(data = hull.data, aes(x = NMDS1, y = NMDS2, fill = mob, group = mob), alpha = 0.30) + # add the convex hulls
+  geom_text_repel(data = data.scores, aes(x = NMDS1, y = NMDS2, label = site), alpha = 0.5) +  # add the species labels
+  geom_point(data = data.scores, aes(x = NMDS1, y = NMDS2, shape = mob, colour = mob), size = 4) + # add the point markers
+  coord_equal() +
+  theme_bw() + 
+  theme(axis.text.x = element_blank(),  # remove x-axis text
+        axis.text.y = element_blank(), # remove y-axis text
+        axis.ticks = element_blank(),  # remove axis ticks
+        axis.title.x = element_text(size = 10), # remove x-axis labels
+        axis.title.y = element_text(size = 10), # remove y-axis labels
+        panel.background = element_blank(), 
+        panel.grid.major = element_blank(),  #remove major-grid labels
+        panel.grid.minor = element_blank(),  #remove minor-grid labels
+        plot.background = element_blank())
+mob_nmds
+
+
+hull.data <- rbind(lev.a, lev.b, lev.c)
+level_nmds <- ggplot() + 
+  geom_polygon(data = hull.data, aes(x = NMDS1, y = NMDS2, fill = level, group = level), alpha = 0.30) + # add the convex hulls
+  geom_text_repel(data = data.scores, aes(x = NMDS1, y = NMDS2, label = site), alpha = 0.5) +  # add the species labels
+  geom_point(data = data.scores, aes(x = NMDS1, y = NMDS2, shape = level, colour = level), size = 4) + # add the point markers
+  coord_equal() +
+  theme_bw() + 
+  theme(axis.text.x = element_blank(),  # remove x-axis text
+        axis.text.y = element_blank(), # remove y-axis text
+        axis.ticks = element_blank(),  # remove axis ticks
+        axis.title.x = element_text(size = 10), # remove x-axis labels
+        axis.title.y = element_text(size = 10), # remove y-axis labels
+        panel.background = element_blank(), 
+        panel.grid.major = element_blank(),  #remove major-grid labels
+        panel.grid.minor = element_blank(),  #remove minor-grid labels
+        plot.background = element_blank())
+level_nmds
+
+
+ahull.data <- rbind(act.a, act.b)
+act_nmds <- ggplot() + 
+  geom_polygon(data = hull.data, aes(x = NMDS1, y = NMDS2, fill = act, group = act), alpha = 0.30) + # add the convex hulls
+  geom_text_repel(data = data.scores, aes(x = NMDS1, y = NMDS2, label = site), alpha = 0.5) +  # add the species labels
+  geom_point(data = data.scores, aes(x = NMDS1, y = NMDS2, shape = act, colour = act), size = 4) + # add the point markers
+  coord_equal() +
+  theme_bw() + 
+  theme(axis.text.x = element_blank(),  # remove x-axis text
+        axis.text.y = element_blank(), # remove y-axis text
+        axis.ticks = element_blank(),  # remove axis ticks
+        axis.title.x = element_text(size = 10), # remove x-axis labels
+        axis.title.y = element_text(size = 10), # remove y-axis labels
+        panel.background = element_blank(), 
+        panel.grid.major = element_blank(),  #remove major-grid labels
+        panel.grid.minor = element_blank(),  #remove minor-grid labels
+        plot.background = element_blank())
+act_nmds
+
+
+hull.data <- rbind(size.b, size.c, size.d, size.e, size.f)
+size_nmds <- ggplot() + 
+  geom_polygon(data = hull.data, aes(x = NMDS1, y = NMDS2, fill = size, group = size), alpha = 0.30) + # add the convex hulls
+  geom_text_repel(data = data.scores, aes(x = NMDS1, y = NMDS2, label = site), alpha = 0.5) +  # add the species labels
+  geom_point(data = data.scores, aes(x = NMDS1, y = NMDS2, shape = size, colour = size), size = 4) + # add the point markers
+  coord_equal() +
+  theme_bw() + 
+  theme(axis.text.x = element_blank(),  # remove x-axis text
+        axis.text.y = element_blank(), # remove y-axis text
+        axis.ticks = element_blank(),  # remove axis ticks
+        axis.title.x = element_text(size = 10), # remove x-axis labels
+        axis.title.y = element_text(size = 10), # remove y-axis labels
+        panel.background = element_blank(), 
+        panel.grid.major = element_blank(),  #remove major-grid labels
+        panel.grid.minor = element_blank(),  #remove minor-grid labels
+        plot.background = element_blank())
+size_nmds
+
+
+hull.data <- rbind(diet.h, diet.c, diet.d, diet.p, diet.z)
+diet_nmds <- ggplot() + 
+  geom_polygon(data = hull.data, aes(x = NMDS1, y = NMDS2, fill = diet, group = diet), alpha = 0.30) + # add the convex hulls
+  geom_text_repel(data = data.scores, aes(x = NMDS1, y = NMDS2, label = site), alpha = 0.5) +  # add the species labels
+  geom_point(data = data.scores, aes(x = NMDS1, y = NMDS2, shape = diet, colour = diet), size = 4) + # add the point markers
+  coord_equal() +
+  theme_bw() + 
+  theme(axis.text.x = element_blank(),  # remove x-axis text
+        axis.text.y = element_blank(), # remove y-axis text
+        axis.ticks = element_blank(),  # remove axis ticks
+        axis.title.x = element_text(size = 10), # remove x-axis labels
+        axis.title.y = element_text(size = 10), # remove y-axis labels
+        panel.background = element_blank(), 
+        panel.grid.major = element_blank(),  #remove major-grid labels
+        panel.grid.minor = element_blank(),  #remove minor-grid labels
+        plot.background = element_blank())
+diet_nmds
 
