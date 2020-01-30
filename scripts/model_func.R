@@ -1,45 +1,47 @@
 # load packages:
 source("scripts/pckgs_preps.R")
-library(todor)# not required
 
 # load MEData
-# TODO update medata file (make sure no mistakes with the crete depth data)
-
 med_raw <- read_csv("data/med_raw.csv", col_types = cols(depth = col_double())) %>%
   filter(data.origin != "azz_asi") %>% # azz_asi is only presence-absence so at the moment it's irrelevant
   mutate(loc = paste0(site, "_", trans), tmean_reg = scale(tmean)) # TODO regularise depth covariate
 str(med_raw)
 pryr::object_size(med_raw)
 
-# Define west/east basins = `basin` variable
+# Define `basin` variable
 west <- list("France", "Italy", "Spain")
 east <- list("Croatia", "Greece", "Israel", "Malta", "Turkey")
 
-# Define a vector that includes the names of the species of interest =`group` or `grp` variable
+# Define `group` variable
 groupers <- c("Epinephelus.costae", "Epinephelus.marginatus",
               "Mycteroperca.rubra", "Serranus.cabrilla", "Serranus.scriba")
+diplodus <- c("Diplodus.annularis", "Diplodus.puntazzo", "Diplodus.sargus",
+              "Diplodus.vulgaris", "Diplodus.cervinus")
+herbivores <- c("Siganus.rivulatus", "Siganus.luridus", "Sarpa.salpa",
+                "Scarus.ghobban", "Sparisoma.cretense")
 
-# covs <- med_raw %>% select(tmean, sal_mean, pp_mean)
-# dim(covs)[[2]]
-# dim(med_raw$enforcement)[[2]]
-# 
-# med_raw$tmean_reg
+# THINGS TO ADDRESS:
+# 1. Categorical variable (4 levels, not 3)
+# 2. Title for graph
+# 3. Create a grid of graphs of the same covariate (different levels)
+# 4. What happens if a species diesn't appear in the data in one of the basins (relevant mainly to herb grp)
 
-# Function 1: create matrix from subset of the main dataset ----------------
-shuster <- function(dataset, basin, group, covariate, family){
+my_model <- function(dataset, basin, group, covariate, family){
+  # Step 1: Create species matrix for `group` in `basin` with 1 `covariate`
   species_mat <<- dataset %>%
     filter(country %in% basin) %>% 
-    group_by(loc, species, tmean_reg, enforcement) %>%
+    group_by(loc, species, tmean_reg, enforcement, depth) %>%
     summarise(n = sum(sp.n)) %>% 
     spread(species, n, fill = 0) %>% 
     as.data.frame() %>% 
     `rownames<-`(make.unique(.$loc)) %>%
     select(group, covariate)
-  
+  # Step 2: Run model and create occurrence predictions
   mod <<- MRFcov(data = species_mat, n_nodes = length(group), n_covariates = 1, family = family)
   boot <<- bootstrap_MRF(data = species_mat, n_nodes = length(group), n_covariates = 1, family = family)
   pred <<- predict_MRF(data = species_mat, MRF_mod = boot) %>% invlogit()
-  
+  # Step 3: Create graphs
+    # 3a. Categorise continuous data
   species_mat_cat <- species_mat %>%
     mutate(category = cut(x = covariate,
                           breaks = c(-Inf,
@@ -49,13 +51,13 @@ shuster <- function(dataset, basin, group, covariate, family){
                           labels = c("low", "med", "hi"))) %>% 
     group_by(category) %>%
     nest()
-  
+    # 3b. Run model on each category
   nested_data <- species_mat_cat %>%
     mutate(model = map(data, function(x) MRFcov(data = x,
                                                 n_nodes = length(group),
                                                 n_covariates = 1,
                                                 family = "gaussian")))
-  
+    # 3c. Create graph
   sub_graph <- graph.adjacency(nested_data$model[[1]][[1]], weighted = T, mode = "undirected")
   deg <- degree(sub_graph, mode = "all")
   plot.igraph(sub_graph, layout = layout.circle(sub_graph),
@@ -70,16 +72,36 @@ shuster <- function(dataset, basin, group, covariate, family){
   
 }
 
-shuster(dataset = med_raw, basin = east, group = groupers, covariate = "tmean_reg", family = "gaussian")
+my_model(dataset = med_raw, basin = east, group = groupers, covariate = "tmean_reg", family = "gaussian")
 head(pred)
 str(species_mat)
 
-# define group name
+## define group name
 # grp_name <- as.character(colnames(groupers))
+
+
+
+# fix the problem with arg `covariate`? -----------------------------------
+dataset <- med_raw
+basin <- east
+group <- groupers
+covariate <- med_raw$tmean_reg
+
+species_mat <<- dataset %>%
+  filter(country %in% basin) %>% 
+  group_by(loc, species, tmean_reg, enforcement) %>%
+  summarise(n = sum(sp.n)) %>% 
+  spread(species, n, fill = 0) %>% 
+  as.data.frame() %>% 
+  `rownames<-`(make.unique(.$loc)) %>%
+  select(group, covariate)
+
+# Error: `covariate` must evaluate to column positions or names, not a double vector
 
 
 # - -----------------------------------------------------------------------
 
+# Function 1: create matrix from subset of the main dataset ---------------
 
 # group_basin_var <- med_raw %>%
 #   filter(country %in% east) %>% 
@@ -89,7 +111,6 @@ str(species_mat)
 #   as.data.frame() %>% 
 #   `rownames<-`(make.unique(.$loc)) %>%
 #   select(groupers, tmean_reg)
-
 
 ## Function 2: Run model, bootstrapped model and model predictions ---------
 
