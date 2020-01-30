@@ -40,13 +40,47 @@ shuster <- function(dataset, basin, group, covariate, family){
   boot <<- bootstrap_MRF(data = species_mat, n_nodes = length(group), n_covariates = 1, family = family)
   pred <<- predict_MRF(data = species_mat, MRF_mod = boot) %>% invlogit()
   
+  species_mat_cat <- species_mat %>%
+    mutate(category = cut(x = covariate,
+                          breaks = c(-Inf,
+                                     quantile(covariate, 0.33),
+                                     quantile(covariate, 0.66),
+                                     Inf),
+                          labels = c("low", "med", "hi"))) %>% 
+    group_by(category) %>%
+    nest()
+  
+  nested_data <- species_mat_cat %>%
+    mutate(model = map(data, function(x) MRFcov(data = x,
+                                                n_nodes = length(group),
+                                                n_covariates = 1,
+                                                family = "gaussian")))
+  
+  sub_graph <- graph.adjacency(nested_data$model[[1]][[1]], weighted = T, mode = "undirected")
+  deg <- degree(sub_graph, mode = "all")
+  plot.igraph(sub_graph, layout = layout.circle(sub_graph),
+              edge.width = abs(E(sub_graph)$weight),
+              edge.color = ifelse(E(sub_graph)$weight < 0, '#3399CC', '#FF3333'),
+              vertex.size = deg,
+              vertex.label.family = "sans",
+              vertex.label.font	= 3,
+              vertex.label.cex = 1,
+              vertex.label.color = adjustcolor("#333333", 0.85),
+              vertex.color = adjustcolor("#FFFFFF", .5))
+  
 }
 
 shuster(dataset = med_raw, basin = east, group = groupers, covariate = "tmean_reg", family = "gaussian")
 head(pred)
 str(species_mat)
 
-# Try one without the function
+# define group name
+# grp_name <- as.character(colnames(groupers))
+
+
+# - -----------------------------------------------------------------------
+
+
 # group_basin_var <- med_raw %>%
 #   filter(country %in% east) %>% 
 #   group_by(loc, species, tmean_reg, enforcement) %>%
@@ -56,9 +90,8 @@ str(species_mat)
 #   `rownames<-`(make.unique(.$loc)) %>%
 #   select(groupers, tmean_reg)
 
-# test = mrf_matrix(dataset = med_raw, basin = east, group = groupers, covariate = 'tmean_reg')
 
-# Function 2: Run model, bootstrapped model and model predictions ---------
+## Function 2: Run model, bootstrapped model and model predictions ---------
 
 # mrf_model <- function(data, n_nodes, n_covariates, family, MRF_mod){
 #   mod <- MRFcov(data = species_mat, n_nodes = n_nodes, n_covariates = n_covariates, family = family)
@@ -75,57 +108,5 @@ str(species_mat)
 
 # Function 3: Create network graphs ---------------------------------------
 
-# Categorise covariate
 
-species_mat_cat <- species_mat %>% mutate(category = cut(x = tmean_reg,
-                                                          breaks = c(-Inf,
-                                                                     quantile(tmean_reg, 0.33),
-                                                                     quantile(tmean_reg, 0.66),
-                                                                     Inf),
-                                                          labels = c("low", "med", "hi")))
-
-
-head(species_mat_cat)
-# Check how many rows of each category
-species_mat_cat %>% group_by(category) %>% nest()
-
-# # define the level i want to subset for:
-# temp <- "med" # this needs to be automated
-
-################################### work from here ########################################
-# --------------------------------------------------------------------------------------- #
-sub_temp <- species_mat_cat %>% filter(category == temp) %>% select(-category)
-sub_model <- MRFcov(data = sub_temp, n_nodes = 5, n_covariates = 1, family = "gaussian")
-sub_graph <- graph.adjacency(sub_model$graph, weighted = T, mode = "undirected")
-deg <- degree(sub_graph, mode = "all")
-plot.igraph(sub_graph, layout = layout.circle(sub_graph),
-            edge.width = abs(E(sub_graph)$weight),
-            edge.color = ifelse(E(sub_graph)$weight < 0, '#3399CC', '#FF3333'),
-            vertex.size = deg,
-            vertex.label.family = "sans",
-            vertex.label.font	= 3,
-            vertex.label.cex = 1,
-            vertex.label.color = adjustcolor("#333333", 0.85),
-            vertex.color = adjustcolor("#FFFFFF", .5),
-            main = paste(temp, covariate))
-
-# --------------------------------------------------------------------------------------- #
-
-
-# create graph
-net_mod <- MRFcov(data = species_mat_cat, n_nodes = length(group), family = "gaussian")
-net_graph <- graph.adjacency(net_mod$graph, weighted = T, mode = "undirected")
-deg <- degree(net_graph, mode = "all")
-plot.igraph(net_graph, layout = layout.circle(net_graph),
-            edge.width = abs(E(net_graph)$weight),
-            edge.color = ifelse(E(net_graph)$weight < 0, '#3399CC', '#FF3333'), # blue = neg; red = pos
-            vertex.size = deg,
-            vertex.label.family = "sans",
-            vertex.label.font	= 3,
-            vertex.label.cex = 1,
-            vertex.label.color = adjustcolor("#333333", 0.85),
-            vertex.color = adjustcolor("#FFFFFF", .5))
-
-# define group name
-# grp_name <- as.character(colnames(groupers))
 
