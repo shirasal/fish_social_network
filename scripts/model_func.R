@@ -24,7 +24,8 @@ run_mod <- function(species_mat, n_covs, family){
 }
 
 # Func 3: Categorise continuous data
-categorise_cov <- function(species_mat, covariate_vector){
+categorise_cov <- function(species_mat, covariate){
+  covariate_vector <- species_mat[[covariate]]
   species_mat %>%
     mutate(category = cut(x = covariate_vector,
                           breaks = c(-Inf,
@@ -38,23 +39,23 @@ categorise_cov <- function(species_mat, covariate_vector){
     nest()
 }
 
-# Run MRFcov model with some defaults
+# Func 4: Run MRFcov model with some defaults
 get_model <- function(data, ncov){
   MRFcov(data = data, n_nodes = ncol(data) - ncov, n_covariates = ncov, family = "gaussian")
 }
 
-# Func 4: Run model on each category
+# Func 5: Run model on each category
 nested_models <- function(nested_df){
   nested_df %>%
     mutate(model = map(data, function(x) get_model(data = x, ncov = 1)))
 }
 
-# Func 5: Get graph data
+# Func 6: Get graph data
 get_graph <- function(model){
   graph.adjacency(model$graph, weighted = T, mode = "undirected")
 }
 
-# Func 6: Plot graphs
+# Func 7: Plot graphs
 plotting_func <- function(igraph, category){
   sub_graph <- igraph
   deg <- degree(sub_graph, mode = "all")
@@ -70,12 +71,10 @@ plotting_func <- function(igraph, category){
                       main = category)
 }
 
-# Func 7: Plot multiple graphs on the same grid
+# Func 8: Plot multiple graphs on the same grid
 plot_multi_graphs <- function(nested_df, n_graphs){
   layout(matrix(c(1:n_graphs), 1, n_graphs, byrow = TRUE))
   map2(.x = nested_df$plot, .y = nested_df$category, plotting_func)
 }
-
-
 
 
