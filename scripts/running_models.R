@@ -27,7 +27,7 @@ herbivores <- c("Siganus.rivulatus", "Siganus.luridus", "Sarpa.salpa",
 
 # TODO THINGS TO ADDRESS:
 # 1. Categorical variable (4 levels, not 3)
-# 2. Add title to graph grid
+# 2. Add title to graph grid (https://stackoverflow.com/questions/14660372/common-main-title-of-a-figure-panel-compiled-with-parmfrow)
 # 3. What happens if a species doesn't appear in the data in one of the basins (relevant mainly to herb grp)
 
 
