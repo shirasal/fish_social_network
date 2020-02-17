@@ -23,7 +23,7 @@ run_mod <- function(species_mat, n_covs, family){
   return(list(mod = mod, boot = boot, pred = pred))
 }
 
-# Func 3: Categorise continuous data
+# Func 3a: Categorise continuous data ---- Only for continuous data!
 categorise_cov <- function(species_mat, covariate){
   covariate_vector <- species_mat[[covariate]]
   species_mat %>%
@@ -33,11 +33,24 @@ categorise_cov <- function(species_mat, covariate){
                                      quantile(covariate_vector, 0.66),
                                      Inf),
                           labels = c("low", "med", "hi"),
-                          ordered_result = TRUE)) %>% 
-    arrange(category) %>% 
-    group_by(category) %>%
-    nest()
+                          ordered_result = TRUE))
 }
+
+# Func 3b: nest data according to categories
+
+nested_data <- function(categorised_data){
+  if_else(!"category" %in% colnames(categorised_data),
+          categorised_data %>%
+            mutate(category = as.factor(.[, ncol(.)])) %>%
+            arrange(category) %>%
+            group_by(category) %>%
+            nest(), 
+          categorised_data %>%
+            arrange(category) %>%
+            group_by(category) %>%
+            nest())
+}
+
 
 # Func 4: Run MRFcov model with some defaults
 get_model <- function(data, ncov){

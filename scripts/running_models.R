@@ -27,7 +27,8 @@ herbivores <- c("Siganus.rivulatus", "Siganus.luridus", "Sarpa.salpa",
 
 # TODO THINGS TO ADDRESS:
 # 1. Categorical variable (4 levels, not 3)
-# 2. What happens if a species doesn't appear in the data in one of the basins (relevant mainly to herb grp)
+# 2. Add title to graph grid
+# 3. What happens if a species doesn't appear in the data in one of the basins (relevant mainly to herb grp)
 
 
 
@@ -46,22 +47,24 @@ str(model_temp$pred)
 
 # Func 3
 categories <- categorise_cov(species_mat = spp_mat, covariate = "tmean_reg")
+nested_cats <- nested_data(categorised_data = categories) # FIXME Error: Can't use numeric NA as column index with `[`.
 
 # Func 4
 cat_model <- get_model(data = spp_mat, ncov = 1)
 cat_model
 
 # Func 5
-nested <- nested_models(nested_df = categories)
+nested <- nested_models(nested_df = nested_cats)
 
 # Func 6
-nested_data <- nested %>% mutate(plot = map(model, get_graph))
+nested_plot <- nested %>% mutate(plot = map(model, get_graph))
 
 # Func 8
-temperature_graph <- plot_multi_graphs(nested_df = nested_data,n_graphs = 3)
+temperature_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
 
 
-# Run functions on enforcement --------------------------------------------
+
+# Run functions on MPA data -----------------------------------------------
 
 # Func 1
 spp_mat <- create_spp_mat(dataset = med_raw, basin = east,
@@ -69,26 +72,24 @@ spp_mat <- create_spp_mat(dataset = med_raw, basin = east,
 str(spp_mat)
 
 # Func 2
-model_temp <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
-model_temp$mod
-model_temp$boot
-str(model_temp$pred)
+model_enf <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
+model_enf$mod
+model_enf$boot
+str(model_enf$pred)
 
-# Func 3
-categories <- categorise_cov(species_mat = spp_mat, covariate = "enforcement")
+# Func 3b (no need for 3a because it's already categorised)
+nested_cats <- nested_data(categorised_data = spp_mat)
 
 # Func 4
 cat_model <- get_model(data = spp_mat, ncov = 1)
 cat_model
-# FIXME categories are defined by the covariate (categorical in this case)
 
 # Func 5
-nested <- nested_models(nested_df = categories)
+nested <- nested_models(nested_df = nested_cats)
 
 # Func 6
-nested_data <- nested %>% mutate(plot = map(model, get_graph))
+nested_plot <- nested %>% mutate(plot = map(model, get_graph))
 
 # Func 8
 MPAs_graph <- plot_multi_graphs(nested_df = nested_data,n_graphs = 3)
-
 
