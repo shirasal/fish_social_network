@@ -36,7 +36,7 @@ categorise_cov <- function(species_mat, covariate){
                           ordered_result = TRUE))
 }
 
-# Func 3b: Categorise data
+# Func 3b: Nest categorical (nominal) data
 nested_data <- function(categorised_data) {
   if ("category" %in% colnames(categorised_data)){
     categorised_data %>%
@@ -53,7 +53,6 @@ nested_data <- function(categorised_data) {
       return()
   } 
 }
-
 
 
 # Func 4: Run MRFcov model with some defaults
