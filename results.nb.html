@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
 
 <head>
 
 <meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
@@ -1698,7 +1699,6 @@ summary {
   border: none;
   display: inline-block;
   border-radius: 4px;
-  background-color: transparent;
 }
 
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li {
@@ -1749,308 +1749,586 @@ summary {
 
 
 <!-- rnb-text-begin -->
+<p><strong>How fish communities change along environmental gradients?</strong> Species associations are represented graphically and quantitatively using <em>MRFcov package</em> <a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>.</p>
 <!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc291cmNlKFwic2NyaXB0cy9uZXR3b3Jrcy5SXCIpXG5cbmBgYCJ9 -->
-<pre class="r"><code>source(&quot;scripts/networks.R&quot;)
-</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<div id="averaged-networks" class="section level1">
-<h1>Averaged networks</h1>
-<div id="coefficients-of-each-node-species" class="section level2">
-<h2>Coefficients of each node (species)</h2>
-<p>Which predictors determine it’s odds of occurrence</p>
-<div id="serranidae-network" class="section level3">
-<h3>Serranidae network</h3>
+<div id="data" class="section level3">
+<h3>Data</h3>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuUy5jYWIuY29lZmZzXG5TLnNjcmliLmNvZWZmc1xuXG5gYGAifQ== -->
-<pre class="r"><code>S.cab.coeffs
-S.scrib.coeffs
-</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG5tZWRfcmF3IDwtIHJlYWRfY3N2KFwiZGF0YS9tZWRfcmF3LmNzdlwiLCBjb2xfdHlwZXMgPSBjb2xzKGRlcHRoID0gXCJkXCIpKSAlPiVcbiAgZmlsdGVyKGRhdGEub3JpZ2luICE9IFwiYXp6X2FzaVwiKSAlPiUgIyByZW1vdmUgcHJlc2VuY2UtYWJzZW5jZSBkYXRhXG4gIG11dGF0ZShsb2MgPSBwYXN0ZTAoc2l0ZSwgXCJfXCIsIHRyYW5zKSwgdG1lYW5fcmVnID0gc2NhbGUodG1lYW4pLCBkZXB0aF9yZWcgPSBzY2FsZShkZXB0aCkpXG5zdHIobWVkX3JhdylcbmBgYCJ9 -->
+<pre class="r"><code>
+med_raw &lt;- read_csv(&quot;data/med_raw.csv&quot;, col_types = cols(depth = &quot;d&quot;)) %&gt;%
+  filter(data.origin != &quot;azz_asi&quot;) %&gt;% # remove presence-absence data
+  mutate(loc = paste0(site, &quot;_&quot;, trans), tmean_reg = scale(tmean), depth_reg = scale(depth))
+str(med_raw)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p><em>Serranus cabrilla</em> and <em>Serranus scriba</em> are mostly affected by temperature.</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuRS5jb3N0YWUuY29lZmZzXG5FLm1hcmdpbi5jb2VmZnNcblxuYGBgIn0= -->
-<pre class="r"><code>E.costae.coeffs
-E.margin.coeffs
-</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p><em>Epinephelus marginatus</em> is mostly affected by <em>Epinephelus costae</em> but not the other way around.</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2Vycl9lZmZlY3RzXG5gYGAifQ== -->
-<pre class="r"><code>serr_effects</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2Vycl9kaXN0c1xuYGBgIn0= -->
-<pre class="r"><code>serr_dists</code></pre>
-<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiQ2xhc3NlcyDigJhzcGVjX3RibF9kZuKAmSwg4oCYdGJsX2Rm4oCZLCDigJh0YmzigJkgYW5kICdkYXRhLmZyYW1lJzpcdDM4OTY5IG9icy4gb2YgIDI3IHZhcmlhYmxlczpcbiAkIGRhdGEub3JpZ2luICAgOiBjaHIgIFwiYXp6X21hbHRcIiBcImF6el9tYWx0XCIgXCJhenpfbWFsdFwiIFwiYXp6X21hbHRcIiAuLi5cbiAkIGNvdW50cnkgICAgICAgOiBjaHIgIFwiSXRhbHlcIiBcIkl0YWx5XCIgXCJJdGFseVwiIFwiSXRhbHlcIiAuLi5cbiAkIHNpdGUgICAgICAgICAgOiBjaHIgIFwiTGlub3NhXCIgXCJMaW5vc2FcIiBcIkxpbm9zYVwiIFwiTGlub3NhXCIgLi4uXG4gJCBsb24gICAgICAgICAgIDogbnVtICAxMi45IDEyLjkgMTIuOSAxMi45IDEyLjkgLi4uXG4gJCBsYXQgICAgICAgICAgIDogbnVtICAzNS45IDM1LjkgMzUuOSAzNS45IDM1LjkgLi4uXG4gJCB0cmFucyAgICAgICAgIDogbnVtICAyMTEgMjExIDIxMSAyMTEgMjExIDIxMSAyMTEgMjExIDIxMSAyMTEgLi4uXG4gJCBzcGVjaWVzICAgICAgIDogY2hyICBcIkNvcmlzLmp1bGlzXCIgXCJPZWRhbGVjaGlsdXMubGFiZW9cIiBcIlNwYXJpc29tYS5jcmV0ZW5zZVwiIFwiU3ltcGhvZHVzLnJvaXNzYWxpXCIgLi4uXG4gJCBzcC5sZW5ndGggICAgIDogbnVtICA0IDE5IDIwIDQuNSAxMCAxMyA2IDE0IDI5IDggLi4uXG4gJCBzcC5uICAgICAgICAgIDogbnVtICAyIDEgMSAxIDEgMSAxIDIgMSA4IC4uLlxuICQgc2Vhc29uICAgICAgICA6IGNociAgXCJBdXR1bW5cIiBcIkF1dHVtblwiIFwiQXV0dW1uXCIgXCJBdXR1bW5cIiAuLi5cbiAkIHByb3RlY3Rpb24gICAgOiBjaHIgIFwiWUVTXCIgXCJZRVNcIiBcIllFU1wiIFwiWUVTXCIgLi4uXG4gJCBlbmZvcmNlbWVudCAgIDogbnVtICAxIDEgMSAxIDEgMSAxIDEgMSAxIC4uLlxuICQgdG90YWwubXBhLmhhICA6IG51bSAgTkEgTkEgTkEgTkEgTkEgTkEgTkEgTkEgTkEgTkEgLi4uXG4gJCBzaXplLm5vdGFrZSAgIDogbnVtICBOQSBOQSBOQSBOQSBOQSBOQSBOQSBOQSBOQSBOQSAuLi5cbiAkIHlyLmNyZWF0aW9uICAgOiBudW0gIDIwMDIgMjAwMiAyMDAyIDIwMDIgMjAwMiAuLi5cbiAkIGFnZS5yZXNlcnZlLnlyOiBudW0gIDIgMiAyIDIgMiAyIDIgMiAyIDIgLi4uXG4gJCBkZXB0aCAgICAgICAgIDogbnVtICBOQSBOQSBOQSBOQSBOQSBOQSBOQSBOQSBOQSBOQSAuLi5cbiAkIGEgICAgICAgICAgICAgOiBudW0gIDAuMDA3OTkgMC4wMTEwNyAwLjAwOTgyIDAuMDE1NTQgMC4wMTU1NCAuLi5cbiAkIGIgICAgICAgICAgICAgOiBudW0gIDMuMDkgMi45OCAzLjExIDMuMDMgMy4wMyAuLi5cbiAkIHRtZWFuICAgICAgICAgOiBudW0gIDIwLjQgMjAuNCAyMC40IDIwLjQgMjAuNCAuLi5cbiAkIHRyYW5nZSAgICAgICAgOiBudW0gIDExLjcgMTEuNyAxMS43IDExLjcgMTEuNyAuLi5cbiAkIHNhbF9tZWFuICAgICAgOiBudW0gIDM3LjYgMzcuNiAzNy42IDM3LjYgMzcuNiAuLi5cbiAkIHBwX21lYW4gICAgICAgOiBudW0gIDAuMDAwNTQ2IDAuMDAwNTQ2IDAuMDAwNTQ2IDAuMDAwNTQ2IDAuMDAwNTQ2IDAuMDAwNTQ2IDAuMDAwNTQ2IDAuMDAwNTQ2IDAuMDAwNTQ2IDAuMDAwNTQ2IC4uLlxuICQgcHBfcmFuZ2UgICAgICA6IG51bSAgMC4wMDE3NiAwLjAwMTc2IDAuMDAxNzYgMC4wMDE3NiAwLjAwMTc2IC4uLlxuICQgbG9jICAgICAgICAgICA6IGNociAgXCJMaW5vc2FfMjExXCIgXCJMaW5vc2FfMjExXCIgXCJMaW5vc2FfMjExXCIgXCJMaW5vc2FfMjExXCIgLi4uXG4gJCB0bWVhbl9yZWcgICAgIDogbnVtIFsxOjM4OTY5LCAxXSAwLjExNSAwLjExNSAwLjExNSAwLjExNSAwLjExNSAuLi5cbiAgLi4tIGF0dHIoKiwgXCJzY2FsZWQ6Y2VudGVyXCIpPSBudW0gMjAuMVxuICAuLi0gYXR0cigqLCBcInNjYWxlZDpzY2FsZVwiKT0gbnVtIDIuMDNcbiAkIGRlcHRoX3JlZyAgICAgOiBudW0gWzE6Mzg5NjksIDFdIE5BIE5BIE5BIE5BIE5BIE5BIE5BIE5BIE5BIE5BIC4uLlxuICAuLi0gYXR0cigqLCBcInNjYWxlZDpjZW50ZXJcIik9IG51bSA5LjNcbiAgLi4tIGF0dHIoKiwgXCJzY2FsZWQ6c2NhbGVcIik9IG51bSA1LjEyXG4ifQ== -->
+<pre><code>Classes ‘spec_tbl_df’, ‘tbl_df’, ‘tbl’ and &#39;data.frame&#39;:    38969 obs. of  27 variables:
+ $ data.origin   : chr  &quot;azz_malt&quot; &quot;azz_malt&quot; &quot;azz_malt&quot; &quot;azz_malt&quot; ...
+ $ country       : chr  &quot;Italy&quot; &quot;Italy&quot; &quot;Italy&quot; &quot;Italy&quot; ...
+ $ site          : chr  &quot;Linosa&quot; &quot;Linosa&quot; &quot;Linosa&quot; &quot;Linosa&quot; ...
+ $ lon           : num  12.9 12.9 12.9 12.9 12.9 ...
+ $ lat           : num  35.9 35.9 35.9 35.9 35.9 ...
+ $ trans         : num  211 211 211 211 211 211 211 211 211 211 ...
+ $ species       : chr  &quot;Coris.julis&quot; &quot;Oedalechilus.labeo&quot; &quot;Sparisoma.cretense&quot; &quot;Symphodus.roissali&quot; ...
+ $ sp.length     : num  4 19 20 4.5 10 13 6 14 29 8 ...
+ $ sp.n          : num  2 1 1 1 1 1 1 2 1 8 ...
+ $ season        : chr  &quot;Autumn&quot; &quot;Autumn&quot; &quot;Autumn&quot; &quot;Autumn&quot; ...
+ $ protection    : chr  &quot;YES&quot; &quot;YES&quot; &quot;YES&quot; &quot;YES&quot; ...
+ $ enforcement   : num  1 1 1 1 1 1 1 1 1 1 ...
+ $ total.mpa.ha  : num  NA NA NA NA NA NA NA NA NA NA ...
+ $ size.notake   : num  NA NA NA NA NA NA NA NA NA NA ...
+ $ yr.creation   : num  2002 2002 2002 2002 2002 ...
+ $ age.reserve.yr: num  2 2 2 2 2 2 2 2 2 2 ...
+ $ depth         : num  NA NA NA NA NA NA NA NA NA NA ...
+ $ a             : num  0.00799 0.01107 0.00982 0.01554 0.01554 ...
+ $ b             : num  3.09 2.98 3.11 3.03 3.03 ...
+ $ tmean         : num  20.4 20.4 20.4 20.4 20.4 ...
+ $ trange        : num  11.7 11.7 11.7 11.7 11.7 ...
+ $ sal_mean      : num  37.6 37.6 37.6 37.6 37.6 ...
+ $ pp_mean       : num  0.000546 0.000546 0.000546 0.000546 0.000546 0.000546 0.000546 0.000546 0.000546 0.000546 ...
+ $ pp_range      : num  0.00176 0.00176 0.00176 0.00176 0.00176 ...
+ $ loc           : chr  &quot;Linosa_211&quot; &quot;Linosa_211&quot; &quot;Linosa_211&quot; &quot;Linosa_211&quot; ...
+ $ tmean_reg     : num [1:38969, 1] 0.115 0.115 0.115 0.115 0.115 ...
+  ..- attr(*, &quot;scaled:center&quot;)= num 20.1
+  ..- attr(*, &quot;scaled:scale&quot;)= num 2.03
+ $ depth_reg     : num [1:38969, 1] NA NA NA NA NA NA NA NA NA NA ...
+  ..- attr(*, &quot;scaled:center&quot;)= num 9.3
+  ..- attr(*, &quot;scaled:scale&quot;)= num 5.12</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 </div>
-<div id="diplodus-network" class="section level3">
-<h3>Diplodus network</h3>
+<div id="define-variables-basin-group" class="section level3">
+<h3>Define variables <code>basin</code>; <code>group</code></h3>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuRC5hbm51LmNvZWZmc1xuRC5wdW50LmNvZWZmc1xuRC52dWxnLmNvZWZmc1xuXG5gYGAifQ== -->
-<pre class="r"><code>D.annu.coeffs
-D.punt.coeffs
-D.vulg.coeffs
-</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p><em>Diplodus annularis</em> is mostly affected by the interaction between temperature and the presence of <em>D. sargus</em>.</p>
-<p><em>Diplodus puntazzo</em> is mostly affected by the presence of <em>D. vulgaris</em>.</p>
-<p><em>Diplodus vulgaris</em> is strongly affected by temperature.</p>
-<p><em>Diplodus cervinus</em> is <strong>only</strong> affected by <em>D. sargus</em>.</p>
-</div>
-<div id="herbivore-network" class="section level3">
-<h3>Herbivore network</h3>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuUy5yZXYuY29lZmZzXG5TLnNhbHBhLmNvZWZmc1xuUy5naG9iLmNvZWZmc1xuUy5jcmV0LmNvZWZmc1xuYGBgIn0= -->
-<pre class="r"><code>S.rev.coeffs
-S.salpa.coeffs
-S.ghob.coeffs
-S.cret.coeffs</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p><em>Siganus rivulatus</em> is <strong>only</strong> affected by temperature, as is <em>Sarpa salpa</em>. <em>Scarus ghobban</em> is affected by the interaction of temperature and the presence of <em>Siganus rivulatus</em>, as is <em>Sparisoma cretense</em>.</p>
-</div>
-</div>
-</div>
-<div id="predicted-networks" class="section level1">
-<h1>Predicted networks</h1>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc291cmNlKFwic2NyaXB0cy9wcmVkaWN0X25ldHMuUlwiKVxuXG5gYGAifQ== -->
-<pre class="r"><code>source(&quot;scripts/predict_nets.R&quot;)
-</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Use bootstrapped model (<code>bootstrap_MRF</code>) for predicting log odds (logit) of occurrence for species per site (<code>predict_MRF</code>). These log odds can be transformed into probabilities using <code>LaplacesDemon::invlogit</code> function. These can be “checked” using subsets of the data by covariate levels (e.g. low/mid/hi temp) to create separate networks - not with the predict function but with the <code>MRFcov</code> function. ????</p>
-<p><code>bootstrap_MRF</code> creates distribution of data permutations and helps in eliminating uncertainties. Part of its output is 95% confidence interval for each one of the predictors, which I can use to evaluate the predictors effect.</p>
-<div id="serranidae-networks" class="section level2">
-<h2>Serranidae networks</h2>
-<div id="temperature-effect" class="section level3">
-<h3>Temperature effect</h3>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBMb3dcbnBsb3QuaWdyYXBoKHNlcnJfZ3JhcGhfbG93LCBsYXlvdXQgPSBsYXlvdXQuY2lyY2xlKHNlcnJfZ3JhcGhfbG93KSxcbiAgICAgICAgICAgIGVkZ2Uud2lkdGggPSBhYnMoRShzZXJyX2dyYXBoX2xvdykkd2VpZ2h0KSxcbiAgICAgICAgICAgIGVkZ2UuY29sb3IgPSBpZmVsc2UoRShzZXJyX2dyYXBoX2xvdykkd2VpZ2h0IDwgMCwgJyMzMzk5Q0MnLCAnI0ZGMzMzMycpLFxuICAgICAgICAgICAgdmVydGV4LnNpemUgPSBkZWcsXG4gICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuZmFtaWx5ID0gXCJzYW5zXCIsXG4gICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuZm9udFx0PSAzLFxuICAgICAgICAgICAgdmVydGV4LmxhYmVsLmNleCA9IDEsXG4gICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuY29sb3IgPSBhZGp1c3Rjb2xvcihcIiMzMzMzMzNcIiwgMC44NSksXG4gICAgICAgICAgICB2ZXJ0ZXguY29sb3IgPSBhZGp1c3Rjb2xvcihcIiNGRkZGRkZcIiwgLjUpLFxuICAgICAgICAgICAgbWFpbiA9IFwiU2VycmFuaWRhZSBuZXR3b3JrIGluIGxvdyB0ZW1wZXJhdHVyZXNcIilcblxuIyBNZWRcbnNlcnJfbWVkIDwtIHBsb3QuaWdyYXBoKHNlcnJfZ3JhcGhfbWVkLCBsYXlvdXQgPSBsYXlvdXQuY2lyY2xlKHNlcnJfZ3JhcGhfbWVkKSxcbiAgICAgICAgICAgIGVkZ2Uud2lkdGggPSBhYnMoRShzZXJyX2dyYXBoX21lZCkkd2VpZ2h0KSxcbiAgICAgICAgICAgIGVkZ2UuY29sb3IgPSBpZmVsc2UoRShzZXJyX2dyYXBoX21lZCkkd2VpZ2h0IDwgMCwgJyMzMzk5Q0MnLCAnI0ZGMzMzMycpLFxuICAgICAgICAgICAgdmVydGV4LnNpemUgPSBkZWcsXG4gICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuZmFtaWx5ID0gXCJzYW5zXCIsXG4gICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuZm9udFx0PSAzLFxuICAgICAgICAgICAgdmVydGV4LmxhYmVsLmNleCA9IDEsXG4gICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuY29sb3IgPSBhZGp1c3Rjb2xvcihcIiMzMzMzMzNcIiwgMC44NSksXG4gICAgICAgICAgICB2ZXJ0ZXguY29sb3IgPSBhZGp1c3Rjb2xvcihcIiNGRkZGRkZcIiwgLjUpLFxuICAgICAgICAgICAgbWFpbiA9IFwiU2VycmFuaWRhZSBuZXR3b3JrIGluIG1lZGlhbiB0ZW1wZXJhdHVyZXNcIilcblxuIyBIaWdoXG5wbG90LmlncmFwaChzZXJyX2dyYXBoX2hpLCBsYXlvdXQgPSBsYXlvdXQuY2lyY2xlKHNlcnJfZ3JhcGhfaGkpLFxuICAgICAgICAgICAgZWRnZS53aWR0aCA9IGFicyhFKHNlcnJfZ3JhcGhfaGkpJHdlaWdodCksXG4gICAgICAgICAgICBlZGdlLmNvbG9yID0gaWZlbHNlKEUoc2Vycl9ncmFwaF9oaSkkd2VpZ2h0IDwgMCwgJyMzMzk5Q0MnLCAnI0ZGMzMzMycpLFxuICAgICAgICAgICAgdmVydGV4LnNpemUgPSBkZWcsXG4gICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuZmFtaWx5ID0gXCJzYW5zXCIsXG4gICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuZm9udFx0PSAzLFxuICAgICAgICAgICAgdmVydGV4LmxhYmVsLmNleCA9IDEsXG4gICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuY29sb3IgPSBhZGp1c3Rjb2xvcihcIiMzMzMzMzNcIiwgMC44NSksXG4gICAgICAgICAgICB2ZXJ0ZXguY29sb3IgPSBhZGp1c3Rjb2xvcihcIiNGRkZGRkZcIiwgLjUpLFxuICAgICAgICAgICAgbWFpbiA9IFwiU2VycmFuaWRhZSBuZXR3b3JrIGluIGhpZ2ggdGVtcGVyYXR1cmVzXCIpXG5cbmBgYCJ9 -->
-<pre class="r"><code># Low
-plot.igraph(serr_graph_low, layout = layout.circle(serr_graph_low),
-            edge.width = abs(E(serr_graph_low)$weight),
-            edge.color = ifelse(E(serr_graph_low)$weight &lt; 0, &#39;#3399CC&#39;, &#39;#FF3333&#39;),
-            vertex.size = deg,
-            vertex.label.family = &quot;sans&quot;,
-            vertex.label.font   = 3,
-            vertex.label.cex = 1,
-            vertex.label.color = adjustcolor(&quot;#333333&quot;, 0.85),
-            vertex.color = adjustcolor(&quot;#FFFFFF&quot;, .5),
-            main = &quot;Serranidae network in low temperatures&quot;)
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBCYXNpbnNcbndlc3QgPC0gbGlzdChcIkZyYW5jZVwiLCBcIkl0YWx5XCIsIFwiU3BhaW5cIilcbmVhc3QgPC0gbGlzdChcIkNyb2F0aWFcIiwgXCJHcmVlY2VcIiwgXCJJc3JhZWxcIiwgXCJNYWx0YVwiLCBcIlR1cmtleVwiKVxuXG4jIEdyb3Vwc1xuZ3JvdXBlcnMgPC0gYyhcIkVwaW5lcGhlbHVzLmNvc3RhZVwiLCBcIkVwaW5lcGhlbHVzLm1hcmdpbmF0dXNcIixcbiAgICAgICAgICAgICAgXCJNeWN0ZXJvcGVyY2EucnVicmFcIiwgXCJTZXJyYW51cy5jYWJyaWxsYVwiLCBcIlNlcnJhbnVzLnNjcmliYVwiKVxuZGlwbG9kdXMgPC0gYyhcIkRpcGxvZHVzLmFubnVsYXJpc1wiLCBcIkRpcGxvZHVzLnB1bnRhenpvXCIsIFwiRGlwbG9kdXMuc2FyZ3VzXCIsXG4gICAgICAgICAgICAgIFwiRGlwbG9kdXMudnVsZ2FyaXNcIiwgXCJEaXBsb2R1cy5jZXJ2aW51c1wiKVxuaGVyYml2b3JlcyA8LSBjKFwiU2lnYW51cy5yaXZ1bGF0dXNcIiwgXCJTaWdhbnVzLmx1cmlkdXNcIiwgXCJTYXJwYS5zYWxwYVwiLFxuICAgICAgICAgICAgICAgIFwiU2NhcnVzLmdob2JiYW5cIiwgXCJTcGFyaXNvbWEuY3JldGVuc2VcIilcblxuYGBgIn0= -->
+<pre class="r"><code># Basins
+west &lt;- list(&quot;France&quot;, &quot;Italy&quot;, &quot;Spain&quot;)
+east &lt;- list(&quot;Croatia&quot;, &quot;Greece&quot;, &quot;Israel&quot;, &quot;Malta&quot;, &quot;Turkey&quot;)
 
-# Med
-serr_med &lt;- plot.igraph(serr_graph_med, layout = layout.circle(serr_graph_med),
-            edge.width = abs(E(serr_graph_med)$weight),
-            edge.color = ifelse(E(serr_graph_med)$weight &lt; 0, &#39;#3399CC&#39;, &#39;#FF3333&#39;),
-            vertex.size = deg,
-            vertex.label.family = &quot;sans&quot;,
-            vertex.label.font   = 3,
-            vertex.label.cex = 1,
-            vertex.label.color = adjustcolor(&quot;#333333&quot;, 0.85),
-            vertex.color = adjustcolor(&quot;#FFFFFF&quot;, .5),
-            main = &quot;Serranidae network in median temperatures&quot;)
-
-# High
-plot.igraph(serr_graph_hi, layout = layout.circle(serr_graph_hi),
-            edge.width = abs(E(serr_graph_hi)$weight),
-            edge.color = ifelse(E(serr_graph_hi)$weight &lt; 0, &#39;#3399CC&#39;, &#39;#FF3333&#39;),
-            vertex.size = deg,
-            vertex.label.family = &quot;sans&quot;,
-            vertex.label.font   = 3,
-            vertex.label.cex = 1,
-            vertex.label.color = adjustcolor(&quot;#333333&quot;, 0.85),
-            vertex.color = adjustcolor(&quot;#FFFFFF&quot;, .5),
-            main = &quot;Serranidae network in high temperatures&quot;)
+# Groups
+groupers &lt;- c(&quot;Epinephelus.costae&quot;, &quot;Epinephelus.marginatus&quot;,
+              &quot;Mycteroperca.rubra&quot;, &quot;Serranus.cabrilla&quot;, &quot;Serranus.scriba&quot;)
+diplodus &lt;- c(&quot;Diplodus.annularis&quot;, &quot;Diplodus.puntazzo&quot;, &quot;Diplodus.sargus&quot;,
+              &quot;Diplodus.vulgaris&quot;, &quot;Diplodus.cervinus&quot;)
+herbivores &lt;- c(&quot;Siganus.rivulatus&quot;, &quot;Siganus.luridus&quot;, &quot;Sarpa.salpa&quot;,
+                &quot;Scarus.ghobban&quot;, &quot;Sparisoma.cretense&quot;)
 </code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 </div>
-<div id="mpas-effect" class="section level3">
-<h3>MPAs effect</h3>
+<div id="groupers" class="section level1">
+<h1>Groupers</h1>
+<div id="eastern-mediterranean" class="section level2">
+<h2>Eastern Mediterranean</h2>
+<div id="temperature-as-covariate" class="section level3">
+<h3>Temperature as covariate</h3>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBJbnNpZGUgTVBBc1xucGxvdC5pZ3JhcGgoc2Vycl9ncmFwaF9NUEEsIGxheW91dCA9IGxheW91dC5jaXJjbGUoc2Vycl9ncmFwaF9NUEEpLFxuICAgICAgICAgICAgZWRnZS53aWR0aCA9IGFicyhFKHNlcnJfZ3JhcGhfTVBBKSR3ZWlnaHQpLFxuICAgICAgICAgICAgZWRnZS5jb2xvciA9IGlmZWxzZShFKHNlcnJfZ3JhcGhfTVBBKSR3ZWlnaHQgPCAwLCAnIzMzOTlDQycsICcjRkYzMzMzJyksXG4gICAgICAgICAgICB2ZXJ0ZXguc2l6ZSA9IGRlZyxcbiAgICAgICAgICAgIHZlcnRleC5sYWJlbC5mYW1pbHkgPSBcInNhbnNcIixcbiAgICAgICAgICAgIHZlcnRleC5sYWJlbC5mb250XHQ9IDMsXG4gICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuY2V4ID0gMSxcbiAgICAgICAgICAgIHZlcnRleC5sYWJlbC5jb2xvciA9IGFkanVzdGNvbG9yKFwiIzMzMzMzM1wiLCAwLjg1KSxcbiAgICAgICAgICAgIHZlcnRleC5jb2xvciA9IGFkanVzdGNvbG9yKFwiI0ZGRkZGRlwiLCAuNSksXG4gICAgICAgICAgICBtYWluID0gXCJTZXJyYW5pZGFlIG5ldHdvcmsgaW5zaWRlIE1QQXNcIilcblxucGxvdC5pZ3JhcGgoc2Vycl9ncmFwaF9ub01QQSwgbGF5b3V0ID0gbGF5b3V0LmNpcmNsZShzZXJyX2dyYXBoX25vTVBBKSxcbiAgICAgICAgICAgIGVkZ2Uud2lkdGggPSBhYnMoRShzZXJyX2dyYXBoX25vTVBBKSR3ZWlnaHQpLFxuICAgICAgICAgICAgZWRnZS5jb2xvciA9IGlmZWxzZShFKHNlcnJfZ3JhcGhfbm9NUEEpJHdlaWdodCA8IDAsICcjMzM5OUNDJywgJyNGRjMzMzMnKSxcbiAgICAgICAgICAgIHZlcnRleC5zaXplID0gZGVnLFxuICAgICAgICAgICAgdmVydGV4LmxhYmVsLmZhbWlseSA9IFwic2Fuc1wiLFxuICAgICAgICAgICAgdmVydGV4LmxhYmVsLmZvbnRcdD0gMyxcbiAgICAgICAgICAgIHZlcnRleC5sYWJlbC5jZXggPSAxLFxuICAgICAgICAgICAgdmVydGV4LmxhYmVsLmNvbG9yID0gYWRqdXN0Y29sb3IoXCIjMzMzMzMzXCIsIDAuODUpLFxuICAgICAgICAgICAgdmVydGV4LmNvbG9yID0gYWRqdXN0Y29sb3IoXCIjRkZGRkZGXCIsIC41KSxcbiAgICAgICAgICAgIG1haW4gPSBcIlNlcnJhbmlkYWUgbmV0d29yayBvdXRzaWRlIE1QQXNcIilcblxuYGBgIn0= -->
-<pre class="r"><code># Inside MPAs
-plot.igraph(serr_graph_MPA, layout = layout.circle(serr_graph_MPA),
-            edge.width = abs(E(serr_graph_MPA)$weight),
-            edge.color = ifelse(E(serr_graph_MPA)$weight &lt; 0, &#39;#3399CC&#39;, &#39;#FF3333&#39;),
-            vertex.size = deg,
-            vertex.label.family = &quot;sans&quot;,
-            vertex.label.font   = 3,
-            vertex.label.cex = 1,
-            vertex.label.color = adjustcolor(&quot;#333333&quot;, 0.85),
-            vertex.color = adjustcolor(&quot;#FFFFFF&quot;, .5),
-            main = &quot;Serranidae network inside MPAs&quot;)
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBDcmVhdGUgc3BlY2llcyBtYXRyaXggZm9yIGBncm91cGAgaW4gYGJhc2luYCB3aXRoIGBjb3ZhcmlhdGVgXG5zcHBfbWF0IDwtIGNyZWF0ZV9zcHBfbWF0KGRhdGFzZXQgPSBtZWRfcmF3LCBiYXNpbiA9IGVhc3QsXG4gICAgICAgICAgICAgICAgICAgICAgICAgIGdyb3VwID0gZ3JvdXBlcnMsIGNvdmFyaWF0ZSA9IFwidG1lYW5fcmVnXCIpXG5zdHIoc3BwX21hdClcblxuIyBSdW4gbW9kZWwgYW5kIGNyZWF0ZSBvY2N1cnJlbmNlIHByZWRpY3Rpb25zXG5tb2RlbF90ZW1wIDwtIHJ1bl9tb2Qoc3BlY2llc19tYXQgPSBzcHBfbWF0LCBuX2NvdnMgPSAxLCBmYW1pbHkgPSBcImdhdXNzaWFuXCIpXG5jb2VmX3RlbXAgPC0gbW9kZWxfdGVtcCRtb2QkZGlyZWN0X2NvZWZzXG5rZXlfY29lZl90ZW1wIDwtIG1vZGVsX3RlbXAkYm9vdCRtZWFuX2tleV9jb2Vmc1xucHJlZGljdF90ZW1wIDwtIG1vZGVsX3RlbXAkcHJlZFxuXG4jIENhdGVnb3Jpc2UgY29udGludW91cyBkYXRhICsgTmVzdCBjYXRlZ29yaWNhbCAobm9taW5hbCkgZGF0YVxuY2F0ZWdvcmllcyA8LSBjYXRlZ29yaXNlX2NvdihzcGVjaWVzX21hdCA9IHNwcF9tYXQsIGNvdmFyaWF0ZSA9IFwidG1lYW5fcmVnXCIpXG5uZXN0ZWRfY2F0cyA8LSBuZXN0ZWRfZGF0YShjYXRlZ29yaXNlZF9kYXRhID0gY2F0ZWdvcmllcylcblxuIyBSdW4gTVJGY292IG1vZGVsIHdpdGggc29tZSBkZWZhdWx0c1xuY2F0X21vZGVsIDwtIGdldF9tb2RlbChkYXRhID0gc3BwX21hdCwgbmNvdiA9IDEpXG5jYXRfbW9kZWxcblxuIyBSdW4gbW9kZWwgb24gZWFjaCBjYXRlZ29yeVxubmVzdGVkIDwtIG5lc3RlZF9tb2RlbHMobmVzdGVkX2RmID0gbmVzdGVkX2NhdHMpXG5cbiMgR2V0IGdyYXBoIGRhdGFcbm5lc3RlZF9wbG90IDwtIG5lc3RlZCAlPiUgbXV0YXRlKHBsb3QgPSBtYXAobW9kZWwsIGdldF9ncmFwaCkpXG5cbiMgUGxvdCBtdWx0aXBsZSBncmFwaHMgZm9yIGdyYWRpZW50XG50ZW1wZXJhdHVyZV9ncmFwaCA8LSBwbG90X211bHRpX2dyYXBocyhuZXN0ZWRfZGYgPSBuZXN0ZWRfcGxvdCwgbl9ncmFwaHMgPSAzKVxuXG4jIHBuZyhcImZpZ3VyZXMvZ3JvdXBlcnNfZWFzdF90ZW1wLnBuZ1wiLCBoZWlnaHQgPSA0NTAsIHdpZHRoID0gMTIwMCwgcmVzID0gMTUwKVxuIyBwbG90X211bHRpX2dyYXBocyhuZXN0ZWRfZGYgPSBuZXN0ZWRfcGxvdCwgbl9ncmFwaHMgPSAzKVxuIyBkZXYub2ZmKClcblxuYGBgIn0= -->
+<pre class="r"><code># Create species matrix for `group` in `basin` with `covariate`
+spp_mat &lt;- create_spp_mat(dataset = med_raw, basin = east,
+                          group = groupers, covariate = &quot;tmean_reg&quot;)
+str(spp_mat)
 
-plot.igraph(serr_graph_noMPA, layout = layout.circle(serr_graph_noMPA),
-            edge.width = abs(E(serr_graph_noMPA)$weight),
-            edge.color = ifelse(E(serr_graph_noMPA)$weight &lt; 0, &#39;#3399CC&#39;, &#39;#FF3333&#39;),
-            vertex.size = deg,
-            vertex.label.family = &quot;sans&quot;,
-            vertex.label.font   = 3,
-            vertex.label.cex = 1,
-            vertex.label.color = adjustcolor(&quot;#333333&quot;, 0.85),
-            vertex.color = adjustcolor(&quot;#FFFFFF&quot;, .5),
-            main = &quot;Serranidae network outside MPAs&quot;)
+# Run model and create occurrence predictions
+model_temp &lt;- run_mod(species_mat = spp_mat, n_covs = 1, family = &quot;gaussian&quot;)
+coef_temp &lt;- model_temp$mod$direct_coefs
+key_coef_temp &lt;- model_temp$boot$mean_key_coefs
+predict_temp &lt;- model_temp$pred
+
+# Categorise continuous data + Nest categorical (nominal) data
+categories &lt;- categorise_cov(species_mat = spp_mat, covariate = &quot;tmean_reg&quot;)
+nested_cats &lt;- nested_data(categorised_data = categories)
+
+# Run MRFcov model with some defaults
+cat_model &lt;- get_model(data = spp_mat, ncov = 1)
+cat_model
+
+# Run model on each category
+nested &lt;- nested_models(nested_df = nested_cats)
+
+# Get graph data
+nested_plot &lt;- nested %&gt;% mutate(plot = map(model, get_graph))
+
+# Plot multiple graphs for gradient
+temperature_graph &lt;- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
+
+# png(&quot;figures/groupers_east_temp.png&quot;, height = 450, width = 1200, res = 150)
+# plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
+# dev.off()
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="mpa-as-covariate" class="section level3">
+<h3>MPA as covariate</h3>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG5zcHBfbWF0IDwtIGNyZWF0ZV9zcHBfbWF0KGRhdGFzZXQgPSBtZWRfcmF3LCBiYXNpbiA9IGVhc3QsXG4gICAgICAgICAgICAgICAgICAgICAgICAgIGdyb3VwID0gZ3JvdXBlcnMsIGNvdmFyaWF0ZSA9IFwiZW5mb3JjZW1lbnRcIilcblxubW9kZWxfZW5mIDwtIHJ1bl9tb2Qoc3BlY2llc19tYXQgPSBzcHBfbWF0LCBuX2NvdnMgPSAxLCBmYW1pbHkgPSBcImdhdXNzaWFuXCIpXG5jb2VmX2VuZiA8LSBtb2RlbF9lbmYkbW9kJGRpcmVjdF9jb2Vmc1xua2V5X2NvZWZfZW5mIDwtIG1vZGVsX2VuZiRib290JG1lYW5fa2V5X2NvZWZzXG5wcmVkaWN0X2VuZiA8LSBtb2RlbF9lbmYkcHJlZFxuXG4jIEZ1bmMgM2IgKG5vIG5lZWQgZm9yIDNhIGJlY2F1c2UgaXQncyBhbHJlYWR5IGNhdGVnb3Jpc2VkKSAtIG5lc3Rpbmcgb25seVxubmVzdGVkX2NhdHMgPC0gbmVzdGVkX2RhdGEoY2F0ZWdvcmlzZWRfZGF0YSA9IHNwcF9tYXQpXG5cbmNhdF9tb2RlbCA8LSBnZXRfbW9kZWwoZGF0YSA9IHNwcF9tYXQsIG5jb3YgPSAxKVxuXG5uZXN0ZWQgPC0gbmVzdGVkX21vZGVscyhuZXN0ZWRfZGYgPSBuZXN0ZWRfY2F0cylcblxubmVzdGVkX3Bsb3QgPC0gbmVzdGVkICU+JSBtdXRhdGUocGxvdCA9IG1hcChtb2RlbCwgZ2V0X2dyYXBoKSlcblxuTVBBc19ncmFwaCA8LSBwbG90X211bHRpX2dyYXBocyhuZXN0ZWRfZGYgPSBuZXN0ZWRfcGxvdCwgbl9ncmFwaHMgPSA0KSBcblxuIyBwbmcoXCJmaWd1cmVzL2dyb3VwZXJzX2Vhc3RfbXBhLnBuZ1wiLCBoZWlnaHQgPSA0NTAsIHdpZHRoID0gMTYwMCwgcmVzID0gMTUwKVxuIyBwbG90X211bHRpX2dyYXBocyhuZXN0ZWRfZGYgPSBuZXN0ZWRfcGxvdCwgbl9ncmFwaHMgPSA0KVxuIyBkZXYub2ZmKClcblxuYGBgIn0= -->
+<pre class="r"><code>
+spp_mat &lt;- create_spp_mat(dataset = med_raw, basin = east,
+                          group = groupers, covariate = &quot;enforcement&quot;)
+
+model_enf &lt;- run_mod(species_mat = spp_mat, n_covs = 1, family = &quot;gaussian&quot;)
+coef_enf &lt;- model_enf$mod$direct_coefs
+key_coef_enf &lt;- model_enf$boot$mean_key_coefs
+predict_enf &lt;- model_enf$pred
+
+# Func 3b (no need for 3a because it&#39;s already categorised) - nesting only
+nested_cats &lt;- nested_data(categorised_data = spp_mat)
+
+cat_model &lt;- get_model(data = spp_mat, ncov = 1)
+
+nested &lt;- nested_models(nested_df = nested_cats)
+
+nested_plot &lt;- nested %&gt;% mutate(plot = map(model, get_graph))
+
+MPAs_graph &lt;- plot_multi_graphs(nested_df = nested_plot, n_graphs = 4) 
+
+# png(&quot;figures/groupers_east_mpa.png&quot;, height = 450, width = 1600, res = 150)
+# plot_multi_graphs(nested_df = nested_plot, n_graphs = 4)
+# dev.off()
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="depth-as-covariate" class="section level3">
+<h3>Depth as covariate</h3>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3BwX21hdCA8LSBjcmVhdGVfc3BwX21hdChkYXRhc2V0ID0gbWVkX3JhdywgYmFzaW4gPSBlYXN0LFxuICAgICAgICAgICAgICAgICAgICAgICAgICBncm91cCA9IGdyb3VwZXJzLCBjb3ZhcmlhdGUgPSBcImRlcHRoXCIpICU+JSBuYS5vbWl0KClcblxubW9kZWxfZGVwIDwtIHJ1bl9tb2Qoc3BlY2llc19tYXQgPSBzcHBfbWF0LCBuX2NvdnMgPSAxLCBmYW1pbHkgPSBcImdhdXNzaWFuXCIpXG5jb2VmX2RlcCA8LSBtb2RlbF9kZXAkbW9kJGRpcmVjdF9jb2Vmc1xua2V5X2NvZWZfZGVwIDwtIG1vZGVsX2RlcCRib290JG1lYW5fa2V5X2NvZWZzXG5wcmVkaWN0X2RlcCA8LSBtb2RlbF9kZXAkcHJlZFxuXG5jYXRlZ29yaWVzIDwtIGNhdGVnb3Jpc2VfY292KHNwZWNpZXNfbWF0ID0gc3BwX21hdCwgY292YXJpYXRlID0gXCJkZXB0aFwiKVxubmVzdGVkX2NhdHMgPC0gbmVzdGVkX2RhdGEoY2F0ZWdvcmlzZWRfZGF0YSA9IGNhdGVnb3JpZXMpXG5cbmNhdF9tb2RlbCA8LSBnZXRfbW9kZWwoZGF0YSA9IHNwcF9tYXQsIG5jb3YgPSAxKVxuXG5uZXN0ZWQgPC0gbmVzdGVkX21vZGVscyhuZXN0ZWRfZGYgPSBuZXN0ZWRfY2F0cylcblxubmVzdGVkX3Bsb3QgPC0gbmVzdGVkICU+JSBtdXRhdGUocGxvdCA9IG1hcChtb2RlbCwgZ2V0X2dyYXBoKSlcblxuZGVwdGhfZ3JhcGggPC0gcGxvdF9tdWx0aV9ncmFwaHMobmVzdGVkX2RmID0gbmVzdGVkX3Bsb3QsIG5fZ3JhcGhzID0gMylcblxuIyBwbmcoXCJmaWd1cmVzL2dyb3VwZXJzX2Vhc3RfZGVwdGgucG5nXCIsIGhlaWdodCA9IDQ1MCwgd2lkdGggPSAxMjAwLCByZXMgPSAxNTApXG4jIHBsb3RfbXVsdGlfZ3JhcGhzKG5lc3RlZF9kZiA9IG5lc3RlZF9wbG90LCBuX2dyYXBocyA9IDMpXG4jIGRldi5vZmYoKVxuXG5gYGAifQ== -->
+<pre class="r"><code>spp_mat &lt;- create_spp_mat(dataset = med_raw, basin = east,
+                          group = groupers, covariate = &quot;depth&quot;) %&gt;% na.omit()
+
+model_dep &lt;- run_mod(species_mat = spp_mat, n_covs = 1, family = &quot;gaussian&quot;)
+coef_dep &lt;- model_dep$mod$direct_coefs
+key_coef_dep &lt;- model_dep$boot$mean_key_coefs
+predict_dep &lt;- model_dep$pred
+
+categories &lt;- categorise_cov(species_mat = spp_mat, covariate = &quot;depth&quot;)
+nested_cats &lt;- nested_data(categorised_data = categories)
+
+cat_model &lt;- get_model(data = spp_mat, ncov = 1)
+
+nested &lt;- nested_models(nested_df = nested_cats)
+
+nested_plot &lt;- nested %&gt;% mutate(plot = map(model, get_graph))
+
+depth_graph &lt;- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
+
+# png(&quot;figures/groupers_east_depth.png&quot;, height = 450, width = 1200, res = 150)
+# plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
+# dev.off()
 </code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 </div>
 </div>
-<div id="diplodus-networks" class="section level2">
-<h2>Diplodus networks</h2>
-<div id="temperature-effect-1" class="section level3">
-<h3>Temperature effect</h3>
+<div id="western-mediterranean" class="section level2">
+<h2>Western Mediterranean</h2>
+<div id="temperature-as-covariate-1" class="section level3">
+<h3>Temperature as covariate</h3>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-plot-begin eyJjb25kaXRpb25zIjpbXSwiaGVpZ2h0Ijo0MzIuNjMyOSwic2l6ZV9iZWhhdmlvciI6MCwid2lkdGgiOjcwMH0= -->
-<p><img src="data:image/png;base64,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" /></p>
-<!-- rnb-plot-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBDcmVhdGUgc3BlY2llcyBtYXRyaXggZm9yIGBncm91cGAgaW4gYGJhc2luYCB3aXRoIGBjb3ZhcmlhdGVgXG5zcHBfbWF0IDwtIGNyZWF0ZV9zcHBfbWF0KGRhdGFzZXQgPSBtZWRfcmF3LCBiYXNpbiA9IHdlc3QsXG4gICAgICAgICAgICAgICAgICAgICAgICAgIGdyb3VwID0gZ3JvdXBlcnMsIGNvdmFyaWF0ZSA9IFwidG1lYW5fcmVnXCIpXG5zdHIoc3BwX21hdClcblxuIyBSdW4gbW9kZWwgYW5kIGNyZWF0ZSBvY2N1cnJlbmNlIHByZWRpY3Rpb25zXG5tb2RlbF90ZW1wIDwtIHJ1bl9tb2Qoc3BlY2llc19tYXQgPSBzcHBfbWF0LCBuX2NvdnMgPSAxLCBmYW1pbHkgPSBcImdhdXNzaWFuXCIpXG5jb2VmX3RlbXAgPC0gbW9kZWxfdGVtcCRtb2QkZGlyZWN0X2NvZWZzXG5rZXlfY29lZl90ZW1wIDwtIG1vZGVsX3RlbXAkYm9vdCRtZWFuX2tleV9jb2Vmc1xucHJlZGljdF90ZW1wIDwtIG1vZGVsX3RlbXAkcHJlZFxuXG4jIENhdGVnb3Jpc2UgY29udGludW91cyBkYXRhICsgTmVzdCBjYXRlZ29yaWNhbCAobm9taW5hbCkgZGF0YVxuY2F0ZWdvcmllcyA8LSBjYXRlZ29yaXNlX2NvdihzcGVjaWVzX21hdCA9IHNwcF9tYXQsIGNvdmFyaWF0ZSA9IFwidG1lYW5fcmVnXCIpXG5uZXN0ZWRfY2F0cyA8LSBuZXN0ZWRfZGF0YShjYXRlZ29yaXNlZF9kYXRhID0gY2F0ZWdvcmllcylcblxuIyBSdW4gTVJGY292IG1vZGVsIHdpdGggc29tZSBkZWZhdWx0c1xuY2F0X21vZGVsIDwtIGdldF9tb2RlbChkYXRhID0gc3BwX21hdCwgbmNvdiA9IDEpXG5cbiMgUnVuIG1vZGVsIG9uIGVhY2ggY2F0ZWdvcnlcbm5lc3RlZCA8LSBuZXN0ZWRfbW9kZWxzKG5lc3RlZF9kZiA9IG5lc3RlZF9jYXRzKVxuXG4jIEdldCBncmFwaCBkYXRhXG5uZXN0ZWRfcGxvdCA8LSBuZXN0ZWQgJT4lIG11dGF0ZShwbG90ID0gbWFwKG1vZGVsLCBnZXRfZ3JhcGgpKVxuXG4jIFBsb3QgbXVsdGlwbGUgZ3JhcGhzIGZvciBncmFkaWVudFxudGVtcGVyYXR1cmVfZ3JhcGggPC0gcGxvdF9tdWx0aV9ncmFwaHMobmVzdGVkX2RmID0gbmVzdGVkX3Bsb3QsIG5fZ3JhcGhzID0gMylcblxuYGBgIn0= -->
+<pre class="r"><code># Create species matrix for `group` in `basin` with `covariate`
+spp_mat &lt;- create_spp_mat(dataset = med_raw, basin = west,
+                          group = groupers, covariate = &quot;tmean_reg&quot;)
+str(spp_mat)
+
+# Run model and create occurrence predictions
+model_temp &lt;- run_mod(species_mat = spp_mat, n_covs = 1, family = &quot;gaussian&quot;)
+coef_temp &lt;- model_temp$mod$direct_coefs
+key_coef_temp &lt;- model_temp$boot$mean_key_coefs
+predict_temp &lt;- model_temp$pred
+
+# Categorise continuous data + Nest categorical (nominal) data
+categories &lt;- categorise_cov(species_mat = spp_mat, covariate = &quot;tmean_reg&quot;)
+nested_cats &lt;- nested_data(categorised_data = categories)
+
+# Run MRFcov model with some defaults
+cat_model &lt;- get_model(data = spp_mat, ncov = 1)
+
+# Run model on each category
+nested &lt;- nested_models(nested_df = nested_cats)
+
+# Get graph data
+nested_plot &lt;- nested %&gt;% mutate(plot = map(model, get_graph))
+
+# Plot multiple graphs for gradient
+temperature_graph &lt;- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
+</code></pre>
+<!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 </div>
-<div id="mpas-effect-1" class="section level3">
-<h3>MPAs effect</h3>
+<div id="mpa-as-covariate-1" class="section level3">
+<h3>MPA as covariate</h3>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBXaXRoaW5cbnBsb3QuaWdyYXBoKGRpcF9ncmFwaF9NUEEsIGxheW91dCA9IGxheW91dC5jaXJjbGUoZGlwX2dyYXBoX01QQSksXG4gICAgICAgICAgICBlZGdlLndpZHRoID0gYWJzKEUoZGlwX2dyYXBoX01QQSkkd2VpZ2h0KSxcbiAgICAgICAgICAgIGVkZ2UuY29sb3IgPSBpZmVsc2UoRShkaXBfZ3JhcGhfTVBBKSR3ZWlnaHQgPCAwLCAnIzMzOTlDQycsICcjRkYzMzMzJyksXG4gICAgICAgICAgICB2ZXJ0ZXguc2l6ZSA9IGRlZyxcbiAgICAgICAgICAgIHZlcnRleC5sYWJlbC5mYW1pbHkgPSBcInNhbnNcIixcbiAgICAgICAgICAgIHZlcnRleC5sYWJlbC5mb250XHQ9IDMsXG4gICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuY2V4ID0gMSxcbiAgICAgICAgICAgIHZlcnRleC5sYWJlbC5jb2xvciA9IGFkanVzdGNvbG9yKFwiIzMzMzMzM1wiLCAwLjg1KSxcbiAgICAgICAgICAgIHZlcnRleC5jb2xvciA9IGFkanVzdGNvbG9yKFwiI0ZGRkZGRlwiLCAuNSksXG4gICAgICAgICAgICBtYWluID0gXCJEaXBsb2R1cyBuZXR3b3JrIGluc2lkZSBNUEFzXCIpXG5cbiMgT3V0c2lkZVxucGxvdC5pZ3JhcGgoZGlwX2dyYXBoX25vTVBBLCBsYXlvdXQgPSBsYXlvdXQuY2lyY2xlKGRpcF9ncmFwaF9ub01QQSksXG4gICAgICAgICAgICBlZGdlLndpZHRoID0gYWJzKEUoZGlwX2dyYXBoX25vTVBBKSR3ZWlnaHQpLFxuICAgICAgICAgICAgZWRnZS5jb2xvciA9IGlmZWxzZShFKGRpcF9ncmFwaF9ub01QQSkkd2VpZ2h0IDwgMCwgJyMzMzk5Q0MnLCAnI0ZGMzMzMycpLFxuICAgICAgICAgICAgdmVydGV4LnNpemUgPSBkZWcsXG4gICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuZmFtaWx5ID0gXCJzYW5zXCIsXG4gICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuZm9udFx0PSAzLFxuICAgICAgICAgICAgdmVydGV4LmxhYmVsLmNleCA9IDEsXG4gICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuY29sb3IgPSBhZGp1c3Rjb2xvcihcIiMzMzMzMzNcIiwgMC44NSksXG4gICAgICAgICAgICB2ZXJ0ZXguY29sb3IgPSBhZGp1c3Rjb2xvcihcIiNGRkZGRkZcIiwgLjUpLFxuICAgICAgICAgICAgbWFpbiA9IFwiRGlwbG9kdXMgbmV0d29yayBvdXRzaWRlIE1QQXNcIilcblxuYGBgIn0= -->
-<pre class="r"><code># Within
-plot.igraph(dip_graph_MPA, layout = layout.circle(dip_graph_MPA),
-            edge.width = abs(E(dip_graph_MPA)$weight),
-            edge.color = ifelse(E(dip_graph_MPA)$weight &lt; 0, &#39;#3399CC&#39;, &#39;#FF3333&#39;),
-            vertex.size = deg,
-            vertex.label.family = &quot;sans&quot;,
-            vertex.label.font   = 3,
-            vertex.label.cex = 1,
-            vertex.label.color = adjustcolor(&quot;#333333&quot;, 0.85),
-            vertex.color = adjustcolor(&quot;#FFFFFF&quot;, .5),
-            main = &quot;Diplodus network inside MPAs&quot;)
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG5zcHBfbWF0IDwtIGNyZWF0ZV9zcHBfbWF0KGRhdGFzZXQgPSBtZWRfcmF3LCBiYXNpbiA9IGVhc3QsXG4gICAgICAgICAgICAgICAgICAgICAgICAgIGdyb3VwID0gZ3JvdXBlcnMsIGNvdmFyaWF0ZSA9IFwiZW5mb3JjZW1lbnRcIilcblxubW9kZWxfZW5mIDwtIHJ1bl9tb2Qoc3BlY2llc19tYXQgPSBzcHBfbWF0LCBuX2NvdnMgPSAxLCBmYW1pbHkgPSBcImdhdXNzaWFuXCIpXG5jb2VmX2VuZiA8LSBtb2RlbF9lbmYkbW9kJGRpcmVjdF9jb2Vmc1xua2V5X2NvZWZfZW5mIDwtIG1vZGVsX2VuZiRib290JG1lYW5fa2V5X2NvZWZzXG5wcmVkaWN0X2VuZiA8LSBtb2RlbF9lbmYkcHJlZFxuXG4jIEZ1bmMgM2IgKG5vIG5lZWQgZm9yIDNhIGJlY2F1c2UgaXQncyBhbHJlYWR5IGNhdGVnb3Jpc2VkKSAtIG5lc3Rpbmcgb25seVxubmVzdGVkX2NhdHMgPC0gbmVzdGVkX2RhdGEoY2F0ZWdvcmlzZWRfZGF0YSA9IHNwcF9tYXQpXG5cbmNhdF9tb2RlbCA8LSBnZXRfbW9kZWwoZGF0YSA9IHNwcF9tYXQsIG5jb3YgPSAxKVxuXG5uZXN0ZWQgPC0gbmVzdGVkX21vZGVscyhuZXN0ZWRfZGYgPSBuZXN0ZWRfY2F0cylcblxubmVzdGVkX3Bsb3QgPC0gbmVzdGVkICU+JSBtdXRhdGUocGxvdCA9IG1hcChtb2RlbCwgZ2V0X2dyYXBoKSlcblxuTVBBc19ncmFwaCA8LSBwbG90X211bHRpX2dyYXBocyhuZXN0ZWRfZGYgPSBuZXN0ZWRfcGxvdCwgbl9ncmFwaHMgPSA0KSBcblxuYGBgIn0= -->
+<pre class="r"><code>
+spp_mat &lt;- create_spp_mat(dataset = med_raw, basin = east,
+                          group = groupers, covariate = &quot;enforcement&quot;)
 
-# Outside
-plot.igraph(dip_graph_noMPA, layout = layout.circle(dip_graph_noMPA),
-            edge.width = abs(E(dip_graph_noMPA)$weight),
-            edge.color = ifelse(E(dip_graph_noMPA)$weight &lt; 0, &#39;#3399CC&#39;, &#39;#FF3333&#39;),
-            vertex.size = deg,
-            vertex.label.family = &quot;sans&quot;,
-            vertex.label.font   = 3,
-            vertex.label.cex = 1,
-            vertex.label.color = adjustcolor(&quot;#333333&quot;, 0.85),
-            vertex.color = adjustcolor(&quot;#FFFFFF&quot;, .5),
-            main = &quot;Diplodus network outside MPAs&quot;)
+model_enf &lt;- run_mod(species_mat = spp_mat, n_covs = 1, family = &quot;gaussian&quot;)
+coef_enf &lt;- model_enf$mod$direct_coefs
+key_coef_enf &lt;- model_enf$boot$mean_key_coefs
+predict_enf &lt;- model_enf$pred
+
+# Func 3b (no need for 3a because it&#39;s already categorised) - nesting only
+nested_cats &lt;- nested_data(categorised_data = spp_mat)
+
+cat_model &lt;- get_model(data = spp_mat, ncov = 1)
+
+nested &lt;- nested_models(nested_df = nested_cats)
+
+nested_plot &lt;- nested %&gt;% mutate(plot = map(model, get_graph))
+
+MPAs_graph &lt;- plot_multi_graphs(nested_df = nested_plot, n_graphs = 4) 
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="depth-as-covariate-1" class="section level3">
+<h3>Depth as covariate</h3>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3BwX21hdCA8LSBjcmVhdGVfc3BwX21hdChkYXRhc2V0ID0gbWVkX3JhdywgYmFzaW4gPSBlYXN0LFxuICAgICAgICAgICAgICAgICAgICAgICAgICBncm91cCA9IGdyb3VwZXJzLCBjb3ZhcmlhdGUgPSBcImRlcHRoXCIpICU+JSBuYS5vbWl0KClcblxubW9kZWxfZGVwIDwtIHJ1bl9tb2Qoc3BlY2llc19tYXQgPSBzcHBfbWF0LCBuX2NvdnMgPSAxLCBmYW1pbHkgPSBcImdhdXNzaWFuXCIpXG5jb2VmX2RlcCA8LSBtb2RlbF9kZXAkbW9kJGRpcmVjdF9jb2Vmc1xua2V5X2NvZWZfZGVwIDwtIG1vZGVsX2RlcCRib290JG1lYW5fa2V5X2NvZWZzXG5wcmVkaWN0X2RlcCA8LSBtb2RlbF9kZXAkcHJlZFxuXG5jYXRlZ29yaWVzIDwtIGNhdGVnb3Jpc2VfY292KHNwZWNpZXNfbWF0ID0gc3BwX21hdCwgY292YXJpYXRlID0gXCJkZXB0aFwiKVxubmVzdGVkX2NhdHMgPC0gbmVzdGVkX2RhdGEoY2F0ZWdvcmlzZWRfZGF0YSA9IGNhdGVnb3JpZXMpXG5cbmNhdF9tb2RlbCA8LSBnZXRfbW9kZWwoZGF0YSA9IHNwcF9tYXQsIG5jb3YgPSAxKVxuXG5uZXN0ZWQgPC0gbmVzdGVkX21vZGVscyhuZXN0ZWRfZGYgPSBuZXN0ZWRfY2F0cylcblxubmVzdGVkX3Bsb3QgPC0gbmVzdGVkICU+JSBtdXRhdGUocGxvdCA9IG1hcChtb2RlbCwgZ2V0X2dyYXBoKSlcblxuZGVwdGhfZ3JhcGggPC0gcGxvdF9tdWx0aV9ncmFwaHMobmVzdGVkX2RmID0gbmVzdGVkX3Bsb3QsIG5fZ3JhcGhzID0gMylcblxuYGBgIn0= -->
+<pre class="r"><code>spp_mat &lt;- create_spp_mat(dataset = med_raw, basin = east,
+                          group = groupers, covariate = &quot;depth&quot;) %&gt;% na.omit()
+
+model_dep &lt;- run_mod(species_mat = spp_mat, n_covs = 1, family = &quot;gaussian&quot;)
+coef_dep &lt;- model_dep$mod$direct_coefs
+key_coef_dep &lt;- model_dep$boot$mean_key_coefs
+predict_dep &lt;- model_dep$pred
+
+categories &lt;- categorise_cov(species_mat = spp_mat, covariate = &quot;depth&quot;)
+nested_cats &lt;- nested_data(categorised_data = categories)
+
+cat_model &lt;- get_model(data = spp_mat, ncov = 1)
+
+nested &lt;- nested_models(nested_df = nested_cats)
+
+nested_plot &lt;- nested %&gt;% mutate(plot = map(model, get_graph))
+
+depth_graph &lt;- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
 </code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 </div>
 </div>
-<div id="herbivores" class="section level2">
-<h2>Herbivores</h2>
-<div id="temperature-effect-2" class="section level3">
-<h3>Temperature effect</h3>
+</div>
+<div id="diplodus" class="section level1">
+<h1>Diplodus</h1>
+<div id="eastern-mediterranean-1" class="section level2">
+<h2>Eastern Mediterranean</h2>
+<div id="temperature-as-covariate-2" class="section level3">
+<h3>Temperature as covariate</h3>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBMb3dcbnBsb3QuaWdyYXBoKGhlcmJfZ3JhcGhfbG93LCBsYXlvdXQgPSBsYXlvdXQuY2lyY2xlKGhlcmJfZ3JhcGhfbG93KSxcbiAgICAgICAgICAgIGVkZ2Uud2lkdGggPSBhYnMoRShoZXJiX2dyYXBoX2xvdykkd2VpZ2h0KSxcbiAgICAgICAgICAgIGVkZ2UuY29sb3IgPSBpZmVsc2UoRShoZXJiX2dyYXBoX2xvdykkd2VpZ2h0IDwgMCwgJyMzMzk5Q0MnLCAnI0ZGMzMzMycpLFxuICAgICAgICAgICAgdmVydGV4LnNpemUgPSBkZWcsXG4gICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuZmFtaWx5ID0gXCJzYW5zXCIsXG4gICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuZm9udFx0PSAzLFxuICAgICAgICAgICAgdmVydGV4LmxhYmVsLmNleCA9IDEsXG4gICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuY29sb3IgPSBhZGp1c3Rjb2xvcihcIiMzMzMzMzNcIiwgMC44NSksXG4gICAgICAgICAgICB2ZXJ0ZXguY29sb3IgPSBhZGp1c3Rjb2xvcihcIiNGRkZGRkZcIiwgLjUpLFxuICAgICAgICAgICAgbWFpbiA9IFwiSGVyYml2b3JlIG5ldHdvcmsgaW4gbG93IHRlbXBlcmF0dXJlc1wiKVxuIyBNZWRcbnBsb3QuaWdyYXBoKGhlcmJfZ3JhcGhfbWVkLCBsYXlvdXQgPSBsYXlvdXQuY2lyY2xlKGhlcmJfZ3JhcGhfbWVkKSxcbiAgICAgICAgICAgIGVkZ2Uud2lkdGggPSBhYnMoRShoZXJiX2dyYXBoX21lZCkkd2VpZ2h0KSxcbiAgICAgICAgICAgIGVkZ2UuY29sb3IgPSBpZmVsc2UoRShoZXJiX2dyYXBoX21lZCkkd2VpZ2h0IDwgMCwgJyMzMzk5Q0MnLCAnI0ZGMzMzMycpLFxuICAgICAgICAgICAgdmVydGV4LnNpemUgPSBkZWcsXG4gICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuZmFtaWx5ID0gXCJzYW5zXCIsXG4gICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuZm9udFx0PSAzLFxuICAgICAgICAgICAgdmVydGV4LmxhYmVsLmNleCA9IDEsXG4gICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuY29sb3IgPSBhZGp1c3Rjb2xvcihcIiMzMzMzMzNcIiwgMC44NSksXG4gICAgICAgICAgICB2ZXJ0ZXguY29sb3IgPSBhZGp1c3Rjb2xvcihcIiNGRkZGRkZcIiwgLjUpLFxuICAgICAgICAgICAgbWFpbiA9IFwiSGVyYml2b3JlIG5ldHdvcmsgaW4gbWVkaWFuIHRlbXBlcmF0dXJlc1wiKVxuIyBIaWdoXG5wbG90LmlncmFwaChoZXJiX2dyYXBoX2hpLCBsYXlvdXQgPSBsYXlvdXQuY2lyY2xlKGhlcmJfZ3JhcGhfaGkpLFxuICAgICAgICAgICAgZWRnZS53aWR0aCA9IGFicyhFKGhlcmJfZ3JhcGhfaGkpJHdlaWdodCksXG4gICAgICAgICAgICBlZGdlLmNvbG9yID0gaWZlbHNlKEUoaGVyYl9ncmFwaF9oaSkkd2VpZ2h0IDwgMCwgJyMzMzk5Q0MnLCAnI0ZGMzMzMycpLFxuICAgICAgICAgICAgdmVydGV4LnNpemUgPSBkZWcsXG4gICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuZmFtaWx5ID0gXCJzYW5zXCIsXG4gICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuZm9udFx0PSAzLFxuICAgICAgICAgICAgdmVydGV4LmxhYmVsLmNleCA9IDEsXG4gICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuY29sb3IgPSBhZGp1c3Rjb2xvcihcIiMzMzMzMzNcIiwgMC44NSksXG4gICAgICAgICAgICB2ZXJ0ZXguY29sb3IgPSBhZGp1c3Rjb2xvcihcIiNGRkZGRkZcIiwgLjUpLFxuICAgICAgICAgICAgbWFpbiA9IFwiSGVyYml2b3JlIG5ldHdvcmsgaW4gaGlnaCB0ZW1wZXJhdHVyZXNcIilcbmBgYCJ9 -->
-<pre class="r"><code># Low
-plot.igraph(herb_graph_low, layout = layout.circle(herb_graph_low),
-            edge.width = abs(E(herb_graph_low)$weight),
-            edge.color = ifelse(E(herb_graph_low)$weight &lt; 0, &#39;#3399CC&#39;, &#39;#FF3333&#39;),
-            vertex.size = deg,
-            vertex.label.family = &quot;sans&quot;,
-            vertex.label.font   = 3,
-            vertex.label.cex = 1,
-            vertex.label.color = adjustcolor(&quot;#333333&quot;, 0.85),
-            vertex.color = adjustcolor(&quot;#FFFFFF&quot;, .5),
-            main = &quot;Herbivore network in low temperatures&quot;)
-# Med
-plot.igraph(herb_graph_med, layout = layout.circle(herb_graph_med),
-            edge.width = abs(E(herb_graph_med)$weight),
-            edge.color = ifelse(E(herb_graph_med)$weight &lt; 0, &#39;#3399CC&#39;, &#39;#FF3333&#39;),
-            vertex.size = deg,
-            vertex.label.family = &quot;sans&quot;,
-            vertex.label.font   = 3,
-            vertex.label.cex = 1,
-            vertex.label.color = adjustcolor(&quot;#333333&quot;, 0.85),
-            vertex.color = adjustcolor(&quot;#FFFFFF&quot;, .5),
-            main = &quot;Herbivore network in median temperatures&quot;)
-# High
-plot.igraph(herb_graph_hi, layout = layout.circle(herb_graph_hi),
-            edge.width = abs(E(herb_graph_hi)$weight),
-            edge.color = ifelse(E(herb_graph_hi)$weight &lt; 0, &#39;#3399CC&#39;, &#39;#FF3333&#39;),
-            vertex.size = deg,
-            vertex.label.family = &quot;sans&quot;,
-            vertex.label.font   = 3,
-            vertex.label.cex = 1,
-            vertex.label.color = adjustcolor(&quot;#333333&quot;, 0.85),
-            vertex.color = adjustcolor(&quot;#FFFFFF&quot;, .5),
-            main = &quot;Herbivore network in high temperatures&quot;)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3BwX21hdCA8LSBjcmVhdGVfc3BwX21hdChkYXRhc2V0ID0gbWVkX3JhdywgYmFzaW4gPSBlYXN0LFxuICAgICAgICAgICAgICAgICAgICAgICAgICBncm91cCA9IGRpcGxvZHVzLCBjb3ZhcmlhdGUgPSBcInRtZWFuX3JlZ1wiKVxuXG5tb2RlbF90ZW1wIDwtIHJ1bl9tb2Qoc3BlY2llc19tYXQgPSBzcHBfbWF0LCBuX2NvdnMgPSAxLCBmYW1pbHkgPSBcImdhdXNzaWFuXCIpXG5jb2VmX3RlbXAgPC0gbW9kZWxfdGVtcCRtb2QkZGlyZWN0X2NvZWZzXG5rZXlfY29lZl90ZW1wIDwtIG1vZGVsX3RlbXAkYm9vdCRtZWFuX2tleV9jb2Vmc1xucHJlZGljdF90ZW1wIDwtIG1vZGVsX3RlbXAkcHJlZFxuXG5jYXRlZ29yaWVzIDwtIGNhdGVnb3Jpc2VfY292KHNwZWNpZXNfbWF0ID0gc3BwX21hdCwgY292YXJpYXRlID0gXCJ0bWVhbl9yZWdcIilcbm5lc3RlZF9jYXRzIDwtIG5lc3RlZF9kYXRhKGNhdGVnb3Jpc2VkX2RhdGEgPSBjYXRlZ29yaWVzKVxuXG5jYXRfbW9kZWwgPC0gZ2V0X21vZGVsKGRhdGEgPSBzcHBfbWF0LCBuY292ID0gMSlcblxubmVzdGVkIDwtIG5lc3RlZF9tb2RlbHMobmVzdGVkX2RmID0gbmVzdGVkX2NhdHMpXG5cbm5lc3RlZF9wbG90IDwtIG5lc3RlZCAlPiUgbXV0YXRlKHBsb3QgPSBtYXAobW9kZWwsIGdldF9ncmFwaCkpXG5cbnRlbXBlcmF0dXJlX2dyYXBoIDwtIHBsb3RfbXVsdGlfZ3JhcGhzKG5lc3RlZF9kZiA9IG5lc3RlZF9wbG90LCBuX2dyYXBocyA9IDMpXG5cblxuYGBgIn0= -->
+<pre class="r"><code>spp_mat &lt;- create_spp_mat(dataset = med_raw, basin = east,
+                          group = diplodus, covariate = &quot;tmean_reg&quot;)
+
+model_temp &lt;- run_mod(species_mat = spp_mat, n_covs = 1, family = &quot;gaussian&quot;)
+coef_temp &lt;- model_temp$mod$direct_coefs
+key_coef_temp &lt;- model_temp$boot$mean_key_coefs
+predict_temp &lt;- model_temp$pred
+
+categories &lt;- categorise_cov(species_mat = spp_mat, covariate = &quot;tmean_reg&quot;)
+nested_cats &lt;- nested_data(categorised_data = categories)
+
+cat_model &lt;- get_model(data = spp_mat, ncov = 1)
+
+nested &lt;- nested_models(nested_df = nested_cats)
+
+nested_plot &lt;- nested %&gt;% mutate(plot = map(model, get_graph))
+
+temperature_graph &lt;- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
+</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 </div>
-<div id="mpas-effect-2" class="section level3">
-<h3>MPAs effect</h3>
+<div id="mpa-as-covariate-2" class="section level3">
+<h3>MPA as covariate</h3>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBXaXRoaW5cbnBsb3QuaWdyYXBoKGhlcmJfZ3JhcGhfTVBBLCBsYXlvdXQgPSBsYXlvdXQuY2lyY2xlKGhlcmJfZ3JhcGhfTVBBKSxcbiAgICAgICAgICAgIGVkZ2Uud2lkdGggPSBhYnMoRShoZXJiX2dyYXBoX01QQSkkd2VpZ2h0KSxcbiAgICAgICAgICAgIGVkZ2UuY29sb3IgPSBpZmVsc2UoRShoZXJiX2dyYXBoX01QQSkkd2VpZ2h0IDwgMCwgJyMzMzk5Q0MnLCAnI0ZGMzMzMycpLFxuICAgICAgICAgICAgdmVydGV4LnNpemUgPSBkZWcsXG4gICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuZmFtaWx5ID0gXCJzYW5zXCIsXG4gICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuZm9udFx0PSAzLFxuICAgICAgICAgICAgdmVydGV4LmxhYmVsLmNleCA9IDEsXG4gICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuY29sb3IgPSBhZGp1c3Rjb2xvcihcIiMzMzMzMzNcIiwgMC44NSksXG4gICAgICAgICAgICB2ZXJ0ZXguY29sb3IgPSBhZGp1c3Rjb2xvcihcIiNGRkZGRkZcIiwgLjUpLFxuICAgICAgICAgICAgbWFpbiA9IFwiSGVyYml2b3JlIG5ldHdvcmsgaW5zaWRlIE1QQXNcIilcblxuIyBPdXRzaWRlXG5wbG90LmlncmFwaChoZXJiX2dyYXBoX25vTVBBLCBsYXlvdXQgPSBsYXlvdXQuY2lyY2xlKGhlcmJfZ3JhcGhfbm9NUEEpLFxuICAgICAgICAgICAgZWRnZS53aWR0aCA9IGFicyhFKGhlcmJfZ3JhcGhfbm9NUEEpJHdlaWdodCksXG4gICAgICAgICAgICBlZGdlLmNvbG9yID0gaWZlbHNlKEUoaGVyYl9ncmFwaF9ub01QQSkkd2VpZ2h0IDwgMCwgJyMzMzk5Q0MnLCAnI0ZGMzMzMycpLFxuICAgICAgICAgICAgdmVydGV4LnNpemUgPSBkZWcsXG4gICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuZmFtaWx5ID0gXCJzYW5zXCIsXG4gICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuZm9udFx0PSAzLFxuICAgICAgICAgICAgdmVydGV4LmxhYmVsLmNleCA9IDEsXG4gICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuY29sb3IgPSBhZGp1c3Rjb2xvcihcIiMzMzMzMzNcIiwgMC44NSksXG4gICAgICAgICAgICB2ZXJ0ZXguY29sb3IgPSBhZGp1c3Rjb2xvcihcIiNGRkZGRkZcIiwgLjUpLFxuICAgICAgICAgICAgbWFpbiA9IFwiSGVyYml2b3JlIG5ldHdvcmsgb3V0c2lkZSBNUEFzXCIpXG5gYGAifQ== -->
-<pre class="r"><code># Within
-plot.igraph(herb_graph_MPA, layout = layout.circle(herb_graph_MPA),
-            edge.width = abs(E(herb_graph_MPA)$weight),
-            edge.color = ifelse(E(herb_graph_MPA)$weight &lt; 0, &#39;#3399CC&#39;, &#39;#FF3333&#39;),
-            vertex.size = deg,
-            vertex.label.family = &quot;sans&quot;,
-            vertex.label.font   = 3,
-            vertex.label.cex = 1,
-            vertex.label.color = adjustcolor(&quot;#333333&quot;, 0.85),
-            vertex.color = adjustcolor(&quot;#FFFFFF&quot;, .5),
-            main = &quot;Herbivore network inside MPAs&quot;)
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="depth-as-covariate-2" class="section level3">
+<h3>Depth as covariate</h3>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+</div>
+<div id="western-mediterranean-1" class="section level2">
+<h2>Western Mediterranean</h2>
+<div id="temperature-as-covariate-3" class="section level3">
+<h3>Temperature as covariate</h3>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="mpa-as-covariate-3" class="section level3">
+<h3>MPA as covariate</h3>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG5zcHBfbWF0IDwtIGNyZWF0ZV9zcHBfbWF0KGRhdGFzZXQgPSBtZWRfcmF3LCBiYXNpbiA9IHdlc3QsXG4gICAgICAgICAgICAgICAgICAgICAgICAgIGdyb3VwID0gZGlwbG9kdXMsIGNvdmFyaWF0ZSA9IFwiZW5mb3JjZW1lbnRcIikgJT4lIG5hLm9taXQoKVxuXG5tb2RlbF9lbmYgPC0gcnVuX21vZChzcGVjaWVzX21hdCA9IHNwcF9tYXQsIG5fY292cyA9IDEsIGZhbWlseSA9IFwiZ2F1c3NpYW5cIilcbmNvZWZfZW5mIDwtIG1vZGVsX2VuZiRtb2QkZGlyZWN0X2NvZWZzXG5rZXlfY29lZl9lbmYgPC0gbW9kZWxfZW5mJGJvb3QkbWVhbl9rZXlfY29lZnNcbnByZWRpY3RfZW5mIDwtIG1vZGVsX2VuZiRwcmVkXG5cbm5lc3RlZF9jYXRzIDwtIG5lc3RlZF9kYXRhKGNhdGVnb3Jpc2VkX2RhdGEgPSBzcHBfbWF0KVxuXG5jYXRfbW9kZWwgPC0gZ2V0X21vZGVsKGRhdGEgPSBzcHBfbWF0LCBuY292ID0gMSlcblxubmVzdGVkIDwtIG5lc3RlZF9tb2RlbHMobmVzdGVkX2RmID0gbmVzdGVkX2NhdHMpXG5cbm5lc3RlZF9wbG90IDwtIG5lc3RlZCAlPiUgbXV0YXRlKHBsb3QgPSBtYXAobW9kZWwsIGdldF9ncmFwaCkpXG5cbk1QQXNfZ3JhcGggPC0gcGxvdF9tdWx0aV9ncmFwaHMobmVzdGVkX2RmID0gbmVzdGVkX3Bsb3QsIG5fZ3JhcGhzID0gNCkgXG5cbmBgYCJ9 -->
+<pre class="r"><code>
+spp_mat &lt;- create_spp_mat(dataset = med_raw, basin = west,
+                          group = diplodus, covariate = &quot;enforcement&quot;) %&gt;% na.omit()
 
-# Outside
-plot.igraph(herb_graph_noMPA, layout = layout.circle(herb_graph_noMPA),
-            edge.width = abs(E(herb_graph_noMPA)$weight),
-            edge.color = ifelse(E(herb_graph_noMPA)$weight &lt; 0, &#39;#3399CC&#39;, &#39;#FF3333&#39;),
-            vertex.size = deg,
-            vertex.label.family = &quot;sans&quot;,
-            vertex.label.font   = 3,
-            vertex.label.cex = 1,
-            vertex.label.color = adjustcolor(&quot;#333333&quot;, 0.85),
-            vertex.color = adjustcolor(&quot;#FFFFFF&quot;, .5),
-            main = &quot;Herbivore network outside MPAs&quot;)</code></pre>
+model_enf &lt;- run_mod(species_mat = spp_mat, n_covs = 1, family = &quot;gaussian&quot;)
+coef_enf &lt;- model_enf$mod$direct_coefs
+key_coef_enf &lt;- model_enf$boot$mean_key_coefs
+predict_enf &lt;- model_enf$pred
+
+nested_cats &lt;- nested_data(categorised_data = spp_mat)
+
+cat_model &lt;- get_model(data = spp_mat, ncov = 1)
+
+nested &lt;- nested_models(nested_df = nested_cats)
+
+nested_plot &lt;- nested %&gt;% mutate(plot = map(model, get_graph))
+
+MPAs_graph &lt;- plot_multi_graphs(nested_df = nested_plot, n_graphs = 4) 
+</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
+</div>
+<div id="depth-as-covariate-3" class="section level3">
+<h3>Depth as covariate</h3>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+</div>
+</div>
+<div id="herbivores" class="section level1">
+<h1>Herbivores</h1>
+<div id="eastern-mediterranean-2" class="section level2">
+<h2>Eastern Mediterranean</h2>
+<div id="temperature-as-covariate-4" class="section level3">
+<h3>Temperature as covariate</h3>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3BwX21hdCA8LSBjcmVhdGVfc3BwX21hdChkYXRhc2V0ID0gbWVkX3JhdywgYmFzaW4gPSBlYXN0LFxuICAgICAgICAgICAgICAgICAgICAgICAgICBncm91cCA9IGhlcmJpdm9yZXMsIGNvdmFyaWF0ZSA9IFwidG1lYW5fcmVnXCIpXG5cbm1vZGVsX3RlbXAgPC0gcnVuX21vZChzcGVjaWVzX21hdCA9IHNwcF9tYXQsIG5fY292cyA9IDEsIGZhbWlseSA9IFwiZ2F1c3NpYW5cIilcbmNvZWZfdGVtcCA8LSBtb2RlbF90ZW1wJG1vZCRkaXJlY3RfY29lZnNcbmtleV9jb2VmX3RlbXAgPC0gbW9kZWxfdGVtcCRib290JG1lYW5fa2V5X2NvZWZzXG5wcmVkaWN0X3RlbXAgPC0gbW9kZWxfdGVtcCRwcmVkXG5cbmNhdGVnb3JpZXMgPC0gY2F0ZWdvcmlzZV9jb3Yoc3BlY2llc19tYXQgPSBzcHBfbWF0LCBjb3ZhcmlhdGUgPSBcInRtZWFuX3JlZ1wiKVxubmVzdGVkX2NhdHMgPC0gbmVzdGVkX2RhdGEoY2F0ZWdvcmlzZWRfZGF0YSA9IGNhdGVnb3JpZXMpXG5cbmNhdF9tb2RlbCA8LSBnZXRfbW9kZWwoZGF0YSA9IHNwcF9tYXQsIG5jb3YgPSAxKVxuXG5uZXN0ZWQgPC0gbmVzdGVkX21vZGVscyhuZXN0ZWRfZGYgPSBuZXN0ZWRfY2F0cylcblxubmVzdGVkX3Bsb3QgPC0gbmVzdGVkICU+JSBtdXRhdGUocGxvdCA9IG1hcChtb2RlbCwgZ2V0X2dyYXBoKSlcblxudGVtcGVyYXR1cmVfZ3JhcGggPC0gcGxvdF9tdWx0aV9ncmFwaHMobmVzdGVkX2RmID0gbmVzdGVkX3Bsb3QsIG5fZ3JhcGhzID0gMylcblxuYGBgIn0= -->
+<pre class="r"><code>spp_mat &lt;- create_spp_mat(dataset = med_raw, basin = east,
+                          group = herbivores, covariate = &quot;tmean_reg&quot;)
+
+model_temp &lt;- run_mod(species_mat = spp_mat, n_covs = 1, family = &quot;gaussian&quot;)
+coef_temp &lt;- model_temp$mod$direct_coefs
+key_coef_temp &lt;- model_temp$boot$mean_key_coefs
+predict_temp &lt;- model_temp$pred
+
+categories &lt;- categorise_cov(species_mat = spp_mat, covariate = &quot;tmean_reg&quot;)
+nested_cats &lt;- nested_data(categorised_data = categories)
+
+cat_model &lt;- get_model(data = spp_mat, ncov = 1)
+
+nested &lt;- nested_models(nested_df = nested_cats)
+
+nested_plot &lt;- nested %&gt;% mutate(plot = map(model, get_graph))
+
+temperature_graph &lt;- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="mpa-as-covariate-4" class="section level3">
+<h3>MPA as covariate</h3>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG5zcHBfbWF0IDwtIGNyZWF0ZV9zcHBfbWF0KGRhdGFzZXQgPSBtZWRfcmF3LCBiYXNpbiA9IGVhc3QsXG4gICAgICAgICAgICAgICAgICAgICAgICAgIGdyb3VwID0gaGVyYml2b3JlcywgY292YXJpYXRlID0gXCJlbmZvcmNlbWVudFwiKVxuXG5tb2RlbF9lbmYgPC0gcnVuX21vZChzcGVjaWVzX21hdCA9IHNwcF9tYXQsIG5fY292cyA9IDEsIGZhbWlseSA9IFwiZ2F1c3NpYW5cIilcbmNvZWZfZW5mIDwtIG1vZGVsX2VuZiRtb2QkZGlyZWN0X2NvZWZzXG5rZXlfY29lZl9lbmYgPC0gbW9kZWxfZW5mJGJvb3QkbWVhbl9rZXlfY29lZnNcbnByZWRpY3RfZW5mIDwtIG1vZGVsX2VuZiRwcmVkXG5cbm5lc3RlZF9jYXRzIDwtIG5lc3RlZF9kYXRhKGNhdGVnb3Jpc2VkX2RhdGEgPSBzcHBfbWF0KVxuXG5jYXRfbW9kZWwgPC0gZ2V0X21vZGVsKGRhdGEgPSBzcHBfbWF0LCBuY292ID0gMSlcblxubmVzdGVkIDwtIG5lc3RlZF9tb2RlbHMobmVzdGVkX2RmID0gbmVzdGVkX2NhdHMpXG5cbm5lc3RlZF9wbG90IDwtIG5lc3RlZCAlPiUgbXV0YXRlKHBsb3QgPSBtYXAobW9kZWwsIGdldF9ncmFwaCkpXG5cbk1QQXNfZ3JhcGggPC0gcGxvdF9tdWx0aV9ncmFwaHMobmVzdGVkX2RmID0gbmVzdGVkX3Bsb3QsIG5fZ3JhcGhzID0gNCkgXG5cbmBgYCJ9 -->
+<pre class="r"><code>
+spp_mat &lt;- create_spp_mat(dataset = med_raw, basin = east,
+                          group = herbivores, covariate = &quot;enforcement&quot;)
+
+model_enf &lt;- run_mod(species_mat = spp_mat, n_covs = 1, family = &quot;gaussian&quot;)
+coef_enf &lt;- model_enf$mod$direct_coefs
+key_coef_enf &lt;- model_enf$boot$mean_key_coefs
+predict_enf &lt;- model_enf$pred
+
+nested_cats &lt;- nested_data(categorised_data = spp_mat)
+
+cat_model &lt;- get_model(data = spp_mat, ncov = 1)
+
+nested &lt;- nested_models(nested_df = nested_cats)
+
+nested_plot &lt;- nested %&gt;% mutate(plot = map(model, get_graph))
+
+MPAs_graph &lt;- plot_multi_graphs(nested_df = nested_plot, n_graphs = 4) 
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="depth-as-covariate-4" class="section level3">
+<h3>Depth as covariate</h3>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3BwX21hdCA8LSBjcmVhdGVfc3BwX21hdChkYXRhc2V0ID0gbWVkX3JhdywgYmFzaW4gPSBlYXN0LFxuICAgICAgICAgICAgICAgICAgICAgICAgICBncm91cCA9IGhlcmJpdm9yZXMsIGNvdmFyaWF0ZSA9IFwiZGVwdGhcIikgJT4lIG5hLm9taXQoKVxuXG5tb2RlbF9kZXAgPC0gcnVuX21vZChzcGVjaWVzX21hdCA9IHNwcF9tYXQsIG5fY292cyA9IDEsIGZhbWlseSA9IFwiZ2F1c3NpYW5cIilcbmNvZWZfZGVwIDwtIG1vZGVsX2RlcCRtb2QkZGlyZWN0X2NvZWZzXG5rZXlfY29lZl9kZXAgPC0gbW9kZWxfZGVwJGJvb3QkbWVhbl9rZXlfY29lZnNcbnByZWRpY3RfZGVwIDwtIG1vZGVsX2RlcCRwcmVkXG5cbmNhdGVnb3JpZXMgPC0gY2F0ZWdvcmlzZV9jb3Yoc3BlY2llc19tYXQgPSBzcHBfbWF0LCBjb3ZhcmlhdGUgPSBcImRlcHRoXCIpXG5uZXN0ZWRfY2F0cyA8LSBuZXN0ZWRfZGF0YShjYXRlZ29yaXNlZF9kYXRhID0gY2F0ZWdvcmllcylcblxuY2F0X21vZGVsIDwtIGdldF9tb2RlbChkYXRhID0gc3BwX21hdCwgbmNvdiA9IDEpXG5cbm5lc3RlZCA8LSBuZXN0ZWRfbW9kZWxzKG5lc3RlZF9kZiA9IG5lc3RlZF9jYXRzKVxuXG5uZXN0ZWRfcGxvdCA8LSBuZXN0ZWQgJT4lIG11dGF0ZShwbG90ID0gbWFwKG1vZGVsLCBnZXRfZ3JhcGgpKVxuXG5kZXB0aF9ncmFwaCA8LSBwbG90X211bHRpX2dyYXBocyhuZXN0ZWRfZGYgPSBuZXN0ZWRfcGxvdCwgbl9ncmFwaHMgPSAzKVxuXG5cbmBgYCJ9 -->
+<pre class="r"><code>spp_mat &lt;- create_spp_mat(dataset = med_raw, basin = east,
+                          group = herbivores, covariate = &quot;depth&quot;) %&gt;% na.omit()
+
+model_dep &lt;- run_mod(species_mat = spp_mat, n_covs = 1, family = &quot;gaussian&quot;)
+coef_dep &lt;- model_dep$mod$direct_coefs
+key_coef_dep &lt;- model_dep$boot$mean_key_coefs
+predict_dep &lt;- model_dep$pred
+
+categories &lt;- categorise_cov(species_mat = spp_mat, covariate = &quot;depth&quot;)
+nested_cats &lt;- nested_data(categorised_data = categories)
+
+cat_model &lt;- get_model(data = spp_mat, ncov = 1)
+
+nested &lt;- nested_models(nested_df = nested_cats)
+
+nested_plot &lt;- nested %&gt;% mutate(plot = map(model, get_graph))
+
+depth_graph &lt;- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+</div>
+<div id="western-mediterranean-2" class="section level2">
+<h2>Western Mediterranean</h2>
+<p>The western basin doesn’t have all the species of herbivores in the east so I’ll make a new vector for them</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<div id="temperature-as-covariate-5" class="section level3">
+<h3>Temperature as covariate</h3>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3BwX21hdCA8LSBjcmVhdGVfc3BwX21hdChkYXRhc2V0ID0gbWVkX3JhdywgYmFzaW4gPSB3ZXN0LFxuICAgICAgICAgICAgICAgICAgICAgICAgICBncm91cCA9IGhlcmJfd2VzdCwgY292YXJpYXRlID0gXCJ0bWVhbl9yZWdcIilcblxubW9kZWxfdGVtcCA8LSBydW5fbW9kKHNwZWNpZXNfbWF0ID0gc3BwX21hdCwgbl9jb3ZzID0gMSwgZmFtaWx5ID0gXCJnYXVzc2lhblwiKVxuY29lZl90ZW1wIDwtIG1vZGVsX3RlbXAkbW9kJGRpcmVjdF9jb2Vmc1xua2V5X2NvZWZfdGVtcCA8LSBtb2RlbF90ZW1wJGJvb3QkbWVhbl9rZXlfY29lZnNcbnByZWRpY3RfdGVtcCA8LSBtb2RlbF90ZW1wJHByZWRcblxuY2F0ZWdvcmllcyA8LSBjYXRlZ29yaXNlX2NvdihzcGVjaWVzX21hdCA9IHNwcF9tYXQsIGNvdmFyaWF0ZSA9IFwidG1lYW5fcmVnXCIpXG5uZXN0ZWRfY2F0cyA8LSBuZXN0ZWRfZGF0YShjYXRlZ29yaXNlZF9kYXRhID0gY2F0ZWdvcmllcylcblxuY2F0X21vZGVsIDwtIGdldF9tb2RlbChkYXRhID0gc3BwX21hdCwgbmNvdiA9IDEpXG5cbm5lc3RlZCA8LSBuZXN0ZWRfbW9kZWxzKG5lc3RlZF9kZiA9IG5lc3RlZF9jYXRzKVxuXG5uZXN0ZWRfcGxvdCA8LSBuZXN0ZWQgJT4lIG11dGF0ZShwbG90ID0gbWFwKG1vZGVsLCBnZXRfZ3JhcGgpKVxuXG50ZW1wZXJhdHVyZV9ncmFwaCA8LSBwbG90X211bHRpX2dyYXBocyhuZXN0ZWRfZGYgPSBuZXN0ZWRfcGxvdCwgbl9ncmFwaHMgPSAzKVxuIyBGSVhNRSBFcnJvciBpbiBhYnMoRShzdWJfZ3JhcGgpJHdlaWdodCkgOiBub24tbnVtZXJpYyBhcmd1bWVudCB0byBtYXRoZW1hdGljYWwgZnVuY3Rpb25cblxucG5nKFwiZmlndXJlcy9oZXJiX3dlc3RfdGVtcC5wbmdcIiwgaGVpZ2h0ID0gNDUwLCB3aWR0aCA9IDEyMDAsIHJlcyA9IDE1MClcbnBsb3RfbXVsdGlfZ3JhcGhzKG5lc3RlZF9kZiA9IG5lc3RlZF9wbG90LCBuX2dyYXBocyA9IDMpXG5kZXYub2ZmKClcblxuYGBgIn0= -->
+<pre class="r"><code>spp_mat &lt;- create_spp_mat(dataset = med_raw, basin = west,
+                          group = herb_west, covariate = &quot;tmean_reg&quot;)
+
+model_temp &lt;- run_mod(species_mat = spp_mat, n_covs = 1, family = &quot;gaussian&quot;)
+coef_temp &lt;- model_temp$mod$direct_coefs
+key_coef_temp &lt;- model_temp$boot$mean_key_coefs
+predict_temp &lt;- model_temp$pred
+
+categories &lt;- categorise_cov(species_mat = spp_mat, covariate = &quot;tmean_reg&quot;)
+nested_cats &lt;- nested_data(categorised_data = categories)
+
+cat_model &lt;- get_model(data = spp_mat, ncov = 1)
+
+nested &lt;- nested_models(nested_df = nested_cats)
+
+nested_plot &lt;- nested %&gt;% mutate(plot = map(model, get_graph))
+
+temperature_graph &lt;- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
+# FIXME Error in abs(E(sub_graph)$weight) : non-numeric argument to mathematical function
+
+png(&quot;figures/herb_west_temp.png&quot;, height = 450, width = 1200, res = 150)
+plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
+dev.off()
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="mpa-as-covariate-5" class="section level3">
+<h3>MPA as covariate</h3>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG5zcHBfbWF0IDwtIGNyZWF0ZV9zcHBfbWF0KGRhdGFzZXQgPSBtZWRfcmF3LCBiYXNpbiA9IHdlc3QsXG4gICAgICAgICAgICAgICAgICAgICAgICAgIGdyb3VwID0gaGVyYl93ZXN0LCBjb3ZhcmlhdGUgPSBcImVuZm9yY2VtZW50XCIpICU+JSBuYS5vbWl0KClcblxubW9kZWxfZW5mIDwtIHJ1bl9tb2Qoc3BlY2llc19tYXQgPSBzcHBfbWF0LCBuX2NvdnMgPSAxLCBmYW1pbHkgPSBcImdhdXNzaWFuXCIpXG5jb2VmX2VuZiA8LSBtb2RlbF9lbmYkbW9kJGRpcmVjdF9jb2Vmc1xua2V5X2NvZWZfZW5mIDwtIG1vZGVsX2VuZiRib290JG1lYW5fa2V5X2NvZWZzXG5wcmVkaWN0X2VuZiA8LSBtb2RlbF9lbmYkcHJlZFxuXG5uZXN0ZWRfY2F0cyA8LSBuZXN0ZWRfZGF0YShjYXRlZ29yaXNlZF9kYXRhID0gc3BwX21hdClcblxuY2F0X21vZGVsIDwtIGdldF9tb2RlbChkYXRhID0gc3BwX21hdCwgbmNvdiA9IDEpXG5cbm5lc3RlZCA8LSBuZXN0ZWRfbW9kZWxzKG5lc3RlZF9kZiA9IG5lc3RlZF9jYXRzKVxuXG5uZXN0ZWRfcGxvdCA8LSBuZXN0ZWQgJT4lIG11dGF0ZShwbG90ID0gbWFwKG1vZGVsLCBnZXRfZ3JhcGgpKVxuXG5NUEFzX2dyYXBoIDwtIHBsb3RfbXVsdGlfZ3JhcGhzKG5lc3RlZF9kZiA9IG5lc3RlZF9wbG90LCBuX2dyYXBocyA9IDQpIFxuIyBGSVhNRSBFcnJvciBpbiBhYnMoRShzdWJfZ3JhcGgpJHdlaWdodCkgOiBub24tbnVtZXJpYyBhcmd1bWVudCB0byBtYXRoZW1hdGljYWwgZnVuY3Rpb25cblxucG5nKFwiZmlndXJlcy9oZXJiX3dlc3RfbXBhLnBuZ1wiLCBoZWlnaHQgPSA0NTAsIHdpZHRoID0gMTYwMCwgcmVzID0gMTUwKVxucGxvdF9tdWx0aV9ncmFwaHMobmVzdGVkX2RmID0gbmVzdGVkX3Bsb3QsIG5fZ3JhcGhzID0gNClcbmRldi5vZmYoKVxuXG5gYGAifQ== -->
+<pre class="r"><code>
+spp_mat &lt;- create_spp_mat(dataset = med_raw, basin = west,
+                          group = herb_west, covariate = &quot;enforcement&quot;) %&gt;% na.omit()
+
+model_enf &lt;- run_mod(species_mat = spp_mat, n_covs = 1, family = &quot;gaussian&quot;)
+coef_enf &lt;- model_enf$mod$direct_coefs
+key_coef_enf &lt;- model_enf$boot$mean_key_coefs
+predict_enf &lt;- model_enf$pred
+
+nested_cats &lt;- nested_data(categorised_data = spp_mat)
+
+cat_model &lt;- get_model(data = spp_mat, ncov = 1)
+
+nested &lt;- nested_models(nested_df = nested_cats)
+
+nested_plot &lt;- nested %&gt;% mutate(plot = map(model, get_graph))
+
+MPAs_graph &lt;- plot_multi_graphs(nested_df = nested_plot, n_graphs = 4) 
+# FIXME Error in abs(E(sub_graph)$weight) : non-numeric argument to mathematical function
+
+png(&quot;figures/herb_west_mpa.png&quot;, height = 450, width = 1600, res = 150)
+plot_multi_graphs(nested_df = nested_plot, n_graphs = 4)
+dev.off()
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="depth-as-covariate-5" class="section level3">
+<h3>Depth as covariate</h3>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3BwX21hdCA8LSBjcmVhdGVfc3BwX21hdChkYXRhc2V0ID0gbWVkX3JhdywgYmFzaW4gPSB3ZXN0LFxuICAgICAgICAgICAgICAgICAgICAgICAgICBncm91cCA9IGhlcmJfd2VzdCwgY292YXJpYXRlID0gXCJkZXB0aFwiKSAlPiUgbmEub21pdCgpXG5cbm1vZGVsX2RlcCA8LSBydW5fbW9kKHNwZWNpZXNfbWF0ID0gc3BwX21hdCwgbl9jb3ZzID0gMSwgZmFtaWx5ID0gXCJnYXVzc2lhblwiKVxuY29lZl9kZXAgPC0gbW9kZWxfZGVwJG1vZCRkaXJlY3RfY29lZnNcbmtleV9jb2VmX2RlcCA8LSBtb2RlbF9kZXAkYm9vdCRtZWFuX2tleV9jb2Vmc1xucHJlZGljdF9kZXAgPC0gbW9kZWxfZGVwJHByZWRcblxuY2F0ZWdvcmllcyA8LSBjYXRlZ29yaXNlX2NvdihzcGVjaWVzX21hdCA9IHNwcF9tYXQsIGNvdmFyaWF0ZSA9IFwiZGVwdGhcIilcbiMgRklYTUUgRXJyb3IgaW4gY3V0KCk6IGJyZWFrcyBhcmUgbm90IHVuaXF1ZSBodHRwczovL3N0YWNrb3ZlcmZsb3cuY29tL3F1ZXN0aW9ucy8xNjE4NDk0Ny9jdXQtZXJyb3ItYnJlYWtzLWFyZS1ub3QtdW5pcXVlXG5uZXN0ZWRfY2F0cyA8LSBuZXN0ZWRfZGF0YShjYXRlZ29yaXNlZF9kYXRhID0gY2F0ZWdvcmllcylcblxuY2F0X21vZGVsIDwtIGdldF9tb2RlbChkYXRhID0gc3BwX21hdCwgbmNvdiA9IDEpXG5cbm5lc3RlZCA8LSBuZXN0ZWRfbW9kZWxzKG5lc3RlZF9kZiA9IG5lc3RlZF9jYXRzKVxuXG5uZXN0ZWRfcGxvdCA8LSBuZXN0ZWQgJT4lIG11dGF0ZShwbG90ID0gbWFwKG1vZGVsLCBnZXRfZ3JhcGgpKVxuXG5kZXB0aF9ncmFwaCA8LSBwbG90X211bHRpX2dyYXBocyhuZXN0ZWRfZGYgPSBuZXN0ZWRfcGxvdCwgbl9ncmFwaHMgPSAzKVxuXG5wbmcoXCJmaWd1cmVzL2hlcmJfd2VzdF9kZXB0aC5wbmdcIiwgaGVpZ2h0ID0gNDUwLCB3aWR0aCA9IDEyMDAsIHJlcyA9IDE1MClcbnBsb3RfbXVsdGlfZ3JhcGhzKG5lc3RlZF9kZiA9IG5lc3RlZF9wbG90LCBuX2dyYXBocyA9IDMpXG5kZXYub2ZmKClcblxuYGBgIn0= -->
+<pre class="r"><code>spp_mat &lt;- create_spp_mat(dataset = med_raw, basin = west,
+                          group = herb_west, covariate = &quot;depth&quot;) %&gt;% na.omit()
+
+model_dep &lt;- run_mod(species_mat = spp_mat, n_covs = 1, family = &quot;gaussian&quot;)
+coef_dep &lt;- model_dep$mod$direct_coefs
+key_coef_dep &lt;- model_dep$boot$mean_key_coefs
+predict_dep &lt;- model_dep$pred
+
+categories &lt;- categorise_cov(species_mat = spp_mat, covariate = &quot;depth&quot;)
+# FIXME Error in cut(): breaks are not unique https://stackoverflow.com/questions/16184947/cut-error-breaks-are-not-unique
+nested_cats &lt;- nested_data(categorised_data = categories)
+
+cat_model &lt;- get_model(data = spp_mat, ncov = 1)
+
+nested &lt;- nested_models(nested_df = nested_cats)
+
+nested_plot &lt;- nested %&gt;% mutate(plot = map(model, get_graph))
+
+depth_graph &lt;- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
+
+png(&quot;figures/herb_west_depth.png&quot;, height = 450, width = 1200, res = 150)
+plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
+dev.off()
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<hr />
 <!-- rnb-text-end -->
 </div>
 </div>
 </div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Clark, Nicholas J., Konstans Wells, and Oscar Lindberg. “Unravelling changing interspecific interactions across environmental gradients using Markov random fields.” Ecology 99.6 (2018): 1277-1283.<a href="#fnref1" class="footnote-back">↩</a></p></li>
+</ol>
+</div>
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIlJlc3VsdHMiDQpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sNCi0tLQ0KDQpgYGB7ciBBdmVyYWdlIG5ldHdvcmtzIHJlc3VsdHN9DQpzb3VyY2UoInNjcmlwdHMvbmV0d29ya3MuUiIpDQoNCmBgYA0KDQojIEF2ZXJhZ2VkIG5ldHdvcmtzDQoNCiMjIENvZWZmaWNpZW50cyBvZiBlYWNoIG5vZGUgKHNwZWNpZXMpDQpXaGljaCBwcmVkaWN0b3JzIGRldGVybWluZSBpdCdzIG9kZHMgb2Ygb2NjdXJyZW5jZQ0KDQojIyMgU2VycmFuaWRhZSBuZXR3b3JrDQpgYGB7cn0NClMuY2FiLmNvZWZmcw0KUy5zY3JpYi5jb2VmZnMNCg0KYGBgDQoNCipTZXJyYW51cyBjYWJyaWxsYSogYW5kICpTZXJyYW51cyBzY3JpYmEqIGFyZSBtb3N0bHkgYWZmZWN0ZWQgYnkgdGVtcGVyYXR1cmUuDQoNCmBgYHtyfQ0KRS5jb3N0YWUuY29lZmZzDQpFLm1hcmdpbi5jb2VmZnMNCg0KYGBgDQoNCipFcGluZXBoZWx1cyBtYXJnaW5hdHVzKiBpcyBtb3N0bHkgYWZmZWN0ZWQgYnkgKkVwaW5lcGhlbHVzIGNvc3RhZSogYnV0IG5vdCB0aGUgb3RoZXIgd2F5IGFyb3VuZC4NCg0KYGBge3J9DQpzZXJyX2VmZmVjdHMNCmBgYA0KDQpgYGB7cn0NCnNlcnJfZGlzdHMNCmBgYA0KDQojIyMgRGlwbG9kdXMgbmV0d29yaw0KDQpgYGB7cn0NCkQuYW5udS5jb2VmZnMNCkQucHVudC5jb2VmZnMNCkQudnVsZy5jb2VmZnMNCg0KYGBgDQoNCipEaXBsb2R1cyBhbm51bGFyaXMqIGlzIG1vc3RseSBhZmZlY3RlZCBieSB0aGUgaW50ZXJhY3Rpb24gYmV0d2VlbiB0ZW1wZXJhdHVyZSBhbmQgdGhlIHByZXNlbmNlIG9mICpELiBzYXJndXMqLg0KDQoqRGlwbG9kdXMgcHVudGF6em8qIGlzIG1vc3RseSBhZmZlY3RlZCBieSB0aGUgcHJlc2VuY2Ugb2YgKkQuIHZ1bGdhcmlzKi4NCg0KKkRpcGxvZHVzIHZ1bGdhcmlzKiBpcyBzdHJvbmdseSBhZmZlY3RlZCBieSB0ZW1wZXJhdHVyZS4NCg0KKkRpcGxvZHVzIGNlcnZpbnVzKiBpcyAqKm9ubHkqKiBhZmZlY3RlZCBieSAqRC4gc2FyZ3VzKi4NCg0KIyMjIEhlcmJpdm9yZSBuZXR3b3JrDQpgYGB7cn0NClMucmV2LmNvZWZmcw0KUy5zYWxwYS5jb2VmZnMNClMuZ2hvYi5jb2VmZnMNClMuY3JldC5jb2VmZnMNCmBgYA0KDQoqU2lnYW51cyByaXZ1bGF0dXMqIGlzICoqb25seSoqIGFmZmVjdGVkIGJ5IHRlbXBlcmF0dXJlLCBhcyBpcyAqU2FycGEgc2FscGEqLg0KKlNjYXJ1cyBnaG9iYmFuKiBpcyBhZmZlY3RlZCBieSB0aGUgaW50ZXJhY3Rpb24gb2YgdGVtcGVyYXR1cmUgYW5kIHRoZSBwcmVzZW5jZSBvZiAqU2lnYW51cyByaXZ1bGF0dXMqLCBhcyBpcyAqU3Bhcmlzb21hIGNyZXRlbnNlKi4NCg0KIyBQcmVkaWN0ZWQgbmV0d29ya3MNCg0KYGBge3IgUHJlZGljdGVkIG5ldHdvcmtzIHJlc3VsdHN9DQpzb3VyY2UoInNjcmlwdHMvcHJlZGljdF9uZXRzLlIiKQ0KDQpgYGANCg0KVXNlIGJvb3RzdHJhcHBlZCBtb2RlbCAoYGJvb3RzdHJhcF9NUkZgKSBmb3IgcHJlZGljdGluZyBsb2cgb2RkcyAobG9naXQpIG9mIG9jY3VycmVuY2UgZm9yIHNwZWNpZXMgcGVyIHNpdGUgKGBwcmVkaWN0X01SRmApLiBUaGVzZSBsb2cgb2RkcyBjYW4gYmUgdHJhbnNmb3JtZWQgaW50byBwcm9iYWJpbGl0aWVzIHVzaW5nIGBMYXBsYWNlc0RlbW9uOjppbnZsb2dpdGAgZnVuY3Rpb24uIFRoZXNlIGNhbiBiZSAiY2hlY2tlZCIgdXNpbmcgc3Vic2V0cyBvZiB0aGUgZGF0YSBieSBjb3ZhcmlhdGUgbGV2ZWxzIChlLmcuIGxvdy9taWQvaGkgdGVtcCkgdG8gY3JlYXRlIHNlcGFyYXRlIG5ldHdvcmtzIC0gbm90IHdpdGggdGhlIHByZWRpY3QgZnVuY3Rpb24gYnV0IHdpdGggdGhlIGBNUkZjb3ZgIGZ1bmN0aW9uLiA/Pz8/DQoNCmBib290c3RyYXBfTVJGYCBjcmVhdGVzIGRpc3RyaWJ1dGlvbiBvZiBkYXRhIHBlcm11dGF0aW9ucyBhbmQgaGVscHMgaW4gZWxpbWluYXRpbmcgdW5jZXJ0YWludGllcy4gUGFydCBvZiBpdHMgb3V0cHV0IGlzIDk1JSBjb25maWRlbmNlIGludGVydmFsIGZvciBlYWNoIG9uZSBvZiB0aGUgcHJlZGljdG9ycywgd2hpY2ggSSBjYW4gdXNlIHRvIGV2YWx1YXRlIHRoZSBwcmVkaWN0b3JzIGVmZmVjdC4NCg0KIyMgU2VycmFuaWRhZSBuZXR3b3Jrcw0KDQojIyMgVGVtcGVyYXR1cmUgZWZmZWN0DQoNCmBgYHtyfQ0KIyBMb3cNCnBsb3QuaWdyYXBoKHNlcnJfZ3JhcGhfbG93LCBsYXlvdXQgPSBsYXlvdXQuY2lyY2xlKHNlcnJfZ3JhcGhfbG93KSwNCiAgICAgICAgICAgIGVkZ2Uud2lkdGggPSBhYnMoRShzZXJyX2dyYXBoX2xvdykkd2VpZ2h0KSwNCiAgICAgICAgICAgIGVkZ2UuY29sb3IgPSBpZmVsc2UoRShzZXJyX2dyYXBoX2xvdykkd2VpZ2h0IDwgMCwgJyMzMzk5Q0MnLCAnI0ZGMzMzMycpLA0KICAgICAgICAgICAgdmVydGV4LnNpemUgPSBkZWcsDQogICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuZmFtaWx5ID0gInNhbnMiLA0KICAgICAgICAgICAgdmVydGV4LmxhYmVsLmZvbnQJPSAzLA0KICAgICAgICAgICAgdmVydGV4LmxhYmVsLmNleCA9IDEsDQogICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuY29sb3IgPSBhZGp1c3Rjb2xvcigiIzMzMzMzMyIsIDAuODUpLA0KICAgICAgICAgICAgdmVydGV4LmNvbG9yID0gYWRqdXN0Y29sb3IoIiNGRkZGRkYiLCAuNSksDQogICAgICAgICAgICBtYWluID0gIlNlcnJhbmlkYWUgbmV0d29yayBpbiBsb3cgdGVtcGVyYXR1cmVzIikNCg0KIyBNZWQNCnNlcnJfbWVkIDwtIHBsb3QuaWdyYXBoKHNlcnJfZ3JhcGhfbWVkLCBsYXlvdXQgPSBsYXlvdXQuY2lyY2xlKHNlcnJfZ3JhcGhfbWVkKSwNCiAgICAgICAgICAgIGVkZ2Uud2lkdGggPSBhYnMoRShzZXJyX2dyYXBoX21lZCkkd2VpZ2h0KSwNCiAgICAgICAgICAgIGVkZ2UuY29sb3IgPSBpZmVsc2UoRShzZXJyX2dyYXBoX21lZCkkd2VpZ2h0IDwgMCwgJyMzMzk5Q0MnLCAnI0ZGMzMzMycpLA0KICAgICAgICAgICAgdmVydGV4LnNpemUgPSBkZWcsDQogICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuZmFtaWx5ID0gInNhbnMiLA0KICAgICAgICAgICAgdmVydGV4LmxhYmVsLmZvbnQJPSAzLA0KICAgICAgICAgICAgdmVydGV4LmxhYmVsLmNleCA9IDEsDQogICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuY29sb3IgPSBhZGp1c3Rjb2xvcigiIzMzMzMzMyIsIDAuODUpLA0KICAgICAgICAgICAgdmVydGV4LmNvbG9yID0gYWRqdXN0Y29sb3IoIiNGRkZGRkYiLCAuNSksDQogICAgICAgICAgICBtYWluID0gIlNlcnJhbmlkYWUgbmV0d29yayBpbiBtZWRpYW4gdGVtcGVyYXR1cmVzIikNCg0KIyBIaWdoDQpwbG90LmlncmFwaChzZXJyX2dyYXBoX2hpLCBsYXlvdXQgPSBsYXlvdXQuY2lyY2xlKHNlcnJfZ3JhcGhfaGkpLA0KICAgICAgICAgICAgZWRnZS53aWR0aCA9IGFicyhFKHNlcnJfZ3JhcGhfaGkpJHdlaWdodCksDQogICAgICAgICAgICBlZGdlLmNvbG9yID0gaWZlbHNlKEUoc2Vycl9ncmFwaF9oaSkkd2VpZ2h0IDwgMCwgJyMzMzk5Q0MnLCAnI0ZGMzMzMycpLA0KICAgICAgICAgICAgdmVydGV4LnNpemUgPSBkZWcsDQogICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuZmFtaWx5ID0gInNhbnMiLA0KICAgICAgICAgICAgdmVydGV4LmxhYmVsLmZvbnQJPSAzLA0KICAgICAgICAgICAgdmVydGV4LmxhYmVsLmNleCA9IDEsDQogICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuY29sb3IgPSBhZGp1c3Rjb2xvcigiIzMzMzMzMyIsIDAuODUpLA0KICAgICAgICAgICAgdmVydGV4LmNvbG9yID0gYWRqdXN0Y29sb3IoIiNGRkZGRkYiLCAuNSksDQogICAgICAgICAgICBtYWluID0gIlNlcnJhbmlkYWUgbmV0d29yayBpbiBoaWdoIHRlbXBlcmF0dXJlcyIpDQoNCmBgYA0KDQojIyMgTVBBcyBlZmZlY3QNCg0KYGBge3J9DQojIEluc2lkZSBNUEFzDQpwbG90LmlncmFwaChzZXJyX2dyYXBoX01QQSwgbGF5b3V0ID0gbGF5b3V0LmNpcmNsZShzZXJyX2dyYXBoX01QQSksDQogICAgICAgICAgICBlZGdlLndpZHRoID0gYWJzKEUoc2Vycl9ncmFwaF9NUEEpJHdlaWdodCksDQogICAgICAgICAgICBlZGdlLmNvbG9yID0gaWZlbHNlKEUoc2Vycl9ncmFwaF9NUEEpJHdlaWdodCA8IDAsICcjMzM5OUNDJywgJyNGRjMzMzMnKSwNCiAgICAgICAgICAgIHZlcnRleC5zaXplID0gZGVnLA0KICAgICAgICAgICAgdmVydGV4LmxhYmVsLmZhbWlseSA9ICJzYW5zIiwNCiAgICAgICAgICAgIHZlcnRleC5sYWJlbC5mb250CT0gMywNCiAgICAgICAgICAgIHZlcnRleC5sYWJlbC5jZXggPSAxLA0KICAgICAgICAgICAgdmVydGV4LmxhYmVsLmNvbG9yID0gYWRqdXN0Y29sb3IoIiMzMzMzMzMiLCAwLjg1KSwNCiAgICAgICAgICAgIHZlcnRleC5jb2xvciA9IGFkanVzdGNvbG9yKCIjRkZGRkZGIiwgLjUpLA0KICAgICAgICAgICAgbWFpbiA9ICJTZXJyYW5pZGFlIG5ldHdvcmsgaW5zaWRlIE1QQXMiKQ0KDQpwbG90LmlncmFwaChzZXJyX2dyYXBoX25vTVBBLCBsYXlvdXQgPSBsYXlvdXQuY2lyY2xlKHNlcnJfZ3JhcGhfbm9NUEEpLA0KICAgICAgICAgICAgZWRnZS53aWR0aCA9IGFicyhFKHNlcnJfZ3JhcGhfbm9NUEEpJHdlaWdodCksDQogICAgICAgICAgICBlZGdlLmNvbG9yID0gaWZlbHNlKEUoc2Vycl9ncmFwaF9ub01QQSkkd2VpZ2h0IDwgMCwgJyMzMzk5Q0MnLCAnI0ZGMzMzMycpLA0KICAgICAgICAgICAgdmVydGV4LnNpemUgPSBkZWcsDQogICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuZmFtaWx5ID0gInNhbnMiLA0KICAgICAgICAgICAgdmVydGV4LmxhYmVsLmZvbnQJPSAzLA0KICAgICAgICAgICAgdmVydGV4LmxhYmVsLmNleCA9IDEsDQogICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuY29sb3IgPSBhZGp1c3Rjb2xvcigiIzMzMzMzMyIsIDAuODUpLA0KICAgICAgICAgICAgdmVydGV4LmNvbG9yID0gYWRqdXN0Y29sb3IoIiNGRkZGRkYiLCAuNSksDQogICAgICAgICAgICBtYWluID0gIlNlcnJhbmlkYWUgbmV0d29yayBvdXRzaWRlIE1QQXMiKQ0KDQpgYGANCg0KDQojIyBEaXBsb2R1cyBuZXR3b3Jrcw0KDQojIyMgVGVtcGVyYXR1cmUgZWZmZWN0DQoNCmBgYHtyfQ0KIyBMb3cNCnBsb3QuaWdyYXBoKGRpcF9ncmFwaF9sb3csIGxheW91dCA9IGxheW91dC5jaXJjbGUoZGlwX2dyYXBoX2xvdyksDQogICAgICAgICAgICBlZGdlLndpZHRoID0gYWJzKEUoZGlwX2dyYXBoX2xvdykkd2VpZ2h0KSwNCiAgICAgICAgICAgIGVkZ2UuY29sb3IgPSBpZmVsc2UoRShkaXBfZ3JhcGhfbG93KSR3ZWlnaHQgPCAwLCAnIzMzOTlDQycsICcjRkYzMzMzJyksDQogICAgICAgICAgICB2ZXJ0ZXguc2l6ZSA9IGRlZywNCiAgICAgICAgICAgIHZlcnRleC5sYWJlbC5mYW1pbHkgPSAic2FucyIsDQogICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuZm9udAk9IDMsDQogICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuY2V4ID0gMSwNCiAgICAgICAgICAgIHZlcnRleC5sYWJlbC5jb2xvciA9IGFkanVzdGNvbG9yKCIjMzMzMzMzIiwgMC44NSksDQogICAgICAgICAgICB2ZXJ0ZXguY29sb3IgPSBhZGp1c3Rjb2xvcigiI0ZGRkZGRiIsIC41KSwNCiAgICAgICAgICAgIG1haW4gPSAiRGlwbG9kdXMgbmV0d29yayBpbiBsb3cgdGVtcGVyYXR1cmVzIikNCg0KIyBNZWQNCnBsb3QuaWdyYXBoKGRpcF9ncmFwaF9tZWQsIGxheW91dCA9IGxheW91dC5jaXJjbGUoZGlwX2dyYXBoX21lZCksDQogICAgICAgICAgICBlZGdlLndpZHRoID0gYWJzKEUoZGlwX2dyYXBoX21lZCkkd2VpZ2h0KSwNCiAgICAgICAgICAgIGVkZ2UuY29sb3IgPSBpZmVsc2UoRShkaXBfZ3JhcGhfbWVkKSR3ZWlnaHQgPCAwLCAnIzMzOTlDQycsICcjRkYzMzMzJyksDQogICAgICAgICAgICB2ZXJ0ZXguc2l6ZSA9IGRlZywNCiAgICAgICAgICAgIHZlcnRleC5sYWJlbC5mYW1pbHkgPSAic2FucyIsDQogICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuZm9udAk9IDMsDQogICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuY2V4ID0gMSwNCiAgICAgICAgICAgIHZlcnRleC5sYWJlbC5jb2xvciA9IGFkanVzdGNvbG9yKCIjMzMzMzMzIiwgMC44NSksDQogICAgICAgICAgICB2ZXJ0ZXguY29sb3IgPSBhZGp1c3Rjb2xvcigiI0ZGRkZGRiIsIC41KSwNCiAgICAgICAgICAgIG1haW4gPSAiRGlwbG9kdXMgbmV0d29yayBpbiBtZWRpYW4gdGVtcGVyYXR1cmVzIikNCg0KIyBIaWdoDQpwbG90LmlncmFwaChkaXBfZ3JhcGhfaGksIGxheW91dCA9IGxheW91dC5jaXJjbGUoZGlwX2dyYXBoX2hpKSwNCiAgICAgICAgICAgIGVkZ2Uud2lkdGggPSBhYnMoRShkaXBfZ3JhcGhfaGkpJHdlaWdodCksDQogICAgICAgICAgICBlZGdlLmNvbG9yID0gaWZlbHNlKEUoZGlwX2dyYXBoX2hpKSR3ZWlnaHQgPCAwLCAnIzMzOTlDQycsICcjRkYzMzMzJyksDQogICAgICAgICAgICB2ZXJ0ZXguc2l6ZSA9IGRlZywNCiAgICAgICAgICAgIHZlcnRleC5sYWJlbC5mYW1pbHkgPSAic2FucyIsDQogICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuZm9udAk9IDMsDQogICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuY2V4ID0gMSwNCiAgICAgICAgICAgIHZlcnRleC5sYWJlbC5jb2xvciA9IGFkanVzdGNvbG9yKCIjMzMzMzMzIiwgMC44NSksDQogICAgICAgICAgICB2ZXJ0ZXguY29sb3IgPSBhZGp1c3Rjb2xvcigiI0ZGRkZGRiIsIC41KSwNCiAgICAgICAgICAgIG1haW4gPSAiRGlwbG9kdXMgbmV0d29yayBpbiBoaWdoIHRlbXBlcmF0dXJlcyIpDQpgYGANCg0KIyMjIE1QQXMgZWZmZWN0DQoNCmBgYHtyfQ0KIyBXaXRoaW4NCnBsb3QuaWdyYXBoKGRpcF9ncmFwaF9NUEEsIGxheW91dCA9IGxheW91dC5jaXJjbGUoZGlwX2dyYXBoX01QQSksDQogICAgICAgICAgICBlZGdlLndpZHRoID0gYWJzKEUoZGlwX2dyYXBoX01QQSkkd2VpZ2h0KSwNCiAgICAgICAgICAgIGVkZ2UuY29sb3IgPSBpZmVsc2UoRShkaXBfZ3JhcGhfTVBBKSR3ZWlnaHQgPCAwLCAnIzMzOTlDQycsICcjRkYzMzMzJyksDQogICAgICAgICAgICB2ZXJ0ZXguc2l6ZSA9IGRlZywNCiAgICAgICAgICAgIHZlcnRleC5sYWJlbC5mYW1pbHkgPSAic2FucyIsDQogICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuZm9udAk9IDMsDQogICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuY2V4ID0gMSwNCiAgICAgICAgICAgIHZlcnRleC5sYWJlbC5jb2xvciA9IGFkanVzdGNvbG9yKCIjMzMzMzMzIiwgMC44NSksDQogICAgICAgICAgICB2ZXJ0ZXguY29sb3IgPSBhZGp1c3Rjb2xvcigiI0ZGRkZGRiIsIC41KSwNCiAgICAgICAgICAgIG1haW4gPSAiRGlwbG9kdXMgbmV0d29yayBpbnNpZGUgTVBBcyIpDQoNCiMgT3V0c2lkZQ0KcGxvdC5pZ3JhcGgoZGlwX2dyYXBoX25vTVBBLCBsYXlvdXQgPSBsYXlvdXQuY2lyY2xlKGRpcF9ncmFwaF9ub01QQSksDQogICAgICAgICAgICBlZGdlLndpZHRoID0gYWJzKEUoZGlwX2dyYXBoX25vTVBBKSR3ZWlnaHQpLA0KICAgICAgICAgICAgZWRnZS5jb2xvciA9IGlmZWxzZShFKGRpcF9ncmFwaF9ub01QQSkkd2VpZ2h0IDwgMCwgJyMzMzk5Q0MnLCAnI0ZGMzMzMycpLA0KICAgICAgICAgICAgdmVydGV4LnNpemUgPSBkZWcsDQogICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuZmFtaWx5ID0gInNhbnMiLA0KICAgICAgICAgICAgdmVydGV4LmxhYmVsLmZvbnQJPSAzLA0KICAgICAgICAgICAgdmVydGV4LmxhYmVsLmNleCA9IDEsDQogICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuY29sb3IgPSBhZGp1c3Rjb2xvcigiIzMzMzMzMyIsIDAuODUpLA0KICAgICAgICAgICAgdmVydGV4LmNvbG9yID0gYWRqdXN0Y29sb3IoIiNGRkZGRkYiLCAuNSksDQogICAgICAgICAgICBtYWluID0gIkRpcGxvZHVzIG5ldHdvcmsgb3V0c2lkZSBNUEFzIikNCg0KYGBgDQoNCg0KIyMgSGVyYml2b3Jlcw0KDQojIyMgVGVtcGVyYXR1cmUgZWZmZWN0DQoNCmBgYHtyfQ0KIyBMb3cNCnBsb3QuaWdyYXBoKGhlcmJfZ3JhcGhfbG93LCBsYXlvdXQgPSBsYXlvdXQuY2lyY2xlKGhlcmJfZ3JhcGhfbG93KSwNCiAgICAgICAgICAgIGVkZ2Uud2lkdGggPSBhYnMoRShoZXJiX2dyYXBoX2xvdykkd2VpZ2h0KSwNCiAgICAgICAgICAgIGVkZ2UuY29sb3IgPSBpZmVsc2UoRShoZXJiX2dyYXBoX2xvdykkd2VpZ2h0IDwgMCwgJyMzMzk5Q0MnLCAnI0ZGMzMzMycpLA0KICAgICAgICAgICAgdmVydGV4LnNpemUgPSBkZWcsDQogICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuZmFtaWx5ID0gInNhbnMiLA0KICAgICAgICAgICAgdmVydGV4LmxhYmVsLmZvbnQJPSAzLA0KICAgICAgICAgICAgdmVydGV4LmxhYmVsLmNleCA9IDEsDQogICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuY29sb3IgPSBhZGp1c3Rjb2xvcigiIzMzMzMzMyIsIDAuODUpLA0KICAgICAgICAgICAgdmVydGV4LmNvbG9yID0gYWRqdXN0Y29sb3IoIiNGRkZGRkYiLCAuNSksDQogICAgICAgICAgICBtYWluID0gIkhlcmJpdm9yZSBuZXR3b3JrIGluIGxvdyB0ZW1wZXJhdHVyZXMiKQ0KIyBNZWQNCnBsb3QuaWdyYXBoKGhlcmJfZ3JhcGhfbWVkLCBsYXlvdXQgPSBsYXlvdXQuY2lyY2xlKGhlcmJfZ3JhcGhfbWVkKSwNCiAgICAgICAgICAgIGVkZ2Uud2lkdGggPSBhYnMoRShoZXJiX2dyYXBoX21lZCkkd2VpZ2h0KSwNCiAgICAgICAgICAgIGVkZ2UuY29sb3IgPSBpZmVsc2UoRShoZXJiX2dyYXBoX21lZCkkd2VpZ2h0IDwgMCwgJyMzMzk5Q0MnLCAnI0ZGMzMzMycpLA0KICAgICAgICAgICAgdmVydGV4LnNpemUgPSBkZWcsDQogICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuZmFtaWx5ID0gInNhbnMiLA0KICAgICAgICAgICAgdmVydGV4LmxhYmVsLmZvbnQJPSAzLA0KICAgICAgICAgICAgdmVydGV4LmxhYmVsLmNleCA9IDEsDQogICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuY29sb3IgPSBhZGp1c3Rjb2xvcigiIzMzMzMzMyIsIDAuODUpLA0KICAgICAgICAgICAgdmVydGV4LmNvbG9yID0gYWRqdXN0Y29sb3IoIiNGRkZGRkYiLCAuNSksDQogICAgICAgICAgICBtYWluID0gIkhlcmJpdm9yZSBuZXR3b3JrIGluIG1lZGlhbiB0ZW1wZXJhdHVyZXMiKQ0KIyBIaWdoDQpwbG90LmlncmFwaChoZXJiX2dyYXBoX2hpLCBsYXlvdXQgPSBsYXlvdXQuY2lyY2xlKGhlcmJfZ3JhcGhfaGkpLA0KICAgICAgICAgICAgZWRnZS53aWR0aCA9IGFicyhFKGhlcmJfZ3JhcGhfaGkpJHdlaWdodCksDQogICAgICAgICAgICBlZGdlLmNvbG9yID0gaWZlbHNlKEUoaGVyYl9ncmFwaF9oaSkkd2VpZ2h0IDwgMCwgJyMzMzk5Q0MnLCAnI0ZGMzMzMycpLA0KICAgICAgICAgICAgdmVydGV4LnNpemUgPSBkZWcsDQogICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuZmFtaWx5ID0gInNhbnMiLA0KICAgICAgICAgICAgdmVydGV4LmxhYmVsLmZvbnQJPSAzLA0KICAgICAgICAgICAgdmVydGV4LmxhYmVsLmNleCA9IDEsDQogICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuY29sb3IgPSBhZGp1c3Rjb2xvcigiIzMzMzMzMyIsIDAuODUpLA0KICAgICAgICAgICAgdmVydGV4LmNvbG9yID0gYWRqdXN0Y29sb3IoIiNGRkZGRkYiLCAuNSksDQogICAgICAgICAgICBtYWluID0gIkhlcmJpdm9yZSBuZXR3b3JrIGluIGhpZ2ggdGVtcGVyYXR1cmVzIikNCmBgYA0KDQoNCiMjIyBNUEFzIGVmZmVjdA0KYGBge3J9DQojIFdpdGhpbg0KcGxvdC5pZ3JhcGgoaGVyYl9ncmFwaF9NUEEsIGxheW91dCA9IGxheW91dC5jaXJjbGUoaGVyYl9ncmFwaF9NUEEpLA0KICAgICAgICAgICAgZWRnZS53aWR0aCA9IGFicyhFKGhlcmJfZ3JhcGhfTVBBKSR3ZWlnaHQpLA0KICAgICAgICAgICAgZWRnZS5jb2xvciA9IGlmZWxzZShFKGhlcmJfZ3JhcGhfTVBBKSR3ZWlnaHQgPCAwLCAnIzMzOTlDQycsICcjRkYzMzMzJyksDQogICAgICAgICAgICB2ZXJ0ZXguc2l6ZSA9IGRlZywNCiAgICAgICAgICAgIHZlcnRleC5sYWJlbC5mYW1pbHkgPSAic2FucyIsDQogICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuZm9udAk9IDMsDQogICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuY2V4ID0gMSwNCiAgICAgICAgICAgIHZlcnRleC5sYWJlbC5jb2xvciA9IGFkanVzdGNvbG9yKCIjMzMzMzMzIiwgMC44NSksDQogICAgICAgICAgICB2ZXJ0ZXguY29sb3IgPSBhZGp1c3Rjb2xvcigiI0ZGRkZGRiIsIC41KSwNCiAgICAgICAgICAgIG1haW4gPSAiSGVyYml2b3JlIG5ldHdvcmsgaW5zaWRlIE1QQXMiKQ0KDQojIE91dHNpZGUNCnBsb3QuaWdyYXBoKGhlcmJfZ3JhcGhfbm9NUEEsIGxheW91dCA9IGxheW91dC5jaXJjbGUoaGVyYl9ncmFwaF9ub01QQSksDQogICAgICAgICAgICBlZGdlLndpZHRoID0gYWJzKEUoaGVyYl9ncmFwaF9ub01QQSkkd2VpZ2h0KSwNCiAgICAgICAgICAgIGVkZ2UuY29sb3IgPSBpZmVsc2UoRShoZXJiX2dyYXBoX25vTVBBKSR3ZWlnaHQgPCAwLCAnIzMzOTlDQycsICcjRkYzMzMzJyksDQogICAgICAgICAgICB2ZXJ0ZXguc2l6ZSA9IGRlZywNCiAgICAgICAgICAgIHZlcnRleC5sYWJlbC5mYW1pbHkgPSAic2FucyIsDQogICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuZm9udAk9IDMsDQogICAgICAgICAgICB2ZXJ0ZXgubGFiZWwuY2V4ID0gMSwNCiAgICAgICAgICAgIHZlcnRleC5sYWJlbC5jb2xvciA9IGFkanVzdGNvbG9yKCIjMzMzMzMzIiwgMC44NSksDQogICAgICAgICAgICB2ZXJ0ZXguY29sb3IgPSBhZGp1c3Rjb2xvcigiI0ZGRkZGRiIsIC41KSwNCiAgICAgICAgICAgIG1haW4gPSAiSGVyYml2b3JlIG5ldHdvcmsgb3V0c2lkZSBNUEFzIikNCmBgYA0KDQoNCg0KDQoNCg0KDQoNCg0KDQoNCg0KDQoNCg==</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIlJlc3VsdHMiDQpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sNCi0tLQ0KDQoqKkhvdyBmaXNoIGNvbW11bml0aWVzIGNoYW5nZSBhbG9uZyBlbnZpcm9ubWVudGFsIGdyYWRpZW50cz8qKg0KU3BlY2llcyBhc3NvY2lhdGlvbnMgYXJlIHJlcHJlc2VudGVkIGdyYXBoaWNhbGx5IGFuZCBxdWFudGl0YXRpdmVseSB1c2luZyAqTVJGY292IHBhY2thZ2UqIFteMV0uDQoNCmBgYHtyIExvYWQgcGFja2FnZXMgYW5kIGZ1bmN0aW9ucywgbWVzc2FnZT1GQUxTRSwgd2FybmluZz1GQUxTRSwgaW5jbHVkZT1GQUxTRX0NCg0Kc291cmNlKCJzY3JpcHRzL3Bja2dzX3ByZXBzLlIiKQ0Kc291cmNlKCJzY3JpcHRzL21vZGVsX2Z1bmMuUiIpDQoNCmBgYA0KDQojIyMgRGF0YQ0KDQpgYGB7cn0NCg0KbWVkX3JhdyA8LSByZWFkX2NzdigiZGF0YS9tZWRfcmF3LmNzdiIsIGNvbF90eXBlcyA9IGNvbHMoZGVwdGggPSAiZCIpKSAlPiUNCiAgZmlsdGVyKGRhdGEub3JpZ2luICE9ICJhenpfYXNpIikgJT4lICMgcmVtb3ZlIHByZXNlbmNlLWFic2VuY2UgZGF0YQ0KICBtdXRhdGUobG9jID0gcGFzdGUwKHNpdGUsICJfIiwgdHJhbnMpLCB0bWVhbl9yZWcgPSBzY2FsZSh0bWVhbiksIGRlcHRoX3JlZyA9IHNjYWxlKGRlcHRoKSkNCnN0cihtZWRfcmF3KQ0KDQpgYGANCg0KIyMjIERlZmluZSB2YXJpYWJsZXMgYGJhc2luYDsgYGdyb3VwYA0KDQpgYGB7cn0NCiMgQmFzaW5zDQp3ZXN0IDwtIGxpc3QoIkZyYW5jZSIsICJJdGFseSIsICJTcGFpbiIpDQplYXN0IDwtIGxpc3QoIkNyb2F0aWEiLCAiR3JlZWNlIiwgIklzcmFlbCIsICJNYWx0YSIsICJUdXJrZXkiKQ0KDQojIEdyb3Vwcw0KZ3JvdXBlcnMgPC0gYygiRXBpbmVwaGVsdXMuY29zdGFlIiwgIkVwaW5lcGhlbHVzLm1hcmdpbmF0dXMiLA0KICAgICAgICAgICAgICAiTXljdGVyb3BlcmNhLnJ1YnJhIiwgIlNlcnJhbnVzLmNhYnJpbGxhIiwgIlNlcnJhbnVzLnNjcmliYSIpDQpkaXBsb2R1cyA8LSBjKCJEaXBsb2R1cy5hbm51bGFyaXMiLCAiRGlwbG9kdXMucHVudGF6em8iLCAiRGlwbG9kdXMuc2FyZ3VzIiwNCiAgICAgICAgICAgICAgIkRpcGxvZHVzLnZ1bGdhcmlzIiwgIkRpcGxvZHVzLmNlcnZpbnVzIikNCmhlcmJpdm9yZXMgPC0gYygiU2lnYW51cy5yaXZ1bGF0dXMiLCAiU2lnYW51cy5sdXJpZHVzIiwgIlNhcnBhLnNhbHBhIiwNCiAgICAgICAgICAgICAgICAiU2NhcnVzLmdob2JiYW4iLCAiU3Bhcmlzb21hLmNyZXRlbnNlIikNCg0KYGBgDQoNCiMgR3JvdXBlcnMNCg0KIyMgRWFzdGVybiBNZWRpdGVycmFuZWFuDQoNCiMjIyBUZW1wZXJhdHVyZSBhcyBjb3ZhcmlhdGUNCg0KYGBge3J9DQojIENyZWF0ZSBzcGVjaWVzIG1hdHJpeCBmb3IgYGdyb3VwYCBpbiBgYmFzaW5gIHdpdGggYGNvdmFyaWF0ZWANCnNwcF9tYXQgPC0gY3JlYXRlX3NwcF9tYXQoZGF0YXNldCA9IG1lZF9yYXcsIGJhc2luID0gZWFzdCwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgZ3JvdXAgPSBncm91cGVycywgY292YXJpYXRlID0gInRtZWFuX3JlZyIpDQpzdHIoc3BwX21hdCkNCg0KIyBSdW4gbW9kZWwgYW5kIGNyZWF0ZSBvY2N1cnJlbmNlIHByZWRpY3Rpb25zDQptb2RlbF90ZW1wIDwtIHJ1bl9tb2Qoc3BlY2llc19tYXQgPSBzcHBfbWF0LCBuX2NvdnMgPSAxLCBmYW1pbHkgPSAiZ2F1c3NpYW4iKQ0KY29lZl90ZW1wIDwtIG1vZGVsX3RlbXAkbW9kJGRpcmVjdF9jb2Vmcw0Ka2V5X2NvZWZfdGVtcCA8LSBtb2RlbF90ZW1wJGJvb3QkbWVhbl9rZXlfY29lZnMNCnByZWRpY3RfdGVtcCA8LSBtb2RlbF90ZW1wJHByZWQNCg0KIyBDYXRlZ29yaXNlIGNvbnRpbnVvdXMgZGF0YSArIE5lc3QgY2F0ZWdvcmljYWwgKG5vbWluYWwpIGRhdGENCmNhdGVnb3JpZXMgPC0gY2F0ZWdvcmlzZV9jb3Yoc3BlY2llc19tYXQgPSBzcHBfbWF0LCBjb3ZhcmlhdGUgPSAidG1lYW5fcmVnIikNCm5lc3RlZF9jYXRzIDwtIG5lc3RlZF9kYXRhKGNhdGVnb3Jpc2VkX2RhdGEgPSBjYXRlZ29yaWVzKQ0KDQojIFJ1biBNUkZjb3YgbW9kZWwgd2l0aCBzb21lIGRlZmF1bHRzDQpjYXRfbW9kZWwgPC0gZ2V0X21vZGVsKGRhdGEgPSBzcHBfbWF0LCBuY292ID0gMSkNCmNhdF9tb2RlbA0KDQojIFJ1biBtb2RlbCBvbiBlYWNoIGNhdGVnb3J5DQpuZXN0ZWQgPC0gbmVzdGVkX21vZGVscyhuZXN0ZWRfZGYgPSBuZXN0ZWRfY2F0cykNCg0KIyBHZXQgZ3JhcGggZGF0YQ0KbmVzdGVkX3Bsb3QgPC0gbmVzdGVkICU+JSBtdXRhdGUocGxvdCA9IG1hcChtb2RlbCwgZ2V0X2dyYXBoKSkNCg0KIyBQbG90IG11bHRpcGxlIGdyYXBocyBmb3IgZ3JhZGllbnQNCnRlbXBlcmF0dXJlX2dyYXBoIDwtIHBsb3RfbXVsdGlfZ3JhcGhzKG5lc3RlZF9kZiA9IG5lc3RlZF9wbG90LCBuX2dyYXBocyA9IDMpDQoNCiMgcG5nKCJmaWd1cmVzL2dyb3VwZXJzX2Vhc3RfdGVtcC5wbmciLCBoZWlnaHQgPSA0NTAsIHdpZHRoID0gMTIwMCwgcmVzID0gMTUwKQ0KIyBwbG90X211bHRpX2dyYXBocyhuZXN0ZWRfZGYgPSBuZXN0ZWRfcGxvdCwgbl9ncmFwaHMgPSAzKQ0KIyBkZXYub2ZmKCkNCg0KYGBgDQoNCiMjIyBNUEEgYXMgY292YXJpYXRlDQpgYGB7cn0NCg0Kc3BwX21hdCA8LSBjcmVhdGVfc3BwX21hdChkYXRhc2V0ID0gbWVkX3JhdywgYmFzaW4gPSBlYXN0LA0KICAgICAgICAgICAgICAgICAgICAgICAgICBncm91cCA9IGdyb3VwZXJzLCBjb3ZhcmlhdGUgPSAiZW5mb3JjZW1lbnQiKQ0KDQptb2RlbF9lbmYgPC0gcnVuX21vZChzcGVjaWVzX21hdCA9IHNwcF9tYXQsIG5fY292cyA9IDEsIGZhbWlseSA9ICJnYXVzc2lhbiIpDQpjb2VmX2VuZiA8LSBtb2RlbF9lbmYkbW9kJGRpcmVjdF9jb2Vmcw0Ka2V5X2NvZWZfZW5mIDwtIG1vZGVsX2VuZiRib290JG1lYW5fa2V5X2NvZWZzDQpwcmVkaWN0X2VuZiA8LSBtb2RlbF9lbmYkcHJlZA0KDQojIEZ1bmMgM2IgKG5vIG5lZWQgZm9yIDNhIGJlY2F1c2UgaXQncyBhbHJlYWR5IGNhdGVnb3Jpc2VkKSAtIG5lc3Rpbmcgb25seQ0KbmVzdGVkX2NhdHMgPC0gbmVzdGVkX2RhdGEoY2F0ZWdvcmlzZWRfZGF0YSA9IHNwcF9tYXQpDQoNCmNhdF9tb2RlbCA8LSBnZXRfbW9kZWwoZGF0YSA9IHNwcF9tYXQsIG5jb3YgPSAxKQ0KDQpuZXN0ZWQgPC0gbmVzdGVkX21vZGVscyhuZXN0ZWRfZGYgPSBuZXN0ZWRfY2F0cykNCg0KbmVzdGVkX3Bsb3QgPC0gbmVzdGVkICU+JSBtdXRhdGUocGxvdCA9IG1hcChtb2RlbCwgZ2V0X2dyYXBoKSkNCg0KTVBBc19ncmFwaCA8LSBwbG90X211bHRpX2dyYXBocyhuZXN0ZWRfZGYgPSBuZXN0ZWRfcGxvdCwgbl9ncmFwaHMgPSA0KSANCg0KIyBwbmcoImZpZ3VyZXMvZ3JvdXBlcnNfZWFzdF9tcGEucG5nIiwgaGVpZ2h0ID0gNDUwLCB3aWR0aCA9IDE2MDAsIHJlcyA9IDE1MCkNCiMgcGxvdF9tdWx0aV9ncmFwaHMobmVzdGVkX2RmID0gbmVzdGVkX3Bsb3QsIG5fZ3JhcGhzID0gNCkNCiMgZGV2Lm9mZigpDQoNCmBgYA0KDQojIyMgRGVwdGggYXMgY292YXJpYXRlDQoNCmBgYHtyfQ0Kc3BwX21hdCA8LSBjcmVhdGVfc3BwX21hdChkYXRhc2V0ID0gbWVkX3JhdywgYmFzaW4gPSBlYXN0LA0KICAgICAgICAgICAgICAgICAgICAgICAgICBncm91cCA9IGdyb3VwZXJzLCBjb3ZhcmlhdGUgPSAiZGVwdGgiKSAlPiUgbmEub21pdCgpDQoNCm1vZGVsX2RlcCA8LSBydW5fbW9kKHNwZWNpZXNfbWF0ID0gc3BwX21hdCwgbl9jb3ZzID0gMSwgZmFtaWx5ID0gImdhdXNzaWFuIikNCmNvZWZfZGVwIDwtIG1vZGVsX2RlcCRtb2QkZGlyZWN0X2NvZWZzDQprZXlfY29lZl9kZXAgPC0gbW9kZWxfZGVwJGJvb3QkbWVhbl9rZXlfY29lZnMNCnByZWRpY3RfZGVwIDwtIG1vZGVsX2RlcCRwcmVkDQoNCmNhdGVnb3JpZXMgPC0gY2F0ZWdvcmlzZV9jb3Yoc3BlY2llc19tYXQgPSBzcHBfbWF0LCBjb3ZhcmlhdGUgPSAiZGVwdGgiKQ0KbmVzdGVkX2NhdHMgPC0gbmVzdGVkX2RhdGEoY2F0ZWdvcmlzZWRfZGF0YSA9IGNhdGVnb3JpZXMpDQoNCmNhdF9tb2RlbCA8LSBnZXRfbW9kZWwoZGF0YSA9IHNwcF9tYXQsIG5jb3YgPSAxKQ0KDQpuZXN0ZWQgPC0gbmVzdGVkX21vZGVscyhuZXN0ZWRfZGYgPSBuZXN0ZWRfY2F0cykNCg0KbmVzdGVkX3Bsb3QgPC0gbmVzdGVkICU+JSBtdXRhdGUocGxvdCA9IG1hcChtb2RlbCwgZ2V0X2dyYXBoKSkNCg0KZGVwdGhfZ3JhcGggPC0gcGxvdF9tdWx0aV9ncmFwaHMobmVzdGVkX2RmID0gbmVzdGVkX3Bsb3QsIG5fZ3JhcGhzID0gMykNCg0KIyBwbmcoImZpZ3VyZXMvZ3JvdXBlcnNfZWFzdF9kZXB0aC5wbmciLCBoZWlnaHQgPSA0NTAsIHdpZHRoID0gMTIwMCwgcmVzID0gMTUwKQ0KIyBwbG90X211bHRpX2dyYXBocyhuZXN0ZWRfZGYgPSBuZXN0ZWRfcGxvdCwgbl9ncmFwaHMgPSAzKQ0KIyBkZXYub2ZmKCkNCg0KYGBgDQoNCg0KDQojIyBXZXN0ZXJuIE1lZGl0ZXJyYW5lYW4NCg0KIyMjIFRlbXBlcmF0dXJlIGFzIGNvdmFyaWF0ZQ0KDQpgYGB7cn0NCiMgQ3JlYXRlIHNwZWNpZXMgbWF0cml4IGZvciBgZ3JvdXBgIGluIGBiYXNpbmAgd2l0aCBgY292YXJpYXRlYA0Kc3BwX21hdCA8LSBjcmVhdGVfc3BwX21hdChkYXRhc2V0ID0gbWVkX3JhdywgYmFzaW4gPSB3ZXN0LA0KICAgICAgICAgICAgICAgICAgICAgICAgICBncm91cCA9IGdyb3VwZXJzLCBjb3ZhcmlhdGUgPSAidG1lYW5fcmVnIikNCnN0cihzcHBfbWF0KQ0KDQojIFJ1biBtb2RlbCBhbmQgY3JlYXRlIG9jY3VycmVuY2UgcHJlZGljdGlvbnMNCm1vZGVsX3RlbXAgPC0gcnVuX21vZChzcGVjaWVzX21hdCA9IHNwcF9tYXQsIG5fY292cyA9IDEsIGZhbWlseSA9ICJnYXVzc2lhbiIpDQpjb2VmX3RlbXAgPC0gbW9kZWxfdGVtcCRtb2QkZGlyZWN0X2NvZWZzDQprZXlfY29lZl90ZW1wIDwtIG1vZGVsX3RlbXAkYm9vdCRtZWFuX2tleV9jb2Vmcw0KcHJlZGljdF90ZW1wIDwtIG1vZGVsX3RlbXAkcHJlZA0KDQojIENhdGVnb3Jpc2UgY29udGludW91cyBkYXRhICsgTmVzdCBjYXRlZ29yaWNhbCAobm9taW5hbCkgZGF0YQ0KY2F0ZWdvcmllcyA8LSBjYXRlZ29yaXNlX2NvdihzcGVjaWVzX21hdCA9IHNwcF9tYXQsIGNvdmFyaWF0ZSA9ICJ0bWVhbl9yZWciKQ0KbmVzdGVkX2NhdHMgPC0gbmVzdGVkX2RhdGEoY2F0ZWdvcmlzZWRfZGF0YSA9IGNhdGVnb3JpZXMpDQoNCiMgUnVuIE1SRmNvdiBtb2RlbCB3aXRoIHNvbWUgZGVmYXVsdHMNCmNhdF9tb2RlbCA8LSBnZXRfbW9kZWwoZGF0YSA9IHNwcF9tYXQsIG5jb3YgPSAxKQ0KDQojIFJ1biBtb2RlbCBvbiBlYWNoIGNhdGVnb3J5DQpuZXN0ZWQgPC0gbmVzdGVkX21vZGVscyhuZXN0ZWRfZGYgPSBuZXN0ZWRfY2F0cykNCg0KIyBHZXQgZ3JhcGggZGF0YQ0KbmVzdGVkX3Bsb3QgPC0gbmVzdGVkICU+JSBtdXRhdGUocGxvdCA9IG1hcChtb2RlbCwgZ2V0X2dyYXBoKSkNCg0KIyBQbG90IG11bHRpcGxlIGdyYXBocyBmb3IgZ3JhZGllbnQNCnRlbXBlcmF0dXJlX2dyYXBoIDwtIHBsb3RfbXVsdGlfZ3JhcGhzKG5lc3RlZF9kZiA9IG5lc3RlZF9wbG90LCBuX2dyYXBocyA9IDMpDQoNCmBgYA0KDQojIyMgTVBBIGFzIGNvdmFyaWF0ZQ0KYGBge3J9DQoNCnNwcF9tYXQgPC0gY3JlYXRlX3NwcF9tYXQoZGF0YXNldCA9IG1lZF9yYXcsIGJhc2luID0gZWFzdCwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgZ3JvdXAgPSBncm91cGVycywgY292YXJpYXRlID0gImVuZm9yY2VtZW50IikNCg0KbW9kZWxfZW5mIDwtIHJ1bl9tb2Qoc3BlY2llc19tYXQgPSBzcHBfbWF0LCBuX2NvdnMgPSAxLCBmYW1pbHkgPSAiZ2F1c3NpYW4iKQ0KY29lZl9lbmYgPC0gbW9kZWxfZW5mJG1vZCRkaXJlY3RfY29lZnMNCmtleV9jb2VmX2VuZiA8LSBtb2RlbF9lbmYkYm9vdCRtZWFuX2tleV9jb2Vmcw0KcHJlZGljdF9lbmYgPC0gbW9kZWxfZW5mJHByZWQNCg0KIyBGdW5jIDNiIChubyBuZWVkIGZvciAzYSBiZWNhdXNlIGl0J3MgYWxyZWFkeSBjYXRlZ29yaXNlZCkgLSBuZXN0aW5nIG9ubHkNCm5lc3RlZF9jYXRzIDwtIG5lc3RlZF9kYXRhKGNhdGVnb3Jpc2VkX2RhdGEgPSBzcHBfbWF0KQ0KDQpjYXRfbW9kZWwgPC0gZ2V0X21vZGVsKGRhdGEgPSBzcHBfbWF0LCBuY292ID0gMSkNCg0KbmVzdGVkIDwtIG5lc3RlZF9tb2RlbHMobmVzdGVkX2RmID0gbmVzdGVkX2NhdHMpDQoNCm5lc3RlZF9wbG90IDwtIG5lc3RlZCAlPiUgbXV0YXRlKHBsb3QgPSBtYXAobW9kZWwsIGdldF9ncmFwaCkpDQoNCk1QQXNfZ3JhcGggPC0gcGxvdF9tdWx0aV9ncmFwaHMobmVzdGVkX2RmID0gbmVzdGVkX3Bsb3QsIG5fZ3JhcGhzID0gNCkgDQoNCmBgYA0KDQojIyMgRGVwdGggYXMgY292YXJpYXRlDQoNCmBgYHtyfQ0Kc3BwX21hdCA8LSBjcmVhdGVfc3BwX21hdChkYXRhc2V0ID0gbWVkX3JhdywgYmFzaW4gPSBlYXN0LA0KICAgICAgICAgICAgICAgICAgICAgICAgICBncm91cCA9IGdyb3VwZXJzLCBjb3ZhcmlhdGUgPSAiZGVwdGgiKSAlPiUgbmEub21pdCgpDQoNCm1vZGVsX2RlcCA8LSBydW5fbW9kKHNwZWNpZXNfbWF0ID0gc3BwX21hdCwgbl9jb3ZzID0gMSwgZmFtaWx5ID0gImdhdXNzaWFuIikNCmNvZWZfZGVwIDwtIG1vZGVsX2RlcCRtb2QkZGlyZWN0X2NvZWZzDQprZXlfY29lZl9kZXAgPC0gbW9kZWxfZGVwJGJvb3QkbWVhbl9rZXlfY29lZnMNCnByZWRpY3RfZGVwIDwtIG1vZGVsX2RlcCRwcmVkDQoNCmNhdGVnb3JpZXMgPC0gY2F0ZWdvcmlzZV9jb3Yoc3BlY2llc19tYXQgPSBzcHBfbWF0LCBjb3ZhcmlhdGUgPSAiZGVwdGgiKQ0KbmVzdGVkX2NhdHMgPC0gbmVzdGVkX2RhdGEoY2F0ZWdvcmlzZWRfZGF0YSA9IGNhdGVnb3JpZXMpDQoNCmNhdF9tb2RlbCA8LSBnZXRfbW9kZWwoZGF0YSA9IHNwcF9tYXQsIG5jb3YgPSAxKQ0KDQpuZXN0ZWQgPC0gbmVzdGVkX21vZGVscyhuZXN0ZWRfZGYgPSBuZXN0ZWRfY2F0cykNCg0KbmVzdGVkX3Bsb3QgPC0gbmVzdGVkICU+JSBtdXRhdGUocGxvdCA9IG1hcChtb2RlbCwgZ2V0X2dyYXBoKSkNCg0KZGVwdGhfZ3JhcGggPC0gcGxvdF9tdWx0aV9ncmFwaHMobmVzdGVkX2RmID0gbmVzdGVkX3Bsb3QsIG5fZ3JhcGhzID0gMykNCg0KYGBgDQoNCiMgRGlwbG9kdXMNCg0KIyMgRWFzdGVybiBNZWRpdGVycmFuZWFuDQoNCiMjIyBUZW1wZXJhdHVyZSBhcyBjb3ZhcmlhdGUNCg0KYGBge3J9DQpzcHBfbWF0IDwtIGNyZWF0ZV9zcHBfbWF0KGRhdGFzZXQgPSBtZWRfcmF3LCBiYXNpbiA9IGVhc3QsDQogICAgICAgICAgICAgICAgICAgICAgICAgIGdyb3VwID0gZGlwbG9kdXMsIGNvdmFyaWF0ZSA9ICJ0bWVhbl9yZWciKQ0KDQptb2RlbF90ZW1wIDwtIHJ1bl9tb2Qoc3BlY2llc19tYXQgPSBzcHBfbWF0LCBuX2NvdnMgPSAxLCBmYW1pbHkgPSAiZ2F1c3NpYW4iKQ0KY29lZl90ZW1wIDwtIG1vZGVsX3RlbXAkbW9kJGRpcmVjdF9jb2Vmcw0Ka2V5X2NvZWZfdGVtcCA8LSBtb2RlbF90ZW1wJGJvb3QkbWVhbl9rZXlfY29lZnMNCnByZWRpY3RfdGVtcCA8LSBtb2RlbF90ZW1wJHByZWQNCg0KY2F0ZWdvcmllcyA8LSBjYXRlZ29yaXNlX2NvdihzcGVjaWVzX21hdCA9IHNwcF9tYXQsIGNvdmFyaWF0ZSA9ICJ0bWVhbl9yZWciKQ0KbmVzdGVkX2NhdHMgPC0gbmVzdGVkX2RhdGEoY2F0ZWdvcmlzZWRfZGF0YSA9IGNhdGVnb3JpZXMpDQoNCmNhdF9tb2RlbCA8LSBnZXRfbW9kZWwoZGF0YSA9IHNwcF9tYXQsIG5jb3YgPSAxKQ0KDQpuZXN0ZWQgPC0gbmVzdGVkX21vZGVscyhuZXN0ZWRfZGYgPSBuZXN0ZWRfY2F0cykNCg0KbmVzdGVkX3Bsb3QgPC0gbmVzdGVkICU+JSBtdXRhdGUocGxvdCA9IG1hcChtb2RlbCwgZ2V0X2dyYXBoKSkNCg0KdGVtcGVyYXR1cmVfZ3JhcGggPC0gcGxvdF9tdWx0aV9ncmFwaHMobmVzdGVkX2RmID0gbmVzdGVkX3Bsb3QsIG5fZ3JhcGhzID0gMykNCg0KDQpgYGANCg0KIyMjIE1QQSBhcyBjb3ZhcmlhdGUNCmBgYHtyfQ0KDQpzcHBfbWF0IDwtIGNyZWF0ZV9zcHBfbWF0KGRhdGFzZXQgPSBtZWRfcmF3LCBiYXNpbiA9IGVhc3QsDQogICAgICAgICAgICAgICAgICAgICAgICAgIGdyb3VwID0gZGlwbG9kdXMsIGNvdmFyaWF0ZSA9ICJlbmZvcmNlbWVudCIpDQoNCm1vZGVsX2VuZiA8LSBydW5fbW9kKHNwZWNpZXNfbWF0ID0gc3BwX21hdCwgbl9jb3ZzID0gMSwgZmFtaWx5ID0gImdhdXNzaWFuIikNCmNvZWZfZW5mIDwtIG1vZGVsX2VuZiRtb2QkZGlyZWN0X2NvZWZzDQprZXlfY29lZl9lbmYgPC0gbW9kZWxfZW5mJGJvb3QkbWVhbl9rZXlfY29lZnMNCnByZWRpY3RfZW5mIDwtIG1vZGVsX2VuZiRwcmVkDQoNCm5lc3RlZF9jYXRzIDwtIG5lc3RlZF9kYXRhKGNhdGVnb3Jpc2VkX2RhdGEgPSBzcHBfbWF0KQ0KDQpjYXRfbW9kZWwgPC0gZ2V0X21vZGVsKGRhdGEgPSBzcHBfbWF0LCBuY292ID0gMSkNCg0KbmVzdGVkIDwtIG5lc3RlZF9tb2RlbHMobmVzdGVkX2RmID0gbmVzdGVkX2NhdHMpDQoNCm5lc3RlZF9wbG90IDwtIG5lc3RlZCAlPiUgbXV0YXRlKHBsb3QgPSBtYXAobW9kZWwsIGdldF9ncmFwaCkpDQoNCk1QQXNfZ3JhcGggPC0gcGxvdF9tdWx0aV9ncmFwaHMobmVzdGVkX2RmID0gbmVzdGVkX3Bsb3QsIG5fZ3JhcGhzID0gNCkgDQoNCg0KYGBgDQoNCiMjIyBEZXB0aCBhcyBjb3ZhcmlhdGUNCg0KYGBge3J9DQpzcHBfbWF0IDwtIGNyZWF0ZV9zcHBfbWF0KGRhdGFzZXQgPSBtZWRfcmF3LCBiYXNpbiA9IGVhc3QsDQogICAgICAgICAgICAgICAgICAgICAgICAgIGdyb3VwID0gZGlwbG9kdXMsIGNvdmFyaWF0ZSA9ICJkZXB0aCIpICU+JSBuYS5vbWl0KCkNCg0KbW9kZWxfZGVwIDwtIHJ1bl9tb2Qoc3BlY2llc19tYXQgPSBzcHBfbWF0LCBuX2NvdnMgPSAxLCBmYW1pbHkgPSAiZ2F1c3NpYW4iKQ0KY29lZl9kZXAgPC0gbW9kZWxfZGVwJG1vZCRkaXJlY3RfY29lZnMNCmtleV9jb2VmX2RlcCA8LSBtb2RlbF9kZXAkYm9vdCRtZWFuX2tleV9jb2Vmcw0KcHJlZGljdF9kZXAgPC0gbW9kZWxfZGVwJHByZWQNCg0KY2F0ZWdvcmllcyA8LSBjYXRlZ29yaXNlX2NvdihzcGVjaWVzX21hdCA9IHNwcF9tYXQsIGNvdmFyaWF0ZSA9ICJkZXB0aCIpDQpuZXN0ZWRfY2F0cyA8LSBuZXN0ZWRfZGF0YShjYXRlZ29yaXNlZF9kYXRhID0gY2F0ZWdvcmllcykNCg0KY2F0X21vZGVsIDwtIGdldF9tb2RlbChkYXRhID0gc3BwX21hdCwgbmNvdiA9IDEpDQoNCm5lc3RlZCA8LSBuZXN0ZWRfbW9kZWxzKG5lc3RlZF9kZiA9IG5lc3RlZF9jYXRzKQ0KDQpuZXN0ZWRfcGxvdCA8LSBuZXN0ZWQgJT4lIG11dGF0ZShwbG90ID0gbWFwKG1vZGVsLCBnZXRfZ3JhcGgpKQ0KDQpkZXB0aF9ncmFwaCA8LSBwbG90X211bHRpX2dyYXBocyhuZXN0ZWRfZGYgPSBuZXN0ZWRfcGxvdCwgbl9ncmFwaHMgPSAzKQ0KIyBGSVhNRSBwcm9ibGVtIHdpdGggdGhlIGZpcnN0IGdyYXBoIGVsZW1lbnQNCg0KcG5nKCJmaWd1cmVzL2RpcGxvZHVzX2Vhc3RfZGVwdGgucG5nIiwgaGVpZ2h0ID0gNDUwLCB3aWR0aCA9IDEyMDAsIHJlcyA9IDE1MCkNCnBsb3RfbXVsdGlfZ3JhcGhzKG5lc3RlZF9kZiA9IG5lc3RlZF9wbG90LCBuX2dyYXBocyA9IDMpDQpkZXYub2ZmKCkNCg0KYGBgDQoNCg0KDQojIyBXZXN0ZXJuIE1lZGl0ZXJyYW5lYW4NCg0KIyMjIFRlbXBlcmF0dXJlIGFzIGNvdmFyaWF0ZQ0KDQpgYGB7cn0NCnNwcF9tYXQgPC0gY3JlYXRlX3NwcF9tYXQoZGF0YXNldCA9IG1lZF9yYXcsIGJhc2luID0gd2VzdCwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgZ3JvdXAgPSBkaXBsb2R1cywgY292YXJpYXRlID0gInRtZWFuX3JlZyIpDQoNCm1vZGVsX3RlbXAgPC0gcnVuX21vZChzcGVjaWVzX21hdCA9IHNwcF9tYXQsIG5fY292cyA9IDEsIGZhbWlseSA9ICJnYXVzc2lhbiIpDQpjb2VmX3RlbXAgPC0gbW9kZWxfdGVtcCRtb2QkZGlyZWN0X2NvZWZzDQprZXlfY29lZl90ZW1wIDwtIG1vZGVsX3RlbXAkYm9vdCRtZWFuX2tleV9jb2Vmcw0KcHJlZGljdF90ZW1wIDwtIG1vZGVsX3RlbXAkcHJlZA0KDQpjYXRlZ29yaWVzIDwtIGNhdGVnb3Jpc2VfY292KHNwZWNpZXNfbWF0ID0gc3BwX21hdCwgY292YXJpYXRlID0gInRtZWFuX3JlZyIpDQpuZXN0ZWRfY2F0cyA8LSBuZXN0ZWRfZGF0YShjYXRlZ29yaXNlZF9kYXRhID0gY2F0ZWdvcmllcykNCg0KY2F0X21vZGVsIDwtIGdldF9tb2RlbChkYXRhID0gc3BwX21hdCwgbmNvdiA9IDEpDQoNCm5lc3RlZCA8LSBuZXN0ZWRfbW9kZWxzKG5lc3RlZF9kZiA9IG5lc3RlZF9jYXRzKQ0KDQpuZXN0ZWRfcGxvdCA8LSBuZXN0ZWQgJT4lIG11dGF0ZShwbG90ID0gbWFwKG1vZGVsLCBnZXRfZ3JhcGgpKQ0KDQp0ZW1wZXJhdHVyZV9ncmFwaCA8LSBwbG90X211bHRpX2dyYXBocyhuZXN0ZWRfZGYgPSBuZXN0ZWRfcGxvdCwgbl9ncmFwaHMgPSAzKQ0KDQpgYGANCg0KIyMjIE1QQSBhcyBjb3ZhcmlhdGUNCmBgYHtyfQ0KDQpzcHBfbWF0IDwtIGNyZWF0ZV9zcHBfbWF0KGRhdGFzZXQgPSBtZWRfcmF3LCBiYXNpbiA9IHdlc3QsDQogICAgICAgICAgICAgICAgICAgICAgICAgIGdyb3VwID0gZGlwbG9kdXMsIGNvdmFyaWF0ZSA9ICJlbmZvcmNlbWVudCIpICU+JSBuYS5vbWl0KCkNCg0KbW9kZWxfZW5mIDwtIHJ1bl9tb2Qoc3BlY2llc19tYXQgPSBzcHBfbWF0LCBuX2NvdnMgPSAxLCBmYW1pbHkgPSAiZ2F1c3NpYW4iKQ0KY29lZl9lbmYgPC0gbW9kZWxfZW5mJG1vZCRkaXJlY3RfY29lZnMNCmtleV9jb2VmX2VuZiA8LSBtb2RlbF9lbmYkYm9vdCRtZWFuX2tleV9jb2Vmcw0KcHJlZGljdF9lbmYgPC0gbW9kZWxfZW5mJHByZWQNCg0KbmVzdGVkX2NhdHMgPC0gbmVzdGVkX2RhdGEoY2F0ZWdvcmlzZWRfZGF0YSA9IHNwcF9tYXQpDQoNCmNhdF9tb2RlbCA8LSBnZXRfbW9kZWwoZGF0YSA9IHNwcF9tYXQsIG5jb3YgPSAxKQ0KDQpuZXN0ZWQgPC0gbmVzdGVkX21vZGVscyhuZXN0ZWRfZGYgPSBuZXN0ZWRfY2F0cykNCg0KbmVzdGVkX3Bsb3QgPC0gbmVzdGVkICU+JSBtdXRhdGUocGxvdCA9IG1hcChtb2RlbCwgZ2V0X2dyYXBoKSkNCg0KTVBBc19ncmFwaCA8LSBwbG90X211bHRpX2dyYXBocyhuZXN0ZWRfZGYgPSBuZXN0ZWRfcGxvdCwgbl9ncmFwaHMgPSA0KSANCg0KYGBgDQoNCiMjIyBEZXB0aCBhcyBjb3ZhcmlhdGUNCg0KYGBge3J9DQpzcHBfbWF0IDwtIGNyZWF0ZV9zcHBfbWF0KGRhdGFzZXQgPSBtZWRfcmF3LCBiYXNpbiA9IHdlc3QsDQogICAgICAgICAgICAgICAgICAgICAgICAgIGdyb3VwID0gZGlwbG9kdXMsIGNvdmFyaWF0ZSA9ICJkZXB0aCIpICU+JSBuYS5vbWl0KCkNCg0KbW9kZWxfZGVwIDwtIHJ1bl9tb2Qoc3BlY2llc19tYXQgPSBzcHBfbWF0LCBuX2NvdnMgPSAxLCBmYW1pbHkgPSAiZ2F1c3NpYW4iKQ0KY29lZl9kZXAgPC0gbW9kZWxfZGVwJG1vZCRkaXJlY3RfY29lZnMNCmtleV9jb2VmX2RlcCA8LSBtb2RlbF9kZXAkYm9vdCRtZWFuX2tleV9jb2Vmcw0KcHJlZGljdF9kZXAgPC0gbW9kZWxfZGVwJHByZWQNCg0KY2F0ZWdvcmllcyA8LSBjYXRlZ29yaXNlX2NvdihzcGVjaWVzX21hdCA9IHNwcF9tYXQsIGNvdmFyaWF0ZSA9ICJkZXB0aCIpICMgRklYTUUgRXJyb3IgaW4gY3V0KCk6IGJyZWFrcyBhcmUgbm90IHVuaXF1ZSBodHRwczovL3N0YWNrb3ZlcmZsb3cuY29tL3F1ZXN0aW9ucy8xNjE4NDk0Ny9jdXQtZXJyb3ItYnJlYWtzLWFyZS1ub3QtdW5pcXVlDQpuZXN0ZWRfY2F0cyA8LSBuZXN0ZWRfZGF0YShjYXRlZ29yaXNlZF9kYXRhID0gY2F0ZWdvcmllcykNCg0KY2F0X21vZGVsIDwtIGdldF9tb2RlbChkYXRhID0gc3BwX21hdCwgbmNvdiA9IDEpDQoNCm5lc3RlZCA8LSBuZXN0ZWRfbW9kZWxzKG5lc3RlZF9kZiA9IG5lc3RlZF9jYXRzKQ0KDQpuZXN0ZWRfcGxvdCA8LSBuZXN0ZWQgJT4lIG11dGF0ZShwbG90ID0gbWFwKG1vZGVsLCBnZXRfZ3JhcGgpKQ0KDQpkZXB0aF9ncmFwaCA8LSBwbG90X211bHRpX2dyYXBocyhuZXN0ZWRfZGYgPSBuZXN0ZWRfcGxvdCwgbl9ncmFwaHMgPSAzKQ0KDQpwbmcoImZpZ3VyZXMvZGlwbG9kdXNfd2VzdF9kZXB0aC5wbmciLCBoZWlnaHQgPSA0NTAsIHdpZHRoID0gMTIwMCwgcmVzID0gMTUwKQ0KcGxvdF9tdWx0aV9ncmFwaHMobmVzdGVkX2RmID0gbmVzdGVkX3Bsb3QsIG5fZ3JhcGhzID0gMykNCmRldi5vZmYoKQ0KDQpgYGANCg0KDQojIEhlcmJpdm9yZXMNCg0KIyMgRWFzdGVybiBNZWRpdGVycmFuZWFuDQoNCiMjIyBUZW1wZXJhdHVyZSBhcyBjb3ZhcmlhdGUNCg0KYGBge3J9DQpzcHBfbWF0IDwtIGNyZWF0ZV9zcHBfbWF0KGRhdGFzZXQgPSBtZWRfcmF3LCBiYXNpbiA9IGVhc3QsDQogICAgICAgICAgICAgICAgICAgICAgICAgIGdyb3VwID0gaGVyYml2b3JlcywgY292YXJpYXRlID0gInRtZWFuX3JlZyIpDQoNCm1vZGVsX3RlbXAgPC0gcnVuX21vZChzcGVjaWVzX21hdCA9IHNwcF9tYXQsIG5fY292cyA9IDEsIGZhbWlseSA9ICJnYXVzc2lhbiIpDQpjb2VmX3RlbXAgPC0gbW9kZWxfdGVtcCRtb2QkZGlyZWN0X2NvZWZzDQprZXlfY29lZl90ZW1wIDwtIG1vZGVsX3RlbXAkYm9vdCRtZWFuX2tleV9jb2Vmcw0KcHJlZGljdF90ZW1wIDwtIG1vZGVsX3RlbXAkcHJlZA0KDQpjYXRlZ29yaWVzIDwtIGNhdGVnb3Jpc2VfY292KHNwZWNpZXNfbWF0ID0gc3BwX21hdCwgY292YXJpYXRlID0gInRtZWFuX3JlZyIpDQpuZXN0ZWRfY2F0cyA8LSBuZXN0ZWRfZGF0YShjYXRlZ29yaXNlZF9kYXRhID0gY2F0ZWdvcmllcykNCg0KY2F0X21vZGVsIDwtIGdldF9tb2RlbChkYXRhID0gc3BwX21hdCwgbmNvdiA9IDEpDQoNCm5lc3RlZCA8LSBuZXN0ZWRfbW9kZWxzKG5lc3RlZF9kZiA9IG5lc3RlZF9jYXRzKQ0KDQpuZXN0ZWRfcGxvdCA8LSBuZXN0ZWQgJT4lIG11dGF0ZShwbG90ID0gbWFwKG1vZGVsLCBnZXRfZ3JhcGgpKQ0KDQp0ZW1wZXJhdHVyZV9ncmFwaCA8LSBwbG90X211bHRpX2dyYXBocyhuZXN0ZWRfZGYgPSBuZXN0ZWRfcGxvdCwgbl9ncmFwaHMgPSAzKQ0KDQpgYGANCg0KIyMjIE1QQSBhcyBjb3ZhcmlhdGUNCmBgYHtyfQ0KDQpzcHBfbWF0IDwtIGNyZWF0ZV9zcHBfbWF0KGRhdGFzZXQgPSBtZWRfcmF3LCBiYXNpbiA9IGVhc3QsDQogICAgICAgICAgICAgICAgICAgICAgICAgIGdyb3VwID0gaGVyYml2b3JlcywgY292YXJpYXRlID0gImVuZm9yY2VtZW50IikNCg0KbW9kZWxfZW5mIDwtIHJ1bl9tb2Qoc3BlY2llc19tYXQgPSBzcHBfbWF0LCBuX2NvdnMgPSAxLCBmYW1pbHkgPSAiZ2F1c3NpYW4iKQ0KY29lZl9lbmYgPC0gbW9kZWxfZW5mJG1vZCRkaXJlY3RfY29lZnMNCmtleV9jb2VmX2VuZiA8LSBtb2RlbF9lbmYkYm9vdCRtZWFuX2tleV9jb2Vmcw0KcHJlZGljdF9lbmYgPC0gbW9kZWxfZW5mJHByZWQNCg0KbmVzdGVkX2NhdHMgPC0gbmVzdGVkX2RhdGEoY2F0ZWdvcmlzZWRfZGF0YSA9IHNwcF9tYXQpDQoNCmNhdF9tb2RlbCA8LSBnZXRfbW9kZWwoZGF0YSA9IHNwcF9tYXQsIG5jb3YgPSAxKQ0KDQpuZXN0ZWQgPC0gbmVzdGVkX21vZGVscyhuZXN0ZWRfZGYgPSBuZXN0ZWRfY2F0cykNCg0KbmVzdGVkX3Bsb3QgPC0gbmVzdGVkICU+JSBtdXRhdGUocGxvdCA9IG1hcChtb2RlbCwgZ2V0X2dyYXBoKSkNCg0KTVBBc19ncmFwaCA8LSBwbG90X211bHRpX2dyYXBocyhuZXN0ZWRfZGYgPSBuZXN0ZWRfcGxvdCwgbl9ncmFwaHMgPSA0KSANCg0KYGBgDQoNCiMjIyBEZXB0aCBhcyBjb3ZhcmlhdGUNCg0KYGBge3J9DQpzcHBfbWF0IDwtIGNyZWF0ZV9zcHBfbWF0KGRhdGFzZXQgPSBtZWRfcmF3LCBiYXNpbiA9IGVhc3QsDQogICAgICAgICAgICAgICAgICAgICAgICAgIGdyb3VwID0gaGVyYml2b3JlcywgY292YXJpYXRlID0gImRlcHRoIikgJT4lIG5hLm9taXQoKQ0KDQptb2RlbF9kZXAgPC0gcnVuX21vZChzcGVjaWVzX21hdCA9IHNwcF9tYXQsIG5fY292cyA9IDEsIGZhbWlseSA9ICJnYXVzc2lhbiIpDQpjb2VmX2RlcCA8LSBtb2RlbF9kZXAkbW9kJGRpcmVjdF9jb2Vmcw0Ka2V5X2NvZWZfZGVwIDwtIG1vZGVsX2RlcCRib290JG1lYW5fa2V5X2NvZWZzDQpwcmVkaWN0X2RlcCA8LSBtb2RlbF9kZXAkcHJlZA0KDQpjYXRlZ29yaWVzIDwtIGNhdGVnb3Jpc2VfY292KHNwZWNpZXNfbWF0ID0gc3BwX21hdCwgY292YXJpYXRlID0gImRlcHRoIikNCm5lc3RlZF9jYXRzIDwtIG5lc3RlZF9kYXRhKGNhdGVnb3Jpc2VkX2RhdGEgPSBjYXRlZ29yaWVzKQ0KDQpjYXRfbW9kZWwgPC0gZ2V0X21vZGVsKGRhdGEgPSBzcHBfbWF0LCBuY292ID0gMSkNCg0KbmVzdGVkIDwtIG5lc3RlZF9tb2RlbHMobmVzdGVkX2RmID0gbmVzdGVkX2NhdHMpDQoNCm5lc3RlZF9wbG90IDwtIG5lc3RlZCAlPiUgbXV0YXRlKHBsb3QgPSBtYXAobW9kZWwsIGdldF9ncmFwaCkpDQoNCmRlcHRoX2dyYXBoIDwtIHBsb3RfbXVsdGlfZ3JhcGhzKG5lc3RlZF9kZiA9IG5lc3RlZF9wbG90LCBuX2dyYXBocyA9IDMpDQoNCg0KYGBgDQoNCg0KDQojIyBXZXN0ZXJuIE1lZGl0ZXJyYW5lYW4NCg0KVGhlIHdlc3Rlcm4gYmFzaW4gZG9lc24ndCBoYXZlIGFsbCB0aGUgc3BlY2llcyBvZiBoZXJiaXZvcmVzIGluIHRoZSBlYXN0IHNvIEknbGwgbWFrZSBhIG5ldyB2ZWN0b3IgZm9yIHRoZW0NCmBgYHtyfQ0KDQpoZXJiX3dlc3QgPC0gYygiU2lnYW51cy5sdXJpZHVzIiwgIlNhcnBhLnNhbHBhIiwgIlNwYXJpc29tYS5jcmV0ZW5zZSIpDQoNCmBgYA0KDQojIyMgVGVtcGVyYXR1cmUgYXMgY292YXJpYXRlDQoNCmBgYHtyfQ0Kc3BwX21hdCA8LSBjcmVhdGVfc3BwX21hdChkYXRhc2V0ID0gbWVkX3JhdywgYmFzaW4gPSB3ZXN0LA0KICAgICAgICAgICAgICAgICAgICAgICAgICBncm91cCA9IGhlcmJfd2VzdCwgY292YXJpYXRlID0gInRtZWFuX3JlZyIpDQoNCm1vZGVsX3RlbXAgPC0gcnVuX21vZChzcGVjaWVzX21hdCA9IHNwcF9tYXQsIG5fY292cyA9IDEsIGZhbWlseSA9ICJnYXVzc2lhbiIpDQpjb2VmX3RlbXAgPC0gbW9kZWxfdGVtcCRtb2QkZGlyZWN0X2NvZWZzDQprZXlfY29lZl90ZW1wIDwtIG1vZGVsX3RlbXAkYm9vdCRtZWFuX2tleV9jb2Vmcw0KcHJlZGljdF90ZW1wIDwtIG1vZGVsX3RlbXAkcHJlZA0KDQpjYXRlZ29yaWVzIDwtIGNhdGVnb3Jpc2VfY292KHNwZWNpZXNfbWF0ID0gc3BwX21hdCwgY292YXJpYXRlID0gInRtZWFuX3JlZyIpDQpuZXN0ZWRfY2F0cyA8LSBuZXN0ZWRfZGF0YShjYXRlZ29yaXNlZF9kYXRhID0gY2F0ZWdvcmllcykNCg0KY2F0X21vZGVsIDwtIGdldF9tb2RlbChkYXRhID0gc3BwX21hdCwgbmNvdiA9IDEpDQoNCm5lc3RlZCA8LSBuZXN0ZWRfbW9kZWxzKG5lc3RlZF9kZiA9IG5lc3RlZF9jYXRzKQ0KDQpuZXN0ZWRfcGxvdCA8LSBuZXN0ZWQgJT4lIG11dGF0ZShwbG90ID0gbWFwKG1vZGVsLCBnZXRfZ3JhcGgpKQ0KDQp0ZW1wZXJhdHVyZV9ncmFwaCA8LSBwbG90X211bHRpX2dyYXBocyhuZXN0ZWRfZGYgPSBuZXN0ZWRfcGxvdCwgbl9ncmFwaHMgPSAzKQ0KIyBGSVhNRSBFcnJvciBpbiBhYnMoRShzdWJfZ3JhcGgpJHdlaWdodCkgOiBub24tbnVtZXJpYyBhcmd1bWVudCB0byBtYXRoZW1hdGljYWwgZnVuY3Rpb24NCg0KcG5nKCJmaWd1cmVzL2hlcmJfd2VzdF90ZW1wLnBuZyIsIGhlaWdodCA9IDQ1MCwgd2lkdGggPSAxMjAwLCByZXMgPSAxNTApDQpwbG90X211bHRpX2dyYXBocyhuZXN0ZWRfZGYgPSBuZXN0ZWRfcGxvdCwgbl9ncmFwaHMgPSAzKQ0KZGV2Lm9mZigpDQoNCmBgYA0KDQojIyMgTVBBIGFzIGNvdmFyaWF0ZQ0KYGBge3J9DQoNCnNwcF9tYXQgPC0gY3JlYXRlX3NwcF9tYXQoZGF0YXNldCA9IG1lZF9yYXcsIGJhc2luID0gd2VzdCwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgZ3JvdXAgPSBoZXJiX3dlc3QsIGNvdmFyaWF0ZSA9ICJlbmZvcmNlbWVudCIpICU+JSBuYS5vbWl0KCkNCg0KbW9kZWxfZW5mIDwtIHJ1bl9tb2Qoc3BlY2llc19tYXQgPSBzcHBfbWF0LCBuX2NvdnMgPSAxLCBmYW1pbHkgPSAiZ2F1c3NpYW4iKQ0KY29lZl9lbmYgPC0gbW9kZWxfZW5mJG1vZCRkaXJlY3RfY29lZnMNCmtleV9jb2VmX2VuZiA8LSBtb2RlbF9lbmYkYm9vdCRtZWFuX2tleV9jb2Vmcw0KcHJlZGljdF9lbmYgPC0gbW9kZWxfZW5mJHByZWQNCg0KbmVzdGVkX2NhdHMgPC0gbmVzdGVkX2RhdGEoY2F0ZWdvcmlzZWRfZGF0YSA9IHNwcF9tYXQpDQoNCmNhdF9tb2RlbCA8LSBnZXRfbW9kZWwoZGF0YSA9IHNwcF9tYXQsIG5jb3YgPSAxKQ0KDQpuZXN0ZWQgPC0gbmVzdGVkX21vZGVscyhuZXN0ZWRfZGYgPSBuZXN0ZWRfY2F0cykNCg0KbmVzdGVkX3Bsb3QgPC0gbmVzdGVkICU+JSBtdXRhdGUocGxvdCA9IG1hcChtb2RlbCwgZ2V0X2dyYXBoKSkNCg0KTVBBc19ncmFwaCA8LSBwbG90X211bHRpX2dyYXBocyhuZXN0ZWRfZGYgPSBuZXN0ZWRfcGxvdCwgbl9ncmFwaHMgPSA0KSANCiMgRklYTUUgRXJyb3IgaW4gYWJzKEUoc3ViX2dyYXBoKSR3ZWlnaHQpIDogbm9uLW51bWVyaWMgYXJndW1lbnQgdG8gbWF0aGVtYXRpY2FsIGZ1bmN0aW9uDQoNCnBuZygiZmlndXJlcy9oZXJiX3dlc3RfbXBhLnBuZyIsIGhlaWdodCA9IDQ1MCwgd2lkdGggPSAxNjAwLCByZXMgPSAxNTApDQpwbG90X211bHRpX2dyYXBocyhuZXN0ZWRfZGYgPSBuZXN0ZWRfcGxvdCwgbl9ncmFwaHMgPSA0KQ0KZGV2Lm9mZigpDQoNCmBgYA0KDQojIyMgRGVwdGggYXMgY292YXJpYXRlDQoNCmBgYHtyfQ0Kc3BwX21hdCA8LSBjcmVhdGVfc3BwX21hdChkYXRhc2V0ID0gbWVkX3JhdywgYmFzaW4gPSB3ZXN0LA0KICAgICAgICAgICAgICAgICAgICAgICAgICBncm91cCA9IGhlcmJfd2VzdCwgY292YXJpYXRlID0gImRlcHRoIikgJT4lIG5hLm9taXQoKQ0KDQptb2RlbF9kZXAgPC0gcnVuX21vZChzcGVjaWVzX21hdCA9IHNwcF9tYXQsIG5fY292cyA9IDEsIGZhbWlseSA9ICJnYXVzc2lhbiIpDQpjb2VmX2RlcCA8LSBtb2RlbF9kZXAkbW9kJGRpcmVjdF9jb2Vmcw0Ka2V5X2NvZWZfZGVwIDwtIG1vZGVsX2RlcCRib290JG1lYW5fa2V5X2NvZWZzDQpwcmVkaWN0X2RlcCA8LSBtb2RlbF9kZXAkcHJlZA0KDQpjYXRlZ29yaWVzIDwtIGNhdGVnb3Jpc2VfY292KHNwZWNpZXNfbWF0ID0gc3BwX21hdCwgY292YXJpYXRlID0gImRlcHRoIikNCiMgRklYTUUgRXJyb3IgaW4gY3V0KCk6IGJyZWFrcyBhcmUgbm90IHVuaXF1ZSBodHRwczovL3N0YWNrb3ZlcmZsb3cuY29tL3F1ZXN0aW9ucy8xNjE4NDk0Ny9jdXQtZXJyb3ItYnJlYWtzLWFyZS1ub3QtdW5pcXVlDQpuZXN0ZWRfY2F0cyA8LSBuZXN0ZWRfZGF0YShjYXRlZ29yaXNlZF9kYXRhID0gY2F0ZWdvcmllcykNCg0KY2F0X21vZGVsIDwtIGdldF9tb2RlbChkYXRhID0gc3BwX21hdCwgbmNvdiA9IDEpDQoNCm5lc3RlZCA8LSBuZXN0ZWRfbW9kZWxzKG5lc3RlZF9kZiA9IG5lc3RlZF9jYXRzKQ0KDQpuZXN0ZWRfcGxvdCA8LSBuZXN0ZWQgJT4lIG11dGF0ZShwbG90ID0gbWFwKG1vZGVsLCBnZXRfZ3JhcGgpKQ0KDQpkZXB0aF9ncmFwaCA8LSBwbG90X211bHRpX2dyYXBocyhuZXN0ZWRfZGYgPSBuZXN0ZWRfcGxvdCwgbl9ncmFwaHMgPSAzKQ0KDQpwbmcoImZpZ3VyZXMvaGVyYl93ZXN0X2RlcHRoLnBuZyIsIGhlaWdodCA9IDQ1MCwgd2lkdGggPSAxMjAwLCByZXMgPSAxNTApDQpwbG90X211bHRpX2dyYXBocyhuZXN0ZWRfZGYgPSBuZXN0ZWRfcGxvdCwgbl9ncmFwaHMgPSAzKQ0KZGV2Lm9mZigpDQoNCmBgYA0KDQoNCl9fXw0KDQpbXjFdOiBDbGFyaywgTmljaG9sYXMgSi4sIEtvbnN0YW5zIFdlbGxzLCBhbmQgT3NjYXIgTGluZGJlcmcuICJVbnJhdmVsbGluZyBjaGFuZ2luZyBpbnRlcnNwZWNpZmljIGludGVyYWN0aW9ucyBhY3Jvc3MgZW52aXJvbm1lbnRhbCBncmFkaWVudHMgdXNpbmcgTWFya292IHJhbmRvbSBmaWVsZHMuIiBFY29sb2d5IDk5LjYgKDIwMTgpOiAxMjc3LTEyODMu</div>
 
 
 

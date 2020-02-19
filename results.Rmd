@@ -3,302 +3,561 @@ title: "Results"
 output: html_notebook
 ---
 
-```{r Average networks results}
-source("scripts/networks.R")
+**How fish communities change along environmental gradients?**
+Species associations are represented graphically and quantitatively using *MRFcov package* [^1].
+
+```{r Load packages and functions, message=FALSE, warning=FALSE, include=FALSE}
+
+source("scripts/pckgs_preps.R")
+source("scripts/model_func.R")
 
 ```
 
-# Averaged networks
-
-## Coefficients of each node (species)
-Which predictors determine it's odds of occurrence
-
-### Serranidae network
-```{r}
-S.cab.coeffs
-S.scrib.coeffs
-
-```
-
-*Serranus cabrilla* and *Serranus scriba* are mostly affected by temperature.
+### Data
 
 ```{r}
-E.costae.coeffs
-E.margin.coeffs
+
+med_raw <- read_csv("data/med_raw.csv", col_types = cols(depth = "d")) %>%
+  filter(data.origin != "azz_asi") %>% # remove presence-absence data
+  mutate(loc = paste0(site, "_", trans), tmean_reg = scale(tmean), depth_reg = scale(depth))
+str(med_raw)
 
 ```
 
-*Epinephelus marginatus* is mostly affected by *Epinephelus costae* but not the other way around.
+### Define variables `basin`; `group`
 
 ```{r}
-serr_effects
+# Basins
+west <- list("France", "Italy", "Spain")
+east <- list("Croatia", "Greece", "Israel", "Malta", "Turkey")
+
+# Groups
+groupers <- c("Epinephelus.costae", "Epinephelus.marginatus",
+              "Mycteroperca.rubra", "Serranus.cabrilla", "Serranus.scriba")
+diplodus <- c("Diplodus.annularis", "Diplodus.puntazzo", "Diplodus.sargus",
+              "Diplodus.vulgaris", "Diplodus.cervinus")
+herbivores <- c("Siganus.rivulatus", "Siganus.luridus", "Sarpa.salpa",
+                "Scarus.ghobban", "Sparisoma.cretense")
+
 ```
+
+# Groupers
+
+## Eastern Mediterranean
+
+### Temperature as covariate
 
 ```{r}
-serr_dists
+# Create species matrix for `group` in `basin` with `covariate`
+spp_mat <- create_spp_mat(dataset = med_raw, basin = east,
+                          group = groupers, covariate = "tmean_reg")
+str(spp_mat)
+
+# Run model and create occurrence predictions
+model_temp <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
+coef_temp <- model_temp$mod$direct_coefs
+key_coef_temp <- model_temp$boot$mean_key_coefs
+predict_temp <- model_temp$pred
+
+# Categorise continuous data + Nest categorical (nominal) data
+categories <- categorise_cov(species_mat = spp_mat, covariate = "tmean_reg")
+nested_cats <- nested_data(categorised_data = categories)
+
+# Run MRFcov model with some defaults
+cat_model <- get_model(data = spp_mat, ncov = 1)
+cat_model
+
+# Run model on each category
+nested <- nested_models(nested_df = nested_cats)
+
+# Get graph data
+nested_plot <- nested %>% mutate(plot = map(model, get_graph))
+
+# Plot multiple graphs for gradient
+temperature_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
+
+# png("figures/groupers_east_temp.png", height = 450, width = 1200, res = 150)
+# plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
+# dev.off()
+
 ```
 
-### Diplodus network
+### MPA as covariate
+```{r}
+
+spp_mat <- create_spp_mat(dataset = med_raw, basin = east,
+                          group = groupers, covariate = "enforcement")
+
+model_enf <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
+coef_enf <- model_enf$mod$direct_coefs
+key_coef_enf <- model_enf$boot$mean_key_coefs
+predict_enf <- model_enf$pred
+
+# Func 3b (no need for 3a because it's already categorised) - nesting only
+nested_cats <- nested_data(categorised_data = spp_mat)
+
+cat_model <- get_model(data = spp_mat, ncov = 1)
+
+nested <- nested_models(nested_df = nested_cats)
+
+nested_plot <- nested %>% mutate(plot = map(model, get_graph))
+
+MPAs_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 4) 
+
+# png("figures/groupers_east_mpa.png", height = 450, width = 1600, res = 150)
+# plot_multi_graphs(nested_df = nested_plot, n_graphs = 4)
+# dev.off()
+
+```
+
+### Depth as covariate
 
 ```{r}
-D.annu.coeffs
-D.punt.coeffs
-D.vulg.coeffs
+spp_mat <- create_spp_mat(dataset = med_raw, basin = east,
+                          group = groupers, covariate = "depth") %>% na.omit()
+
+model_dep <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
+coef_dep <- model_dep$mod$direct_coefs
+key_coef_dep <- model_dep$boot$mean_key_coefs
+predict_dep <- model_dep$pred
+
+categories <- categorise_cov(species_mat = spp_mat, covariate = "depth")
+nested_cats <- nested_data(categorised_data = categories)
+
+cat_model <- get_model(data = spp_mat, ncov = 1)
+
+nested <- nested_models(nested_df = nested_cats)
+
+nested_plot <- nested %>% mutate(plot = map(model, get_graph))
+
+depth_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
+
+# png("figures/groupers_east_depth.png", height = 450, width = 1200, res = 150)
+# plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
+# dev.off()
 
 ```
 
-*Diplodus annularis* is mostly affected by the interaction between temperature and the presence of *D. sargus*.
 
-*Diplodus puntazzo* is mostly affected by the presence of *D. vulgaris*.
 
-*Diplodus vulgaris* is strongly affected by temperature.
+## Western Mediterranean
 
-*Diplodus cervinus* is **only** affected by *D. sargus*.
-
-### Herbivore network
-```{r}
-S.rev.coeffs
-S.salpa.coeffs
-S.ghob.coeffs
-S.cret.coeffs
-```
-
-*Siganus rivulatus* is **only** affected by temperature, as is *Sarpa salpa*.
-*Scarus ghobban* is affected by the interaction of temperature and the presence of *Siganus rivulatus*, as is *Sparisoma cretense*.
-
-# Predicted networks
-
-```{r Predicted networks results}
-source("scripts/predict_nets.R")
-
-```
-
-Use bootstrapped model (`bootstrap_MRF`) for predicting log odds (logit) of occurrence for species per site (`predict_MRF`). These log odds can be transformed into probabilities using `LaplacesDemon::invlogit` function. These can be "checked" using subsets of the data by covariate levels (e.g. low/mid/hi temp) to create separate networks - not with the predict function but with the `MRFcov` function. ????
-
-`bootstrap_MRF` creates distribution of data permutations and helps in eliminating uncertainties. Part of its output is 95% confidence interval for each one of the predictors, which I can use to evaluate the predictors effect.
-
-## Serranidae networks
-
-### Temperature effect
+### Temperature as covariate
 
 ```{r}
-# Low
-plot.igraph(serr_graph_low, layout = layout.circle(serr_graph_low),
-            edge.width = abs(E(serr_graph_low)$weight),
-            edge.color = ifelse(E(serr_graph_low)$weight < 0, '#3399CC', '#FF3333'),
-            vertex.size = deg,
-            vertex.label.family = "sans",
-            vertex.label.font	= 3,
-            vertex.label.cex = 1,
-            vertex.label.color = adjustcolor("#333333", 0.85),
-            vertex.color = adjustcolor("#FFFFFF", .5),
-            main = "Serranidae network in low temperatures")
+# Create species matrix for `group` in `basin` with `covariate`
+spp_mat <- create_spp_mat(dataset = med_raw, basin = west,
+                          group = groupers, covariate = "tmean_reg")
+str(spp_mat)
 
-# Med
-serr_med <- plot.igraph(serr_graph_med, layout = layout.circle(serr_graph_med),
-            edge.width = abs(E(serr_graph_med)$weight),
-            edge.color = ifelse(E(serr_graph_med)$weight < 0, '#3399CC', '#FF3333'),
-            vertex.size = deg,
-            vertex.label.family = "sans",
-            vertex.label.font	= 3,
-            vertex.label.cex = 1,
-            vertex.label.color = adjustcolor("#333333", 0.85),
-            vertex.color = adjustcolor("#FFFFFF", .5),
-            main = "Serranidae network in median temperatures")
+# Run model and create occurrence predictions
+model_temp <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
+coef_temp <- model_temp$mod$direct_coefs
+key_coef_temp <- model_temp$boot$mean_key_coefs
+predict_temp <- model_temp$pred
 
-# High
-plot.igraph(serr_graph_hi, layout = layout.circle(serr_graph_hi),
-            edge.width = abs(E(serr_graph_hi)$weight),
-            edge.color = ifelse(E(serr_graph_hi)$weight < 0, '#3399CC', '#FF3333'),
-            vertex.size = deg,
-            vertex.label.family = "sans",
-            vertex.label.font	= 3,
-            vertex.label.cex = 1,
-            vertex.label.color = adjustcolor("#333333", 0.85),
-            vertex.color = adjustcolor("#FFFFFF", .5),
-            main = "Serranidae network in high temperatures")
+# Categorise continuous data + Nest categorical (nominal) data
+categories <- categorise_cov(species_mat = spp_mat, covariate = "tmean_reg")
+nested_cats <- nested_data(categorised_data = categories)
+
+# Run MRFcov model with some defaults
+cat_model <- get_model(data = spp_mat, ncov = 1)
+
+# Run model on each category
+nested <- nested_models(nested_df = nested_cats)
+
+# Get graph data
+nested_plot <- nested %>% mutate(plot = map(model, get_graph))
+
+# Plot multiple graphs for gradient
+temperature_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
 
 ```
 
-### MPAs effect
+### MPA as covariate
+```{r}
+
+spp_mat <- create_spp_mat(dataset = med_raw, basin = east,
+                          group = groupers, covariate = "enforcement")
+
+model_enf <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
+coef_enf <- model_enf$mod$direct_coefs
+key_coef_enf <- model_enf$boot$mean_key_coefs
+predict_enf <- model_enf$pred
+
+# Func 3b (no need for 3a because it's already categorised) - nesting only
+nested_cats <- nested_data(categorised_data = spp_mat)
+
+cat_model <- get_model(data = spp_mat, ncov = 1)
+
+nested <- nested_models(nested_df = nested_cats)
+
+nested_plot <- nested %>% mutate(plot = map(model, get_graph))
+
+MPAs_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 4) 
+
+```
+
+### Depth as covariate
 
 ```{r}
-# Inside MPAs
-plot.igraph(serr_graph_MPA, layout = layout.circle(serr_graph_MPA),
-            edge.width = abs(E(serr_graph_MPA)$weight),
-            edge.color = ifelse(E(serr_graph_MPA)$weight < 0, '#3399CC', '#FF3333'),
-            vertex.size = deg,
-            vertex.label.family = "sans",
-            vertex.label.font	= 3,
-            vertex.label.cex = 1,
-            vertex.label.color = adjustcolor("#333333", 0.85),
-            vertex.color = adjustcolor("#FFFFFF", .5),
-            main = "Serranidae network inside MPAs")
+spp_mat <- create_spp_mat(dataset = med_raw, basin = east,
+                          group = groupers, covariate = "depth") %>% na.omit()
 
-plot.igraph(serr_graph_noMPA, layout = layout.circle(serr_graph_noMPA),
-            edge.width = abs(E(serr_graph_noMPA)$weight),
-            edge.color = ifelse(E(serr_graph_noMPA)$weight < 0, '#3399CC', '#FF3333'),
-            vertex.size = deg,
-            vertex.label.family = "sans",
-            vertex.label.font	= 3,
-            vertex.label.cex = 1,
-            vertex.label.color = adjustcolor("#333333", 0.85),
-            vertex.color = adjustcolor("#FFFFFF", .5),
-            main = "Serranidae network outside MPAs")
+model_dep <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
+coef_dep <- model_dep$mod$direct_coefs
+key_coef_dep <- model_dep$boot$mean_key_coefs
+predict_dep <- model_dep$pred
+
+categories <- categorise_cov(species_mat = spp_mat, covariate = "depth")
+nested_cats <- nested_data(categorised_data = categories)
+
+cat_model <- get_model(data = spp_mat, ncov = 1)
+
+nested <- nested_models(nested_df = nested_cats)
+
+nested_plot <- nested %>% mutate(plot = map(model, get_graph))
+
+depth_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
 
 ```
 
+# Diplodus
 
-## Diplodus networks
+## Eastern Mediterranean
 
-### Temperature effect
+### Temperature as covariate
 
 ```{r}
-# Low
-plot.igraph(dip_graph_low, layout = layout.circle(dip_graph_low),
-            edge.width = abs(E(dip_graph_low)$weight),
-            edge.color = ifelse(E(dip_graph_low)$weight < 0, '#3399CC', '#FF3333'),
-            vertex.size = deg,
-            vertex.label.family = "sans",
-            vertex.label.font	= 3,
-            vertex.label.cex = 1,
-            vertex.label.color = adjustcolor("#333333", 0.85),
-            vertex.color = adjustcolor("#FFFFFF", .5),
-            main = "Diplodus network in low temperatures")
+spp_mat <- create_spp_mat(dataset = med_raw, basin = east,
+                          group = diplodus, covariate = "tmean_reg")
 
-# Med
-plot.igraph(dip_graph_med, layout = layout.circle(dip_graph_med),
-            edge.width = abs(E(dip_graph_med)$weight),
-            edge.color = ifelse(E(dip_graph_med)$weight < 0, '#3399CC', '#FF3333'),
-            vertex.size = deg,
-            vertex.label.family = "sans",
-            vertex.label.font	= 3,
-            vertex.label.cex = 1,
-            vertex.label.color = adjustcolor("#333333", 0.85),
-            vertex.color = adjustcolor("#FFFFFF", .5),
-            main = "Diplodus network in median temperatures")
+model_temp <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
+coef_temp <- model_temp$mod$direct_coefs
+key_coef_temp <- model_temp$boot$mean_key_coefs
+predict_temp <- model_temp$pred
 
-# High
-plot.igraph(dip_graph_hi, layout = layout.circle(dip_graph_hi),
-            edge.width = abs(E(dip_graph_hi)$weight),
-            edge.color = ifelse(E(dip_graph_hi)$weight < 0, '#3399CC', '#FF3333'),
-            vertex.size = deg,
-            vertex.label.family = "sans",
-            vertex.label.font	= 3,
-            vertex.label.cex = 1,
-            vertex.label.color = adjustcolor("#333333", 0.85),
-            vertex.color = adjustcolor("#FFFFFF", .5),
-            main = "Diplodus network in high temperatures")
+categories <- categorise_cov(species_mat = spp_mat, covariate = "tmean_reg")
+nested_cats <- nested_data(categorised_data = categories)
+
+cat_model <- get_model(data = spp_mat, ncov = 1)
+
+nested <- nested_models(nested_df = nested_cats)
+
+nested_plot <- nested %>% mutate(plot = map(model, get_graph))
+
+temperature_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
+
+
 ```
 
-### MPAs effect
+### MPA as covariate
+```{r}
+
+spp_mat <- create_spp_mat(dataset = med_raw, basin = east,
+                          group = diplodus, covariate = "enforcement")
+
+model_enf <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
+coef_enf <- model_enf$mod$direct_coefs
+key_coef_enf <- model_enf$boot$mean_key_coefs
+predict_enf <- model_enf$pred
+
+nested_cats <- nested_data(categorised_data = spp_mat)
+
+cat_model <- get_model(data = spp_mat, ncov = 1)
+
+nested <- nested_models(nested_df = nested_cats)
+
+nested_plot <- nested %>% mutate(plot = map(model, get_graph))
+
+MPAs_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 4) 
+
+
+```
+
+### Depth as covariate
 
 ```{r}
-# Within
-plot.igraph(dip_graph_MPA, layout = layout.circle(dip_graph_MPA),
-            edge.width = abs(E(dip_graph_MPA)$weight),
-            edge.color = ifelse(E(dip_graph_MPA)$weight < 0, '#3399CC', '#FF3333'),
-            vertex.size = deg,
-            vertex.label.family = "sans",
-            vertex.label.font	= 3,
-            vertex.label.cex = 1,
-            vertex.label.color = adjustcolor("#333333", 0.85),
-            vertex.color = adjustcolor("#FFFFFF", .5),
-            main = "Diplodus network inside MPAs")
+spp_mat <- create_spp_mat(dataset = med_raw, basin = east,
+                          group = diplodus, covariate = "depth") %>% na.omit()
 
-# Outside
-plot.igraph(dip_graph_noMPA, layout = layout.circle(dip_graph_noMPA),
-            edge.width = abs(E(dip_graph_noMPA)$weight),
-            edge.color = ifelse(E(dip_graph_noMPA)$weight < 0, '#3399CC', '#FF3333'),
-            vertex.size = deg,
-            vertex.label.family = "sans",
-            vertex.label.font	= 3,
-            vertex.label.cex = 1,
-            vertex.label.color = adjustcolor("#333333", 0.85),
-            vertex.color = adjustcolor("#FFFFFF", .5),
-            main = "Diplodus network outside MPAs")
+model_dep <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
+coef_dep <- model_dep$mod$direct_coefs
+key_coef_dep <- model_dep$boot$mean_key_coefs
+predict_dep <- model_dep$pred
+
+categories <- categorise_cov(species_mat = spp_mat, covariate = "depth")
+nested_cats <- nested_data(categorised_data = categories)
+
+cat_model <- get_model(data = spp_mat, ncov = 1)
+
+nested <- nested_models(nested_df = nested_cats)
+
+nested_plot <- nested %>% mutate(plot = map(model, get_graph))
+
+depth_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
+# FIXME problem with the first graph element
+
+png("figures/diplodus_east_depth.png", height = 450, width = 1200, res = 150)
+plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
+dev.off()
 
 ```
 
 
-## Herbivores
 
-### Temperature effect
+## Western Mediterranean
+
+### Temperature as covariate
 
 ```{r}
-# Low
-plot.igraph(herb_graph_low, layout = layout.circle(herb_graph_low),
-            edge.width = abs(E(herb_graph_low)$weight),
-            edge.color = ifelse(E(herb_graph_low)$weight < 0, '#3399CC', '#FF3333'),
-            vertex.size = deg,
-            vertex.label.family = "sans",
-            vertex.label.font	= 3,
-            vertex.label.cex = 1,
-            vertex.label.color = adjustcolor("#333333", 0.85),
-            vertex.color = adjustcolor("#FFFFFF", .5),
-            main = "Herbivore network in low temperatures")
-# Med
-plot.igraph(herb_graph_med, layout = layout.circle(herb_graph_med),
-            edge.width = abs(E(herb_graph_med)$weight),
-            edge.color = ifelse(E(herb_graph_med)$weight < 0, '#3399CC', '#FF3333'),
-            vertex.size = deg,
-            vertex.label.family = "sans",
-            vertex.label.font	= 3,
-            vertex.label.cex = 1,
-            vertex.label.color = adjustcolor("#333333", 0.85),
-            vertex.color = adjustcolor("#FFFFFF", .5),
-            main = "Herbivore network in median temperatures")
-# High
-plot.igraph(herb_graph_hi, layout = layout.circle(herb_graph_hi),
-            edge.width = abs(E(herb_graph_hi)$weight),
-            edge.color = ifelse(E(herb_graph_hi)$weight < 0, '#3399CC', '#FF3333'),
-            vertex.size = deg,
-            vertex.label.family = "sans",
-            vertex.label.font	= 3,
-            vertex.label.cex = 1,
-            vertex.label.color = adjustcolor("#333333", 0.85),
-            vertex.color = adjustcolor("#FFFFFF", .5),
-            main = "Herbivore network in high temperatures")
+spp_mat <- create_spp_mat(dataset = med_raw, basin = west,
+                          group = diplodus, covariate = "tmean_reg")
+
+model_temp <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
+coef_temp <- model_temp$mod$direct_coefs
+key_coef_temp <- model_temp$boot$mean_key_coefs
+predict_temp <- model_temp$pred
+
+categories <- categorise_cov(species_mat = spp_mat, covariate = "tmean_reg")
+nested_cats <- nested_data(categorised_data = categories)
+
+cat_model <- get_model(data = spp_mat, ncov = 1)
+
+nested <- nested_models(nested_df = nested_cats)
+
+nested_plot <- nested %>% mutate(plot = map(model, get_graph))
+
+temperature_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
+
 ```
 
-
-### MPAs effect
+### MPA as covariate
 ```{r}
-# Within
-plot.igraph(herb_graph_MPA, layout = layout.circle(herb_graph_MPA),
-            edge.width = abs(E(herb_graph_MPA)$weight),
-            edge.color = ifelse(E(herb_graph_MPA)$weight < 0, '#3399CC', '#FF3333'),
-            vertex.size = deg,
-            vertex.label.family = "sans",
-            vertex.label.font	= 3,
-            vertex.label.cex = 1,
-            vertex.label.color = adjustcolor("#333333", 0.85),
-            vertex.color = adjustcolor("#FFFFFF", .5),
-            main = "Herbivore network inside MPAs")
 
-# Outside
-plot.igraph(herb_graph_noMPA, layout = layout.circle(herb_graph_noMPA),
-            edge.width = abs(E(herb_graph_noMPA)$weight),
-            edge.color = ifelse(E(herb_graph_noMPA)$weight < 0, '#3399CC', '#FF3333'),
-            vertex.size = deg,
-            vertex.label.family = "sans",
-            vertex.label.font	= 3,
-            vertex.label.cex = 1,
-            vertex.label.color = adjustcolor("#333333", 0.85),
-            vertex.color = adjustcolor("#FFFFFF", .5),
-            main = "Herbivore network outside MPAs")
+spp_mat <- create_spp_mat(dataset = med_raw, basin = west,
+                          group = diplodus, covariate = "enforcement") %>% na.omit()
+
+model_enf <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
+coef_enf <- model_enf$mod$direct_coefs
+key_coef_enf <- model_enf$boot$mean_key_coefs
+predict_enf <- model_enf$pred
+
+nested_cats <- nested_data(categorised_data = spp_mat)
+
+cat_model <- get_model(data = spp_mat, ncov = 1)
+
+nested <- nested_models(nested_df = nested_cats)
+
+nested_plot <- nested %>% mutate(plot = map(model, get_graph))
+
+MPAs_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 4) 
+
+```
+
+### Depth as covariate
+
+```{r}
+spp_mat <- create_spp_mat(dataset = med_raw, basin = west,
+                          group = diplodus, covariate = "depth") %>% na.omit()
+
+model_dep <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
+coef_dep <- model_dep$mod$direct_coefs
+key_coef_dep <- model_dep$boot$mean_key_coefs
+predict_dep <- model_dep$pred
+
+categories <- categorise_cov(species_mat = spp_mat, covariate = "depth") # FIXME Error in cut(): breaks are not unique https://stackoverflow.com/questions/16184947/cut-error-breaks-are-not-unique
+nested_cats <- nested_data(categorised_data = categories)
+
+cat_model <- get_model(data = spp_mat, ncov = 1)
+
+nested <- nested_models(nested_df = nested_cats)
+
+nested_plot <- nested %>% mutate(plot = map(model, get_graph))
+
+depth_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
+
+png("figures/diplodus_west_depth.png", height = 450, width = 1200, res = 150)
+plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
+dev.off()
+
+```
+
+
+# Herbivores
+
+## Eastern Mediterranean
+
+### Temperature as covariate
+
+```{r}
+spp_mat <- create_spp_mat(dataset = med_raw, basin = east,
+                          group = herbivores, covariate = "tmean_reg")
+
+model_temp <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
+coef_temp <- model_temp$mod$direct_coefs
+key_coef_temp <- model_temp$boot$mean_key_coefs
+predict_temp <- model_temp$pred
+
+categories <- categorise_cov(species_mat = spp_mat, covariate = "tmean_reg")
+nested_cats <- nested_data(categorised_data = categories)
+
+cat_model <- get_model(data = spp_mat, ncov = 1)
+
+nested <- nested_models(nested_df = nested_cats)
+
+nested_plot <- nested %>% mutate(plot = map(model, get_graph))
+
+temperature_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
+
+```
+
+### MPA as covariate
+```{r}
+
+spp_mat <- create_spp_mat(dataset = med_raw, basin = east,
+                          group = herbivores, covariate = "enforcement")
+
+model_enf <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
+coef_enf <- model_enf$mod$direct_coefs
+key_coef_enf <- model_enf$boot$mean_key_coefs
+predict_enf <- model_enf$pred
+
+nested_cats <- nested_data(categorised_data = spp_mat)
+
+cat_model <- get_model(data = spp_mat, ncov = 1)
+
+nested <- nested_models(nested_df = nested_cats)
+
+nested_plot <- nested %>% mutate(plot = map(model, get_graph))
+
+MPAs_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 4) 
+
+```
+
+### Depth as covariate
+
+```{r}
+spp_mat <- create_spp_mat(dataset = med_raw, basin = east,
+                          group = herbivores, covariate = "depth") %>% na.omit()
+
+model_dep <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
+coef_dep <- model_dep$mod$direct_coefs
+key_coef_dep <- model_dep$boot$mean_key_coefs
+predict_dep <- model_dep$pred
+
+categories <- categorise_cov(species_mat = spp_mat, covariate = "depth")
+nested_cats <- nested_data(categorised_data = categories)
+
+cat_model <- get_model(data = spp_mat, ncov = 1)
+
+nested <- nested_models(nested_df = nested_cats)
+
+nested_plot <- nested %>% mutate(plot = map(model, get_graph))
+
+depth_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
+
+
 ```
 
 
 
+## Western Mediterranean
+
+The western basin doesn't have all the species of herbivores in the east so I'll make a new vector for them
+```{r}
+
+herb_west <- c("Siganus.luridus", "Sarpa.salpa", "Sparisoma.cretense")
+
+```
+
+### Temperature as covariate
+
+```{r}
+spp_mat <- create_spp_mat(dataset = med_raw, basin = west,
+                          group = herb_west, covariate = "tmean_reg")
+
+model_temp <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
+coef_temp <- model_temp$mod$direct_coefs
+key_coef_temp <- model_temp$boot$mean_key_coefs
+predict_temp <- model_temp$pred
+
+categories <- categorise_cov(species_mat = spp_mat, covariate = "tmean_reg")
+nested_cats <- nested_data(categorised_data = categories)
+
+cat_model <- get_model(data = spp_mat, ncov = 1)
+
+nested <- nested_models(nested_df = nested_cats)
+
+nested_plot <- nested %>% mutate(plot = map(model, get_graph))
+
+temperature_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
+# FIXME Error in abs(E(sub_graph)$weight) : non-numeric argument to mathematical function
+
+png("figures/herb_west_temp.png", height = 450, width = 1200, res = 150)
+plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
+dev.off()
+
+```
+
+### MPA as covariate
+```{r}
+
+spp_mat <- create_spp_mat(dataset = med_raw, basin = west,
+                          group = herb_west, covariate = "enforcement") %>% na.omit()
+
+model_enf <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
+coef_enf <- model_enf$mod$direct_coefs
+key_coef_enf <- model_enf$boot$mean_key_coefs
+predict_enf <- model_enf$pred
+
+nested_cats <- nested_data(categorised_data = spp_mat)
+
+cat_model <- get_model(data = spp_mat, ncov = 1)
+
+nested <- nested_models(nested_df = nested_cats)
+
+nested_plot <- nested %>% mutate(plot = map(model, get_graph))
+
+MPAs_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 4) 
+# FIXME Error in abs(E(sub_graph)$weight) : non-numeric argument to mathematical function
+
+png("figures/herb_west_mpa.png", height = 450, width = 1600, res = 150)
+plot_multi_graphs(nested_df = nested_plot, n_graphs = 4)
+dev.off()
+
+```
+
+### Depth as covariate
+
+```{r}
+spp_mat <- create_spp_mat(dataset = med_raw, basin = west,
+                          group = herb_west, covariate = "depth") %>% na.omit()
+
+model_dep <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
+coef_dep <- model_dep$mod$direct_coefs
+key_coef_dep <- model_dep$boot$mean_key_coefs
+predict_dep <- model_dep$pred
+
+categories <- categorise_cov(species_mat = spp_mat, covariate = "depth")
+# FIXME Error in cut(): breaks are not unique https://stackoverflow.com/questions/16184947/cut-error-breaks-are-not-unique
+nested_cats <- nested_data(categorised_data = categories)
+
+cat_model <- get_model(data = spp_mat, ncov = 1)
+
+nested <- nested_models(nested_df = nested_cats)
+
+nested_plot <- nested %>% mutate(plot = map(model, get_graph))
+
+depth_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
+
+png("figures/herb_west_depth.png", height = 450, width = 1200, res = 150)
+plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
+dev.off()
+
+```
 
 
+___
 
-
-
-
-
-
-
-
-
+[^1]: Clark, Nicholas J., Konstans Wells, and Oscar Lindberg. "Unravelling changing interspecific interactions across environmental gradients using Markov random fields." Ecology 99.6 (2018): 1277-1283.
