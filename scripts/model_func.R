@@ -71,7 +71,7 @@ get_graph <- function(model){
   graph.adjacency(model$graph, weighted = T, mode = "undirected")
 }
 
-# Func 7: Plot graphs
+# Assisting function for plotting graphs: Plot a graph
 plotting_func <- function(igraph, category){
   sub_graph <- igraph
   deg <- degree(sub_graph, mode = "all")
@@ -87,9 +87,9 @@ plotting_func <- function(igraph, category){
                       main = category)
 }
 
-# Func 8: Plot multiple graphs on the same grid
+# Func 7: Plot multiple graphs on the same grid
 plot_multi_graphs <- function(nested_df, n_graphs){
-  layout(matrix(c(1:n_graphs), 1, n_graphs, byrow = TRUE))
+  layout(matrix(c(1:n_graphs), 1, n_graphs, byrow = TRUE), respect = TRUE)
   map2(.x = nested_df$plot, .y = nested_df$category, plotting_func)
 }
 
