@@ -579,6 +579,74 @@ hist(med_raw$depth)
 
 ```
 
+# Model with all covariates
+
+# Groupers
+```{r}
+spp_mat_all <- med_raw %>%
+  group_by(loc, species, tmean_reg, enforcement, depth_reg) %>%
+  summarise(n = sum(sp.n)) %>% 
+  filter(species %in% groupers) %>% 
+  spread(species, n, fill = 0) %>% 
+  as.data.frame() %>% 
+  `rownames<-`(make.unique(.$loc)) %>%
+  select(groupers, tmean_reg, enforcement, depth_reg) %>% 
+  na.omit(depth_reg)
+
+groupers_model <- MRFcov(data = spp_mat_all, n_nodes = length(groupers), n_covariates = 3, family = "gaussian")
+groupers_model$key_coefs$Epinephelus.costae
+groupers_model$key_coefs$Epinephelus.marginatus
+groupers_model$key_coefs$Mycteroperca.rubra
+groupers_model$key_coefs$Serranus.cabrilla
+groupers_model$key_coefs$Serranus.scriba
+
+```
+
+# Diplodus
+```{r}
+spp_mat_all <- med_raw %>%
+  group_by(loc, species, tmean_reg, enforcement, depth_reg) %>%
+  summarise(n = sum(sp.n)) %>% 
+  filter(species %in% diplodus) %>% 
+  spread(species, n, fill = 0) %>% 
+  as.data.frame() %>% 
+  `rownames<-`(make.unique(.$loc)) %>%
+  select(diplodus, tmean_reg, enforcement, depth_reg) %>% 
+  na.omit(depth_reg)
+
+diplodus_model <- MRFcov(data = spp_mat_all, n_nodes = length(diplodus), n_covariates = 3, family = "gaussian")
+
+diplodus_model$key_coefs$Diplodus.annularis
+diplodus_model$key_coefs$Diplodus.puntazzo
+diplodus_model$key_coefs$Diplodus.sargus
+diplodus_model$key_coefs$Diplodus.vulgaris
+diplodus_model$key_coefs$Diplodus.cervinus
+
+```
+
+# Herbivores
+```{r}
+spp_mat_all <- med_raw %>%
+  group_by(loc, species, tmean_reg, enforcement, depth_reg) %>%
+  summarise(n = sum(sp.n)) %>% 
+  filter(species %in% herbivores) %>% 
+  spread(species, n, fill = 0) %>% 
+  as.data.frame() %>% 
+  `rownames<-`(make.unique(.$loc)) %>%
+  select(herbivores, tmean_reg, enforcement, depth_reg) %>% 
+  na.omit(depth_reg)
+
+herb_model <- MRFcov(data = spp_mat_all, n_nodes = length(herbivores), n_covariates = 3, family = "gaussian")
+
+herb_model$key_coefs$Siganus.rivulatus
+herb_model$key_coefs$Siganus.luridus
+herb_model$key_coefs$Sarpa.salpa
+herb_model$key_coefs$Scarus.ghobban
+herb_model$key_coefs$Sparisoma.cretense
+
+```
+
+> I can measure the continuous data coefficient but don't know hoe I can quantify the MPAs
 
 ___
 
