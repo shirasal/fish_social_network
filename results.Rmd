@@ -114,14 +114,14 @@ MPAs_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 4)
 
 ```{r}
 spp_mat <- create_spp_mat(dataset = med_raw, basin = east,
-                          group = groupers, covariate = "depth") %>% na.omit()
+                          group = groupers, covariate = "depth_reg") %>% na.omit()
 
 model_dep <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
 coef_dep <- model_dep$mod$direct_coefs
 key_coef_dep <- model_dep$boot$mean_key_coefs
 predict_dep <- model_dep$pred
 
-categories <- categorise_cov(species_mat = spp_mat, covariate = "depth")
+categories <- categorise_cov(species_mat = spp_mat, covariate = "depth_reg")
 nested_cats <- nested_data(categorised_data = categories)
 
 cat_model <- get_model(data = spp_mat, ncov = 1)
@@ -202,14 +202,14 @@ MPAs_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 4)
 
 ```{r}
 spp_mat <- create_spp_mat(dataset = med_raw, basin = east,
-                          group = groupers, covariate = "depth") %>% na.omit()
+                          group = groupers, covariate = "depth_reg") %>% na.omit()
 
 model_dep <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
 coef_dep <- model_dep$mod$direct_coefs
 key_coef_dep <- model_dep$boot$mean_key_coefs
 predict_dep <- model_dep$pred
 
-categories <- categorise_cov(species_mat = spp_mat, covariate = "depth")
+categories <- categorise_cov(species_mat = spp_mat, covariate = "depth_reg")
 nested_cats <- nested_data(categorised_data = categories)
 
 cat_model <- get_model(data = spp_mat, ncov = 1)
@@ -248,6 +248,8 @@ nested_plot <- nested %>% mutate(plot = map(model, get_graph))
 
 temperature_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
 
+# FIXME problem with the first graph element
+
 
 ```
 
@@ -279,14 +281,14 @@ MPAs_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 4)
 
 ```{r}
 spp_mat <- create_spp_mat(dataset = med_raw, basin = east,
-                          group = diplodus, covariate = "depth") %>% na.omit()
+                          group = diplodus, covariate = "depth_reg") %>% na.omit()
 
 model_dep <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
 coef_dep <- model_dep$mod$direct_coefs
 key_coef_dep <- model_dep$boot$mean_key_coefs
 predict_dep <- model_dep$pred
 
-categories <- categorise_cov(species_mat = spp_mat, covariate = "depth")
+categories <- categorise_cov(species_mat = spp_mat, covariate = "depth_reg")
 nested_cats <- nested_data(categorised_data = categories)
 
 cat_model <- get_model(data = spp_mat, ncov = 1)
@@ -359,14 +361,14 @@ MPAs_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 4)
 
 ```{r}
 spp_mat <- create_spp_mat(dataset = med_raw, basin = west,
-                          group = diplodus, covariate = "depth") %>% na.omit()
+                          group = diplodus, covariate = "depth_reg") %>% na.omit()
 
 model_dep <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
 coef_dep <- model_dep$mod$direct_coefs
 key_coef_dep <- model_dep$boot$mean_key_coefs
 predict_dep <- model_dep$pred
 
-categories <- categorise_cov(species_mat = spp_mat, covariate = "depth") # FIXME Error in cut(): breaks are not unique https://stackoverflow.com/questions/16184947/cut-error-breaks-are-not-unique
+categories <- categorise_cov(species_mat = spp_mat, covariate = "depth_reg") # BUG
 nested_cats <- nested_data(categorised_data = categories)
 
 cat_model <- get_model(data = spp_mat, ncov = 1)
@@ -382,7 +384,12 @@ plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
 dev.off()
 
 ```
+Depths range is too small for analysis 2-11 metres. and the data isn't distributed well enough between them.
+Check it with:
 
+```{r eval=FALSE, include=FALSE}
+spp_mat$depth %>% table
+```
 
 # Herbivores
 
@@ -432,6 +439,7 @@ nested <- nested_models(nested_df = nested_cats)
 nested_plot <- nested %>% mutate(plot = map(model, get_graph))
 
 MPAs_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 4) 
+# Graph problem FIXME
 
 ```
 
@@ -439,14 +447,14 @@ MPAs_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 4)
 
 ```{r}
 spp_mat <- create_spp_mat(dataset = med_raw, basin = east,
-                          group = herbivores, covariate = "depth") %>% na.omit()
+                          group = herbivores, covariate = "depth_reg") %>% na.omit()
 
 model_dep <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
 coef_dep <- model_dep$mod$direct_coefs
 key_coef_dep <- model_dep$boot$mean_key_coefs
 predict_dep <- model_dep$pred
 
-categories <- categorise_cov(species_mat = spp_mat, covariate = "depth")
+categories <- categorise_cov(species_mat = spp_mat, covariate = "depth_reg")
 nested_cats <- nested_data(categorised_data = categories)
 
 cat_model <- get_model(data = spp_mat, ncov = 1)
@@ -492,11 +500,7 @@ nested <- nested_models(nested_df = nested_cats)
 nested_plot <- nested %>% mutate(plot = map(model, get_graph))
 
 temperature_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
-# FIXME Error in abs(E(sub_graph)$weight) : non-numeric argument to mathematical function
 
-png("figures/herb_west_temp.png", height = 450, width = 1200, res = 150)
-plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
-dev.off()
 
 ```
 
@@ -532,15 +536,15 @@ dev.off()
 
 ```{r}
 spp_mat <- create_spp_mat(dataset = med_raw, basin = west,
-                          group = herb_west, covariate = "depth") %>% na.omit()
+                          group = herb_west, covariate = "depth_reg") %>% na.omit()
 
 model_dep <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
 coef_dep <- model_dep$mod$direct_coefs
 key_coef_dep <- model_dep$boot$mean_key_coefs
 predict_dep <- model_dep$pred
 
-categories <- categorise_cov(species_mat = spp_mat, covariate = "depth")
-# FIXME Error in cut(): breaks are not unique https://stackoverflow.com/questions/16184947/cut-error-breaks-are-not-unique
+categories <- categorise_cov(species_mat = spp_mat, covariate = "depth_reg")
+# FIXME Error in cut(): breaks are not unique
 nested_cats <- nested_data(categorised_data = categories)
 
 cat_model <- get_model(data = spp_mat, ncov = 1)
@@ -556,6 +560,8 @@ plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
 dev.off()
 
 ```
+Again, a problem with the data distribution of depth data
+
 
 
 ___

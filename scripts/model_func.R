@@ -5,8 +5,9 @@ source("scripts/pckgs_preps.R")
 create_spp_mat <- function(dataset, basin, group, covariate){
   dataset %>%
     filter(country %in% basin) %>% 
-    group_by(loc, species, tmean_reg, enforcement, depth) %>%
+    group_by(loc, species, tmean_reg, enforcement, depth_reg) %>%
     summarise(n = sum(sp.n)) %>% 
+    filter(species %in% group) %>% 
     spread(species, n, fill = 0) %>% 
     as.data.frame() %>% 
     `rownames<-`(make.unique(.$loc)) %>%
