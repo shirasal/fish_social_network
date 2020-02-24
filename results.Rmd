@@ -439,7 +439,7 @@ nested <- nested_models(nested_df = nested_cats)
 nested_plot <- nested %>% mutate(plot = map(model, get_graph))
 
 MPAs_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 4) 
-# Graph problem FIXME
+
 
 ```
 
@@ -562,6 +562,22 @@ dev.off()
 ```
 Again, a problem with the data distribution of depth data
 
+
+# Data visualisations
+
+## Covariates
+
+### Temperature distribution
+```{r}
+hist(med_raw$tmean)
+
+```
+
+### Depth distribution
+```{r}
+hist(med_raw$depth)
+
+```
 
 
 ___
