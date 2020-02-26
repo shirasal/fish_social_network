@@ -569,13 +569,27 @@ Again, a problem with the data distribution of depth data
 
 ### Temperature distribution
 ```{r}
-hist(med_raw$tmean)
+ggplot(med_raw, aes(tmean)) + geom_histogram(binwidth = 0.5, aes(fill = ..x..)) +
+  labs(x = "Mean annual temperature", y = "Frequency", title = "Temperature") +
+  guides(fill = FALSE)
+
 
 ```
 
 ### Depth distribution
 ```{r}
-hist(med_raw$depth)
+ggplot(med_raw, aes(depth)) + geom_histogram(binwidth = 1, aes(fill = ..x..)) +
+  labs(x = "Depth of transect", y = "Frequency", title = "Depth") +
+  guides(fill = FALSE)
+
+```
+
+### MPAs (enforcement) distribution
+```{r}
+ggplot(med_raw, aes(enforcement)) + geom_histogram(binwidth = 1, aes(fill = ..x..)) +
+  labs(x = "Level of enforcement", subtitle = "0 = No enforcement; 3 = Fully protected",
+       y = "Frequency", title = "Depth") +
+  guides(fill = FALSE)
 
 ```
 
@@ -646,7 +660,7 @@ herb_model$key_coefs$Sparisoma.cretense
 
 ```
 
-> I can measure the continuous data coefficient but don't know hoe I can quantify the MPAs
+> I can measure the continuous data coefficient but don't know how I can quantify the MPAs
 
 ___
 
