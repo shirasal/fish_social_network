@@ -1,6 +1,7 @@
 ---
 title: "Results"
 output: html_notebook
+  code_folding: hide
 ---
 
 **How fish communities change along environmental gradients?**
@@ -17,16 +18,16 @@ source("scripts/model_func.R")
 
 ```{r}
 
-med_raw <- read_csv("data/med_raw.csv", col_types = cols(depth = "d")) %>%
+med_raw <- read_rds("data/medata.R") %>%
   filter(data.origin != "azz_asi") %>% # remove presence-absence data
   mutate(loc = paste0(site, "_", trans), tmean_reg = scale(tmean), depth_reg = scale(depth))
 str(med_raw)
 
 ```
 
-### Define variables `basin`; `group`
+### Define variables `basin`; `group` -- disabled ATM (sourced instead)
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 # Basins
 west <- list("France", "Italy", "Spain")
 east <- list("Croatia", "Greece", "Israel", "Malta", "Turkey")
@@ -662,6 +663,48 @@ herb_model$key_coefs$Sparisoma.cretense
 
 > I can measure the continuous data coefficient but don't know how I can quantify the MPAs
 
+----------------------------------------------------------------------------------------------------------------------------
+
+# Groupers
+
+## Whole Mediterranean
+
+### Temperature as covariate
+
+```{r}
+# Create species matrix for `group` in `basin` with `covariate`
+spp_mat <- create_spp_mat(dataset = med_raw, basin = east,
+                          group = groupers, covariate = "tmean_reg")
+str(spp_mat)
+
+# Run model and create occurrence predictions
+model_temp <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
+coef_temp <- model_temp$mod$direct_coefs
+key_coef_temp <- model_temp$boot$mean_key_coefs
+predict_temp <- model_temp$pred
+
+# Categorise continuous data + Nest categorical (nominal) data
+categories <- categorise_cov(species_mat = spp_mat, covariate = "tmean_reg")
+nested_cats <- nested_data(categorised_data = categories)
+
+# Run MRFcov model with some defaults
+cat_model <- get_model(data = spp_mat, ncov = 1)
+cat_model
+
+# Run model on each category
+nested <- nested_models(nested_df = nested_cats)
+
+# Get graph data
+nested_plot <- nested %>% mutate(plot = map(model, get_graph))
+
+# Plot multiple graphs for gradient
+temperature_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
+
+# png("figures/groupers_east_temp.png", height = 450, width = 1200, res = 150)
+# plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
+# dev.off()
+
+```
 ___
 
 [^1]: Clark, Nicholas J., Konstans Wells, and Oscar Lindberg. "Unravelling changing interspecific interactions across environmental gradients using Markov random fields." Ecology 99.6 (2018): 1277-1283.
