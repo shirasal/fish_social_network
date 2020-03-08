@@ -7,11 +7,11 @@ create_spp_mat <- function(dataset, basin, group, covariate){
     filter(country %in% basin) %>% 
     group_by(loc, species, tmean_reg, enforcement, depth_reg) %>%
     summarise(n = sum(sp.n)) %>% 
-    filter(species %in% group) %>% 
+    filter(species %in% groups$group) %>% 
     spread(species, n, fill = 0) %>% 
     as.data.frame() %>% 
     `rownames<-`(make.unique(.$loc)) %>%
-    select(group, covariate)
+    select(groups$group, covariate)
 }
 
 # Func 2: Run model and create occurrence predictions
