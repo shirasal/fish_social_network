@@ -17,9 +17,9 @@ east <- list("Croatia", "Greece", "Israel", "Malta", "Turkey")
 all_med <- list("France", "Italy", "Spain", "Croatia", "Greece", "Israel", "Malta", "Turkey")
 
 # Groups
-groups <- tibble(groupers = c("Epinephelus.costae", "Epinephelus.marginatus",
-                              "Mycteroperca.rubra", "Serranus.cabrilla", "Serranus.scriba"),
-                 diplodus = c("Diplodus.annularis", "Diplodus.puntazzo", "Diplodus.sargus",
-                               "Diplodus.vulgaris", "Diplodus.cervinus"),
-                 herbivores = c("Siganus.rivulatus", "Siganus.luridus", "Sarpa.salpa",
-                                 "Scarus.ghobban", "Sparisoma.cretense"))
+groupers <- c("Epinephelus.costae", "Epinephelus.marginatus",
+              "Mycteroperca.rubra", "Serranus.cabrilla", "Serranus.scriba")
+diplodus <- c("Diplodus.annularis", "Diplodus.puntazzo", "Diplodus.sargus",
+             "Diplodus.vulgaris", "Diplodus.cervinus")
+herbivores <- c("Siganus.rivulatus", "Siganus.luridus", "Sarpa.salpa",
+               "Scarus.ghobban", "Sparisoma.cretense")
