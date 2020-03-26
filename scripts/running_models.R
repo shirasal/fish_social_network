@@ -156,8 +156,9 @@ spp_mat <- med_raw %>%
   summarise(n = sum(sp.n)) %>% 
   filter(species %in% group) %>% 
   spread(species, n, fill = 0) %>% 
-  as.data.frame() %>% 
-  `rownames<-`(make.unique(.$loc)) %>%
+  ungroup() %>% 
+  mutate(loc = make.unique(.$loc, "_")) %>% 
+  column_to_rownames("loc") %>%
   select(group, covariate) %>% 
   as.matrix()
 str(spp_mat)
