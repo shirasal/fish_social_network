@@ -23,3 +23,14 @@ diplodus <- c("Diplodus.annularis", "Diplodus.puntazzo", "Diplodus.sargus",
              "Diplodus.vulgaris", "Diplodus.cervinus")
 herbivores <- c("Siganus.rivulatus", "Siganus.luridus", "Sarpa.salpa",
                "Scarus.ghobban", "Sparisoma.cretense")
+
+# Add medata --------------------------------------------------------------
+
+med_raw <- read_rds("data/medata.Rds") %>%
+  filter(data.origin != "azz_asi") %>% # presence-absence
+  mutate(loc = paste0(site, "_", trans),
+         tmean_reg = scale(tmean),
+         depth_reg = scale(depth))
+
+# TODO log abundances?
+# TODO merge protection levels - PROTECTED(2-3)/NOT_PROTECTED(0-1)
