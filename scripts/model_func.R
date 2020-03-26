@@ -1,6 +1,10 @@
 # load packages:
 source("scripts/pckgs_preps.R")
 
+# TODO create defaults:
+# FUNC 1: basin = all_med
+# FUNC 2: n_covs = 1
+
 # Func 1: Create species matrix for `group` in `basin` with `covariate`
 create_spp_mat <- function(dataset, basin, group, covariate){
   dataset %>%
