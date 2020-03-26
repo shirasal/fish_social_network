@@ -191,7 +191,16 @@ pred <- predict_MRF(data = species_mat, MRF_mod = boot) %>% invlogit()
 model_temp <- list(mod = mod, boot = boot, pred = pred)
 
 # Func 3
-categories <- categorise_cov(species_mat = species_mat, covariate = "tmean_reg")
+covariate_vector <- species_mat[, 6]
+categories <- species_mat %>%
+  as_tibble() %>% 
+  mutate(category = cut(x = covariate_vector,
+                        breaks = c(-Inf,
+                                   quantile(covariate_vector, 0.33),
+                                   quantile(covariate_vector, 0.66),
+                                   Inf),
+                        labels = c("low", "med", "hi"),
+                        ordered_result = TRUE))
 nested_cats <- nested_data(categorised_data = categories)
 
 # Func 4
