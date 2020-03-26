@@ -216,7 +216,7 @@ nested_plot <- nested %>% mutate(plot = map(model, get_graph))
 # Func 8
 temperature_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
 
-# png("figures/groupers_east_temp.png", height = 450, width = 1200, res = 150)
+# png("figures/groupers_allmed_temp_spatial.png", height = 450, width = 1200, res = 150)
 # plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
 # dev.off()
 
