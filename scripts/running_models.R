@@ -10,61 +10,28 @@ source("scripts/model_func.R")
 # GROUPERS ----------------------------------------------------------------
 
 # Temperature as covariate ------------------------------------------------
-group <- groupers
-covariate <- "tmean_reg"
 
 # Func 1
-# a) Create species matrix:
-spp_mat <- med_raw %>%
-  group_by(lat, lon, loc, species, tmean_reg, enforcement, depth_reg) %>%
-  summarise(n = sum(sp.n)) %>% 
-  filter(species %in% group) %>% 
-  spread(species, n, fill = 0) %>% 
-  ungroup() %>% 
-  mutate(loc = make.unique(.$loc, "_")) %>% 
-  column_to_rownames("loc") %>%
-  select(group, covariate) %>% 
-  as.matrix()
+func_1_result <- create_spp_mat(dataset = med_raw, basin = all_med, group = groupers, covariate = "tmean_reg")
+
+# a) Extract species matrix:
+spp_mat <- func_1_result[[1]]
+
 str(spp_mat)
 nrow(spp_mat)
 
-# b) Create a coordinate dataframe:
-coords <- med_raw %>%
-  group_by(lat, lon, loc, species, tmean_reg, enforcement, depth_reg) %>%
-  summarise(n = sum(sp.n)) %>% 
-  filter(species %in% group) %>% 
-  spread(species, n, fill = 0) %>% 
-  as.data.frame() %>% 
-  `rownames<-`(make.unique(.$loc)) %>%
-  select(lat, lon)
+# b) Extract coordinate dataframe:
+coords <- func_1_result[[2]]
+
 nrow(coords)
 class(coords)
   
 
 # Func 2
-species_mat <- spp_mat
-n_covs <- 1
-family <- "gaussian"
-
-# Run model + Create predictions
-mod <- MRFcov_spatial(data = species_mat, n_nodes = 5,
-              n_covariates = n_covs, family = family, coords = coords, bootstrap = TRUE)
-boot <- bootstrap_MRF(data = species_mat, n_nodes = 5,
-                      n_covariates = n_covs, family = family)
-pred <- predict_MRF(data = species_mat, MRF_mod = boot) %>% invlogit()
-model_temp <- list(mod = mod, boot = boot, pred = pred)
+run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian", coords = coords)
 
 # Func 3
-covariate_vector <- species_mat[, 6]
-categories <- species_mat %>%
-  as_tibble() %>% 
-  mutate(category = cut(x = covariate_vector,
-                        breaks = c(-Inf,
-                                   quantile(covariate_vector, 0.33),
-                                   quantile(covariate_vector, 0.66),
-                                   Inf),
-                        labels = c("low", "med", "hi"),
-                        ordered_result = TRUE))
+categories <- categorise_cov(species_mat = spp_mat, covariate = "tmean_reg")
 nested_cats <- nested_data(categorised_data = categories)
 
 # Func 4
