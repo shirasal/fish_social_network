@@ -12,7 +12,7 @@ create_spp_mat <- function(dataset, basin, group, covariate){
   spp_mat <- dataset %>%
     filter(country %in% basin) %>% 
     group_by(lat, lon, loc, species, tmean_reg, enforcement, depth_reg) %>%
-    summarise(n = sum(log_n)) %>% 
+    summarise(n = sum(sp.n)) %>% 
     filter(species %in% group) %>% 
     spread(species, n, fill = 0) %>% 
     ungroup() %>% 
@@ -25,7 +25,7 @@ create_spp_mat <- function(dataset, basin, group, covariate){
   coords <- dataset %>%
     filter(country %in% basin) %>% 
     group_by(lat, lon, loc, species, tmean_reg, enforcement, depth_reg) %>%
-    summarise(n = sum(log_n)) %>% 
+    summarise(n = sum(sp.n)) %>% 
     filter(species %in% group) %>% 
     spread(species, n, fill = 0) %>% 
     ungroup() %>% 
