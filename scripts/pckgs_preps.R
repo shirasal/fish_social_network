@@ -31,6 +31,6 @@ med_raw <- read_rds("data/medata.Rds") %>%
   mutate(loc = paste0(site, "_", trans),
          tmean_reg = scale(tmean),
          depth_reg = scale(depth),
-         log_n = log10(sp.n))
+         log_n = log10(sp.n),
+         protect = if_else(protection <= 1, FALSE, TRUE))
 
-# TODO merge protection levels - PROTECTED(2-3)/NOT_PROTECTED(0-1)
