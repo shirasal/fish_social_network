@@ -3,6 +3,7 @@
 
 library(parallel)
 library(igraph)
+library(magrittr)
 library(tidyverse)
 library(MRFcov)
 library(LaplacesDemon)
