@@ -32,5 +32,5 @@ med_raw <- read_rds("data/medata.Rds") %>%
          tmean_reg = scale(tmean),
          depth_reg = scale(depth),
          # log_n = log10(sp.n),
-         protect = if_else(protection <= 1, FALSE, TRUE))
+         mpa = if_else(enforcement <= 1, FALSE, TRUE))
 
