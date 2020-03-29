@@ -5,23 +5,43 @@ source("scripts/pckgs_preps.R")
 # FUNC 1: basin = all_med
 # FUNC 2: n_covs = 1
 
-# Func 1: Create species matrix for `group` in `basin` with `covariate`
+# Func 1: Create species matrix and coordinate dataframe
+
 create_spp_mat <- function(dataset, basin, group, covariate){
-  dataset %>%
+  # a) Create species matrix for `group` in `basin` with `covariate`
+  spp_mat <- dataset %>%
     filter(country %in% basin) %>% 
-    group_by(loc, species, tmean_reg, enforcement, depth_reg) %>%
+    group_by(lat, lon, loc, species, tmean_reg, enforcement, depth_reg) %>%
     summarise(n = sum(sp.n)) %>% 
     filter(species %in% group) %>% 
     spread(species, n, fill = 0) %>% 
+    ungroup() %>% 
+    mutate(loc = make.unique(.$loc, "_")) %>% 
+    column_to_rownames("loc") %>%
+    select(group, covariate) %>% 
+    as.matrix()
+  
+  # b) Create a coordinate dataframe:
+  coords <- dataset %>%
+    filter(country %in% basin) %>% 
+    group_by(lat, lon, loc, species, tmean_reg, enforcement, depth_reg) %>%
+    summarise(n = sum(sp.n)) %>% 
+    filter(species %in% group) %>% 
+    spread(species, n, fill = 0) %>% 
+    ungroup() %>% 
+    mutate(loc = make.unique(.$loc, "_")) %>% 
     as.data.frame() %>% 
-    `rownames<-`(make.unique(.$loc)) %>%
-    select(group, covariate)
+    column_to_rownames("loc") %>%
+    select(lat, lon)
+  
+  return(list(spp_mat, coords))
 }
 
+
 # Func 2: Run model and create occurrence predictions
-run_mod <- function(species_mat, n_covs, family){
-  mod <- MRFcov(data = species_mat, n_nodes = ncol(species_mat) - n_covs,
-                n_covariates = n_covs, family = family)
+run_mod <- function(species_mat, n_covs, family, coords){
+  mod <- MRFcov_spatial(data = species_mat, n_nodes = ncol(species_mat) - n_covs,
+                        n_covariates = n_covs, family = family, coords = coords, bootstrap = TRUE)
   boot <- bootstrap_MRF(data = species_mat, n_nodes = ncol(species_mat) - n_covs,
                         n_covariates = n_covs, family = family)
   pred <- predict_MRF(data = species_mat, MRF_mod = boot) %>% invlogit()
@@ -30,8 +50,9 @@ run_mod <- function(species_mat, n_covs, family){
 
 # Func 3: Categorise continuous data
 categorise_cov <- function(species_mat, covariate){
-  covariate_vector <- species_mat[[covariate]]
-  species_mat %>%
+  covariate_vector <- as.data.frame(species_mat)[[covariate]]
+  categories <- species_mat %>%
+    as_tibble() %>% 
     mutate(category = cut(x = covariate_vector,
                           breaks = c(-Inf,
                                      quantile(covariate_vector, 0.33),
