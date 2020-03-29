@@ -4,56 +4,40 @@ output: html_notebook
 ---
 
 **How fish communities change along environmental gradients?**
+
 Species associations are represented graphically and quantitatively using *MRFcov package* [^1].
 
-```{r Load packages and functions, message=FALSE, warning=FALSE, include=FALSE}
+```{r Load packages, functions and data, message=FALSE, warning=FALSE, include=FALSE}
 
 source("scripts/pckgs_preps.R")
 source("scripts/model_func.R")
 
 ```
 
-### Data
 
-```{r}
-med_raw <- read_rds("data/medata.R") %>%
-  filter(data.origin != "azz_asi") %>% # remove presence-absence data
-  mutate(loc = paste0(site, "_", trans), tmean_reg = scale(tmean), depth_reg = scale(depth))
-str(med_raw)
+# Mediterranean networks
 
-```
+Networks for the whole Mediterranean sea, accounting for spatial autocorrelation.
 
-### Define variables `basin`; `group` -- disabled ATM (sourced instead)
-
-```{r eval=FALSE, include=FALSE}
-# Basins
-west <- list("France", "Italy", "Spain")
-east <- list("Croatia", "Greece", "Israel", "Malta", "Turkey")
-
-# Groups
-groupers <- c("Epinephelus.costae", "Epinephelus.marginatus",
-              "Mycteroperca.rubra", "Serranus.cabrilla", "Serranus.scriba")
-diplodus <- c("Diplodus.annularis", "Diplodus.puntazzo", "Diplodus.sargus",
-              "Diplodus.vulgaris", "Diplodus.cervinus")
-herbivores <- c("Siganus.rivulatus", "Siganus.luridus", "Sarpa.salpa",
-                "Scarus.ghobban", "Sparisoma.cretense")
-
-```
-
-# Groupers
-
-## Eastern Mediterranean
+## Groupers
 
 ### Temperature as covariate
 
 ```{r}
 # Create species matrix for `group` in `basin` with `covariate`
-spp_mat <- create_spp_mat(dataset = med_raw, basin = east,
-                          group = groupers, covariate = "tmean_reg")
-str(spp_mat)
+spp_data <- create_spp_mat(dataset = med_raw, basin = all_med,
+                                group = groupers, covariate = "tmean_reg")
+
+# a) Extract species matrix
+spp_mat <- spp_data[[1]]
+nrow(spp_mat)
+
+# b) Extract coordinate dataframe:
+coords <- spp_data[[2]]
+nrow(coords)
 
 # Run model and create occurrence predictions
-model_temp <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
+model_temp <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian", coords = coords)
 coef_temp <- model_temp$mod$direct_coefs
 key_coef_temp <- model_temp$boot$mean_key_coefs
 predict_temp <- model_temp$pred
@@ -75,7 +59,7 @@ nested_plot <- nested %>% mutate(plot = map(model, get_graph))
 # Plot multiple graphs for gradient
 temperature_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
 
-# png("figures/groupers_east_temp.png", height = 450, width = 1200, res = 150)
+# png("figures/groupers_allmed_temp.png", height = 450, width = 1200, res = 150)
 # plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
 # dev.off()
 
@@ -83,11 +67,14 @@ temperature_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
 
 ### MPA as covariate
 ```{r}
+spp_data <- create_spp_mat(dataset = med_raw, basin = all_med,
+                                group = groupers, covariate = "mpa")
 
-spp_mat <- create_spp_mat(dataset = med_raw, basin = east,
-                          group = groupers, covariate = "enforcement")
+spp_mat <- spp_data[[1]]
+coords <- spp_data[[2]]
+nrow(spp_mat) == nrow(coords)
 
-model_enf <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
+model_enf <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian", coords = coords)
 coef_enf <- model_enf$mod$direct_coefs
 key_coef_enf <- model_enf$boot$mean_key_coefs
 predict_enf <- model_enf$pred
@@ -101,21 +88,27 @@ nested <- nested_models(nested_df = nested_cats)
 
 nested_plot <- nested %>% mutate(plot = map(model, get_graph))
 
-MPAs_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 4) 
+MPAs_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 2) 
 
-# png("figures/groupers_east_mpa.png", height = 450, width = 1600, res = 150)
-# plot_multi_graphs(nested_df = nested_plot, n_graphs = 4)
+# png("figures/groupers_allmed_mpa.png", height = 450, width = 1600, res = 150)
+# plot_multi_graphs(nested_df = nested_plot, n_graphs = 2)
 # dev.off()
 
 ```
 
 ### Depth as covariate
 
-```{r}
-spp_mat <- create_spp_mat(dataset = med_raw, basin = east,
-                          group = groupers, covariate = "depth_reg") %>% na.omit()
+This one is problematic and might be excluded
 
-model_dep <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
+```{r}
+spp_data <- create_spp_mat(dataset = med_raw, basin = all_med,
+                                group = groupers, covariate = "depth_reg")
+
+spp_mat <- spp_data[[1]]
+coords <- spp_data[[2]]
+nrow(spp_mat) == nrow(coords)
+
+model_dep <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian", coords = coords)
 coef_dep <- model_dep$mod$direct_coefs
 key_coef_dep <- model_dep$boot$mean_key_coefs
 predict_dep <- model_dep$pred
@@ -131,7 +124,7 @@ nested_plot <- nested %>% mutate(plot = map(model, get_graph))
 
 depth_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
 
-# png("figures/groupers_east_depth.png", height = 450, width = 1200, res = 150)
+# png("figures/groupers_allmed_depth.png", height = 450, width = 1200, res = 150)
 # plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
 # dev.off()
 
@@ -139,18 +132,25 @@ depth_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
 
 
 
-## Western Mediterranean
+## Diplodus
 
 ### Temperature as covariate
 
 ```{r}
 # Create species matrix for `group` in `basin` with `covariate`
-spp_mat <- create_spp_mat(dataset = med_raw, basin = west,
-                          group = groupers, covariate = "tmean_reg")
-str(spp_mat)
+spp_data <- create_spp_mat(dataset = med_raw, basin = all_med,
+                                group = diplodus, covariate = "tmean_reg")
+
+# a) Extract species matrix
+spp_mat <- spp_data[[1]]
+nrow(spp_mat)
+
+# b) Extract coordinate dataframe:
+coords <- spp_data[[2]]
+nrow(coords)
 
 # Run model and create occurrence predictions
-model_temp <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
+model_temp <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian", coords = coords)
 coef_temp <- model_temp$mod$direct_coefs
 key_coef_temp <- model_temp$boot$mean_key_coefs
 predict_temp <- model_temp$pred
@@ -161,6 +161,7 @@ nested_cats <- nested_data(categorised_data = categories)
 
 # Run MRFcov model with some defaults
 cat_model <- get_model(data = spp_mat, ncov = 1)
+cat_model
 
 # Run model on each category
 nested <- nested_models(nested_df = nested_cats)
@@ -171,15 +172,22 @@ nested_plot <- nested %>% mutate(plot = map(model, get_graph))
 # Plot multiple graphs for gradient
 temperature_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
 
+# png("figures/diplodus_allmed_temp.png", height = 450, width = 1200, res = 150)
+# plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
+# dev.off()
+
 ```
 
 ### MPA as covariate
 ```{r}
+spp_data <- create_spp_mat(dataset = med_raw, basin = all_med,
+                                group = diplodus, covariate = "mpa")
 
-spp_mat <- create_spp_mat(dataset = med_raw, basin = east,
-                          group = groupers, covariate = "enforcement")
+spp_mat <- spp_data[[1]]
+coords <- spp_data[[2]]
+nrow(spp_mat) == nrow(coords)
 
-model_enf <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
+model_enf <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian", coords = coords)
 coef_enf <- model_enf$mod$direct_coefs
 key_coef_enf <- model_enf$boot$mean_key_coefs
 predict_enf <- model_enf$pred
@@ -193,17 +201,27 @@ nested <- nested_models(nested_df = nested_cats)
 
 nested_plot <- nested %>% mutate(plot = map(model, get_graph))
 
-MPAs_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 4) 
+MPAs_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 2) 
+
+# png("figures/diplodus_allmed_mpa.png", height = 450, width = 1600, res = 150)
+# plot_multi_graphs(nested_df = nested_plot, n_graphs = 2)
+# dev.off()
 
 ```
 
 ### Depth as covariate
 
-```{r}
-spp_mat <- create_spp_mat(dataset = med_raw, basin = east,
-                          group = groupers, covariate = "depth_reg") %>% na.omit()
+This one is problematic and might be excluded
 
-model_dep <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
+```{r}
+spp_data <- create_spp_mat(dataset = med_raw, basin = all_med,
+                                group = groupers, covariate = "depth_reg")
+
+spp_mat <- spp_data[[1]]
+coords <- spp_data[[2]]
+nrow(spp_mat) == nrow(coords)
+
+model_dep <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian", coords = coords)
 coef_dep <- model_dep$mod$direct_coefs
 key_coef_dep <- model_dep$boot$mean_key_coefs
 predict_dep <- model_dep$pred
@@ -219,216 +237,81 @@ nested_plot <- nested %>% mutate(plot = map(model, get_graph))
 
 depth_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
 
-```
-
-# Diplodus
-
-## Eastern Mediterranean
-
-### Temperature as covariate
-
-```{r}
-spp_mat <- create_spp_mat(dataset = med_raw, basin = east,
-                          group = diplodus, covariate = "tmean_reg")
-
-model_temp <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
-coef_temp <- model_temp$mod$direct_coefs
-key_coef_temp <- model_temp$boot$mean_key_coefs
-predict_temp <- model_temp$pred
-
-categories <- categorise_cov(species_mat = spp_mat, covariate = "tmean_reg")
-nested_cats <- nested_data(categorised_data = categories)
-
-cat_model <- get_model(data = spp_mat, ncov = 1)
-
-nested <- nested_models(nested_df = nested_cats)
-
-nested_plot <- nested %>% mutate(plot = map(model, get_graph))
-
-temperature_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
-
-# FIXME problem with the first graph element
-
+# png("figures/groupers_allmed_depth.png", height = 450, width = 1200, res = 150)
+# plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
+# dev.off()
 
 ```
 
-### MPA as covariate
-```{r}
-
-spp_mat <- create_spp_mat(dataset = med_raw, basin = east,
-                          group = diplodus, covariate = "enforcement")
-
-model_enf <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
-coef_enf <- model_enf$mod$direct_coefs
-key_coef_enf <- model_enf$boot$mean_key_coefs
-predict_enf <- model_enf$pred
-
-nested_cats <- nested_data(categorised_data = spp_mat)
-
-cat_model <- get_model(data = spp_mat, ncov = 1)
-
-nested <- nested_models(nested_df = nested_cats)
-
-nested_plot <- nested %>% mutate(plot = map(model, get_graph))
-
-MPAs_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 4) 
-
-
-```
-
-### Depth as covariate
-
-```{r}
-spp_mat <- create_spp_mat(dataset = med_raw, basin = east,
-                          group = diplodus, covariate = "depth_reg") %>% na.omit()
-
-model_dep <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
-coef_dep <- model_dep$mod$direct_coefs
-key_coef_dep <- model_dep$boot$mean_key_coefs
-predict_dep <- model_dep$pred
-
-categories <- categorise_cov(species_mat = spp_mat, covariate = "depth_reg")
-nested_cats <- nested_data(categorised_data = categories)
-
-cat_model <- get_model(data = spp_mat, ncov = 1)
-
-nested <- nested_models(nested_df = nested_cats)
-
-nested_plot <- nested %>% mutate(plot = map(model, get_graph))
-
-depth_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
-# FIXME problem with the first graph element
-
-png("figures/diplodus_east_depth.png", height = 450, width = 1200, res = 150)
-plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
-dev.off()
-
-```
-
-
-
-## Western Mediterranean
-
-### Temperature as covariate
-
-```{r}
-spp_mat <- create_spp_mat(dataset = med_raw, basin = west,
-                          group = diplodus, covariate = "tmean_reg")
-
-model_temp <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
-coef_temp <- model_temp$mod$direct_coefs
-key_coef_temp <- model_temp$boot$mean_key_coefs
-predict_temp <- model_temp$pred
-
-categories <- categorise_cov(species_mat = spp_mat, covariate = "tmean_reg")
-nested_cats <- nested_data(categorised_data = categories)
-
-cat_model <- get_model(data = spp_mat, ncov = 1)
-
-nested <- nested_models(nested_df = nested_cats)
-
-nested_plot <- nested %>% mutate(plot = map(model, get_graph))
-
-temperature_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
-
-```
-
-### MPA as covariate
-```{r}
-
-spp_mat <- create_spp_mat(dataset = med_raw, basin = west,
-                          group = diplodus, covariate = "enforcement") %>% na.omit()
-
-model_enf <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
-coef_enf <- model_enf$mod$direct_coefs
-key_coef_enf <- model_enf$boot$mean_key_coefs
-predict_enf <- model_enf$pred
-
-nested_cats <- nested_data(categorised_data = spp_mat)
-
-cat_model <- get_model(data = spp_mat, ncov = 1)
-
-nested <- nested_models(nested_df = nested_cats)
-
-nested_plot <- nested %>% mutate(plot = map(model, get_graph))
-
-MPAs_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 4) 
-
-```
-
-### Depth as covariate
-
-```{r}
-spp_mat <- create_spp_mat(dataset = med_raw, basin = west,
-                          group = diplodus, covariate = "depth_reg") %>% na.omit()
-
-model_dep <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
-coef_dep <- model_dep$mod$direct_coefs
-key_coef_dep <- model_dep$boot$mean_key_coefs
-predict_dep <- model_dep$pred
-
-categories <- categorise_cov(species_mat = spp_mat, covariate = "depth_reg") # BUG
-nested_cats <- nested_data(categorised_data = categories)
-
-cat_model <- get_model(data = spp_mat, ncov = 1)
-
-nested <- nested_models(nested_df = nested_cats)
-
-nested_plot <- nested %>% mutate(plot = map(model, get_graph))
-
-depth_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
-
-png("figures/diplodus_west_depth.png", height = 450, width = 1200, res = 150)
-plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
-dev.off()
-
-```
 Depths range is too small for analysis 2-11 metres. and the data isn't distributed well enough between them.
 Check it with:
 
 ```{r eval=FALSE, include=FALSE}
 spp_mat$depth %>% table
+
 ```
 
 # Herbivores
 
-## Eastern Mediterranean
-
 ### Temperature as covariate
 
 ```{r}
-spp_mat <- create_spp_mat(dataset = med_raw, basin = east,
-                          group = herbivores, covariate = "tmean_reg")
+# Create species matrix for `group` in `basin` with `covariate`
+spp_data <- create_spp_mat(dataset = med_raw, basin = all_med,
+                                group = groupers, covariate = "tmean_reg")
 
-model_temp <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
+# a) Extract species matrix
+spp_mat <- spp_data[[1]]
+nrow(spp_mat)
+
+# b) Extract coordinate dataframe:
+coords <- spp_data[[2]]
+nrow(coords)
+
+# Run model and create occurrence predictions
+model_temp <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian", coords = coords)
 coef_temp <- model_temp$mod$direct_coefs
 key_coef_temp <- model_temp$boot$mean_key_coefs
 predict_temp <- model_temp$pred
 
+# Categorise continuous data + Nest categorical (nominal) data
 categories <- categorise_cov(species_mat = spp_mat, covariate = "tmean_reg")
 nested_cats <- nested_data(categorised_data = categories)
 
+# Run MRFcov model with some defaults
 cat_model <- get_model(data = spp_mat, ncov = 1)
+cat_model
 
+# Run model on each category
 nested <- nested_models(nested_df = nested_cats)
 
+# Get graph data
 nested_plot <- nested %>% mutate(plot = map(model, get_graph))
 
+# Plot multiple graphs for gradient
 temperature_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
+
+# png("figures/groupers_allmed_temp.png", height = 450, width = 1200, res = 150)
+# plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
+# dev.off()
 
 ```
 
 ### MPA as covariate
 ```{r}
+spp_data <- create_spp_mat(dataset = med_raw, basin = all_med,
+                                group = groupers, covariate = "mpa")
 
-spp_mat <- create_spp_mat(dataset = med_raw, basin = east,
-                          group = herbivores, covariate = "enforcement")
+spp_mat <- spp_data[[1]]
+coords <- spp_data[[2]]
+nrow(spp_mat) == nrow(coords)
 
-model_enf <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
+model_enf <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian", coords = coords)
 coef_enf <- model_enf$mod$direct_coefs
 key_coef_enf <- model_enf$boot$mean_key_coefs
 predict_enf <- model_enf$pred
 
+# Func 3b (no need for 3a because it's already categorised) - nesting only
 nested_cats <- nested_data(categorised_data = spp_mat)
 
 cat_model <- get_model(data = spp_mat, ncov = 1)
@@ -437,18 +320,25 @@ nested <- nested_models(nested_df = nested_cats)
 
 nested_plot <- nested %>% mutate(plot = map(model, get_graph))
 
-MPAs_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 4) 
+MPAs_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 2) 
 
+# png("figures/groupers_allmed_mpa.png", height = 450, width = 1600, res = 150)
+# plot_multi_graphs(nested_df = nested_plot, n_graphs = 2)
+# dev.off()
 
 ```
 
 ### Depth as covariate
 
 ```{r}
-spp_mat <- create_spp_mat(dataset = med_raw, basin = east,
-                          group = herbivores, covariate = "depth_reg") %>% na.omit()
+spp_data <- create_spp_mat(dataset = med_raw, basin = all_med,
+                                group = groupers, covariate = "depth_reg")
 
-model_dep <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
+spp_mat <- spp_data[[1]]
+coords <- spp_data[[2]]
+nrow(spp_mat) == nrow(coords)
+
+model_dep <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian", coords = coords)
 coef_dep <- model_dep$mod$direct_coefs
 key_coef_dep <- model_dep$boot$mean_key_coefs
 predict_dep <- model_dep$pred
@@ -464,101 +354,12 @@ nested_plot <- nested %>% mutate(plot = map(model, get_graph))
 
 depth_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
 
+# png("figures/groupers_allmed_depth.png", height = 450, width = 1200, res = 150)
+# plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
+# dev.off()
 
 ```
 
-
-
-## Western Mediterranean
-
-The western basin doesn't have all the species of herbivores in the east so I'll make a new vector for them
-```{r}
-
-herb_west <- c("Siganus.luridus", "Sarpa.salpa", "Sparisoma.cretense")
-
-```
-
-### Temperature as covariate
-
-```{r}
-spp_mat <- create_spp_mat(dataset = med_raw, basin = west,
-                          group = herb_west, covariate = "tmean_reg")
-
-model_temp <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
-coef_temp <- model_temp$mod$direct_coefs
-key_coef_temp <- model_temp$boot$mean_key_coefs
-predict_temp <- model_temp$pred
-
-categories <- categorise_cov(species_mat = spp_mat, covariate = "tmean_reg")
-nested_cats <- nested_data(categorised_data = categories)
-
-cat_model <- get_model(data = spp_mat, ncov = 1)
-
-nested <- nested_models(nested_df = nested_cats)
-
-nested_plot <- nested %>% mutate(plot = map(model, get_graph))
-
-temperature_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
-
-
-```
-
-### MPA as covariate
-```{r}
-
-spp_mat <- create_spp_mat(dataset = med_raw, basin = west,
-                          group = herb_west, covariate = "enforcement") %>% na.omit()
-
-model_enf <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
-coef_enf <- model_enf$mod$direct_coefs
-key_coef_enf <- model_enf$boot$mean_key_coefs
-predict_enf <- model_enf$pred
-
-nested_cats <- nested_data(categorised_data = spp_mat)
-
-cat_model <- get_model(data = spp_mat, ncov = 1)
-
-nested <- nested_models(nested_df = nested_cats)
-
-nested_plot <- nested %>% mutate(plot = map(model, get_graph))
-
-MPAs_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 4) 
-# FIXME Error in abs(E(sub_graph)$weight) : non-numeric argument to mathematical function
-
-png("figures/herb_west_mpa.png", height = 450, width = 1600, res = 150)
-plot_multi_graphs(nested_df = nested_plot, n_graphs = 4)
-dev.off()
-
-```
-
-### Depth as covariate
-
-```{r}
-spp_mat <- create_spp_mat(dataset = med_raw, basin = west,
-                          group = herb_west, covariate = "depth_reg") %>% na.omit()
-
-model_dep <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
-coef_dep <- model_dep$mod$direct_coefs
-key_coef_dep <- model_dep$boot$mean_key_coefs
-predict_dep <- model_dep$pred
-
-categories <- categorise_cov(species_mat = spp_mat, covariate = "depth_reg")
-# FIXME Error in cut(): breaks are not unique
-nested_cats <- nested_data(categorised_data = categories)
-
-cat_model <- get_model(data = spp_mat, ncov = 1)
-
-nested <- nested_models(nested_df = nested_cats)
-
-nested_plot <- nested %>% mutate(plot = map(model, get_graph))
-
-depth_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
-
-png("figures/herb_west_depth.png", height = 450, width = 1200, res = 150)
-plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
-dev.off()
-
-```
 Again, a problem with the data distribution of depth data
 
 
@@ -592,364 +393,6 @@ ggplot(med_raw, aes(enforcement)) + geom_histogram(binwidth = 1, aes(fill = ..x.
 
 ```
 
-# Model with all covariates
-
-# Groupers
-```{r}
-spp_mat_all <- med_raw %>%
-  group_by(loc, species, tmean_reg, enforcement, depth_reg) %>%
-  summarise(n = sum(sp.n)) %>% 
-  filter(species %in% groupers) %>% 
-  spread(species, n, fill = 0) %>% 
-  as.data.frame() %>% 
-  `rownames<-`(make.unique(.$loc)) %>%
-  select(groupers, tmean_reg, enforcement, depth_reg) %>% 
-  na.omit(depth_reg)
-
-groupers_model <- MRFcov(data = spp_mat_all, n_nodes = length(groupers), n_covariates = 3, family = "gaussian")
-groupers_model$key_coefs$Epinephelus.costae
-groupers_model$key_coefs$Epinephelus.marginatus
-groupers_model$key_coefs$Mycteroperca.rubra
-groupers_model$key_coefs$Serranus.cabrilla
-groupers_model$key_coefs$Serranus.scriba
-
-```
-
-# Diplodus
-```{r}
-spp_mat_all <- med_raw %>%
-  group_by(loc, species, tmean_reg, enforcement, depth_reg) %>%
-  summarise(n = sum(sp.n)) %>% 
-  filter(species %in% diplodus) %>% 
-  spread(species, n, fill = 0) %>% 
-  as.data.frame() %>% 
-  `rownames<-`(make.unique(.$loc)) %>%
-  select(diplodus, tmean_reg, enforcement, depth_reg) %>% 
-  na.omit(depth_reg)
-
-diplodus_model <- MRFcov(data = spp_mat_all, n_nodes = length(diplodus), n_covariates = 3, family = "gaussian")
-
-diplodus_model$key_coefs$Diplodus.annularis
-diplodus_model$key_coefs$Diplodus.puntazzo
-diplodus_model$key_coefs$Diplodus.sargus
-diplodus_model$key_coefs$Diplodus.vulgaris
-diplodus_model$key_coefs$Diplodus.cervinus
-
-```
-
-# Herbivores
-```{r}
-spp_mat_all <- med_raw %>%
-  group_by(loc, species, tmean_reg, enforcement, depth_reg) %>%
-  summarise(n = sum(sp.n)) %>% 
-  filter(species %in% herbivores) %>% 
-  spread(species, n, fill = 0) %>% 
-  as.data.frame() %>% 
-  `rownames<-`(make.unique(.$loc)) %>%
-  select(herbivores, tmean_reg, enforcement, depth_reg) %>% 
-  na.omit(depth_reg)
-
-herb_model <- MRFcov(data = spp_mat_all, n_nodes = length(herbivores), n_covariates = 3, family = "gaussian")
-
-herb_model$key_coefs$Siganus.rivulatus
-herb_model$key_coefs$Siganus.luridus
-herb_model$key_coefs$Sarpa.salpa
-herb_model$key_coefs$Scarus.ghobban
-herb_model$key_coefs$Sparisoma.cretense
-
-```
-
-> I can measure the continuous data coefficient but don't know how I can quantify the MPAs
-
-**___**
-
-# Whole Mediterranean
-
-## Groupers
-
-### Temperature as covariate
-
-```{r}
-# Create species matrix for `group` in `basin` with `covariate`
-spp_mat <- create_spp_mat(dataset = med_raw, basin = all_med,
-                          group = groupers, covariate = "tmean_reg")
-str(spp_mat)
-
-# Run model and create occurrence predictions
-model_temp <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
-coef_temp <- model_temp$mod$direct_coefs
-key_coef_temp <- model_temp$boot$mean_key_coefs
-predict_temp <- model_temp$pred
-
-# Categorise continuous data + Nest categorical (nominal) data
-categories <- categorise_cov(species_mat = spp_mat, covariate = "tmean_reg")
-nested_cats <- nested_data(categorised_data = categories)
-
-# Run MRFcov model with some defaults
-cat_model <- get_model(data = spp_mat, ncov = 1)
-cat_model
-
-# Run model on each category
-nested <- nested_models(nested_df = nested_cats)
-
-# Get graph data
-nested_plot <- nested %>% mutate(plot = map(model, get_graph))
-
-# Plot multiple graphs for gradient
-temperature_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
-
-# png("figures/groupers_temp_allmed.png", height = 450, width = 1200, res = 150)
-# plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
-# dev.off()
-
-```
-
-### MPA as covariate
-```{r}
-
-spp_mat <- create_spp_mat(dataset = med_raw, basin = all_med,
-                          group = groupers, covariate = "enforcement") %>% na.omit()
-
-model_enf <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
-coef_enf <- model_enf$mod$direct_coefs
-key_coef_enf <- model_enf$boot$mean_key_coefs
-predict_enf <- model_enf$pred
-
-# Func 3b (no need for 3a because it's already categorised) - nesting only
-nested_cats <- nested_data(categorised_data = spp_mat)
-
-cat_model <- get_model(data = spp_mat, ncov = 1)
-
-nested <- nested_models(nested_df = nested_cats)
-
-nested_plot <- nested %>% mutate(plot = map(model, get_graph))
-
-MPAs_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 4) 
-
-# png("figures/groupers_mpa_allmed.png", height = 450, width = 1600, res = 150)
-# plot_multi_graphs(nested_df = nested_plot, n_graphs = 4)
-# dev.off()
-
-```
-
-### Depth as covariate
-
-```{r}
-spp_mat <- create_spp_mat(dataset = med_raw, basin = all_med,
-                          group = groupers, covariate = "depth_reg") %>% na.omit()
-
-model_dep <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
-coef_dep <- model_dep$mod$direct_coefs
-key_coef_dep <- model_dep$boot$mean_key_coefs
-predict_dep <- model_dep$pred
-
-categories <- categorise_cov(species_mat = spp_mat, covariate = "depth_reg")
-nested_cats <- nested_data(categorised_data = categories)
-
-cat_model <- get_model(data = spp_mat, ncov = 1)
-
-nested <- nested_models(nested_df = nested_cats)
-
-nested_plot <- nested %>% mutate(plot = map(model, get_graph))
-
-depth_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
-
-# png("figures/groupers_depth_allmed.png", height = 450, width = 1200, res = 150)
-# plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
-# dev.off()
-
-```
-
-## Diplodus
-
-### Temperature as covariate
-
-```{r}
-# Create species matrix for `group` in `basin` with `covariate`
-spp_mat <- create_spp_mat(dataset = med_raw, basin = all_med,
-                          group = diplodus, covariate = "tmean_reg")
-str(spp_mat)
-
-# Run model and create occurrence predictions
-model_temp <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
-coef_temp <- model_temp$mod$direct_coefs
-key_coef_temp <- model_temp$boot$mean_key_coefs
-predict_temp <- model_temp$pred
-
-# Categorise continuous data + Nest categorical (nominal) data
-categories <- categorise_cov(species_mat = spp_mat, covariate = "tmean_reg")
-nested_cats <- nested_data(categorised_data = categories)
-
-# Run MRFcov model with some defaults
-cat_model <- get_model(data = spp_mat, ncov = 1)
-cat_model
-
-# Run model on each category
-nested <- nested_models(nested_df = nested_cats)
-
-# Get graph data
-nested_plot <- nested %>% mutate(plot = map(model, get_graph))
-
-# Plot multiple graphs for gradient
-temperature_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
-
-# png("figures/diplodus_temp_allmed.png", height = 450, width = 1200, res = 150)
-# plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
-# dev.off()
-
-```
-
-### MPA as covariate
-```{r}
-
-spp_mat <- create_spp_mat(dataset = med_raw, basin = all_med,
-                          group = diplodus, covariate = "enforcement") %>% na.omit()
-
-model_enf <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
-coef_enf <- model_enf$mod$direct_coefs
-key_coef_enf <- model_enf$boot$mean_key_coefs
-predict_enf <- model_enf$pred
-
-# Func 3b (no need for 3a because it's already categorised) - nesting only
-nested_cats <- nested_data(categorised_data = spp_mat)
-
-cat_model <- get_model(data = spp_mat, ncov = 1)
-
-nested <- nested_models(nested_df = nested_cats)
-
-nested_plot <- nested %>% mutate(plot = map(model, get_graph))
-
-MPAs_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 4) 
-
-# png("figures/diplodus_mpa_allmed.png", height = 450, width = 1600, res = 150)
-# plot_multi_graphs(nested_df = nested_plot, n_graphs = 4)
-# dev.off()
-
-```
-
-### Depth as covariate
-
-```{r}
-spp_mat <- create_spp_mat(dataset = med_raw, basin = all_med,
-                          group = diplodus, covariate = "depth_reg") %>% na.omit()
-
-model_dep <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
-coef_dep <- model_dep$mod$direct_coefs
-key_coef_dep <- model_dep$boot$mean_key_coefs
-predict_dep <- model_dep$pred
-
-categories <- categorise_cov(species_mat = spp_mat, covariate = "depth_reg")
-nested_cats <- nested_data(categorised_data = categories)
-
-cat_model <- get_model(data = spp_mat, ncov = 1)
-
-nested <- nested_models(nested_df = nested_cats)
-
-nested_plot <- nested %>% mutate(plot = map(model, get_graph))
-
-depth_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
-
-# png("figures/diplodus_depth_allmed.png", height = 450, width = 1200, res = 150)
-# plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
-# dev.off()
-
-```
-
-
-## Herbivores
-
-### Temperature as covariate
-
-```{r}
-# Create species matrix for `group` in `basin` with `covariate`
-spp_mat <- create_spp_mat(dataset = med_raw, basin = all_med,
-                          group = herbivores, covariate = "tmean_reg")
-str(spp_mat)
-
-# Run model and create occurrence predictions
-model_temp <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
-coef_temp <- model_temp$mod$direct_coefs
-key_coef_temp <- model_temp$boot$mean_key_coefs
-predict_temp <- model_temp$pred
-
-# Categorise continuous data + Nest categorical (nominal) data
-categories <- categorise_cov(species_mat = spp_mat, covariate = "tmean_reg")
-nested_cats <- nested_data(categorised_data = categories)
-
-# Run MRFcov model with some defaults
-cat_model <- get_model(data = spp_mat, ncov = 1)
-cat_model
-
-# Run model on each category
-nested <- nested_models(nested_df = nested_cats)
-
-# Get graph data
-nested_plot <- nested %>% mutate(plot = map(model, get_graph))
-
-# Plot multiple graphs for gradient
-temperature_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
-
-# png("figures/herb_temp_allmed.png", height = 450, width = 1200, res = 150)
-# plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
-# dev.off()
-
-```
-
-### MPA as covariate
-```{r}
-
-spp_mat <- create_spp_mat(dataset = med_raw, basin = all_med,
-                          group = herbivores, covariate = "enforcement") %>% na.omit()
-
-model_enf <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
-coef_enf <- model_enf$mod$direct_coefs
-key_coef_enf <- model_enf$boot$mean_key_coefs
-predict_enf <- model_enf$pred
-
-# Func 3b (no need for 3a because it's already categorised) - nesting only
-nested_cats <- nested_data(categorised_data = spp_mat)
-
-cat_model <- get_model(data = spp_mat, ncov = 1)
-
-nested <- nested_models(nested_df = nested_cats)
-
-nested_plot <- nested %>% mutate(plot = map(model, get_graph))
-
-MPAs_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 4) 
-
-# png("figures/herb_mpa_allmed.png", height = 450, width = 1600, res = 150)
-# plot_multi_graphs(nested_df = nested_plot, n_graphs = 4)
-# dev.off()
-
-```
-
-### Depth as covariate
-
-```{r}
-spp_mat <- create_spp_mat(dataset = med_raw, basin = all_med,
-                          group = herbivores, covariate = "depth_reg") %>% na.omit()
-
-model_dep <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
-coef_dep <- model_dep$mod$direct_coefs
-key_coef_dep <- model_dep$boot$mean_key_coefs
-predict_dep <- model_dep$pred
-
-categories <- categorise_cov(species_mat = spp_mat, covariate = "depth_reg")
-nested_cats <- nested_data(categorised_data = categories)
-
-cat_model <- get_model(data = spp_mat, ncov = 1)
-
-nested <- nested_models(nested_df = nested_cats)
-
-nested_plot <- nested %>% mutate(plot = map(model, get_graph))
-
-depth_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
-
-# png("figures/herb_depth_allmed.png", height = 450, width = 1200, res = 150)
-# plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
-# dev.off()
-
-```
 
 ___
 
