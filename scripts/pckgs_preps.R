@@ -30,7 +30,7 @@ med_raw <- read_rds("data/medata.Rds") %>%
   filter(data.origin != "azz_asi") %>% # presence-absence
   mutate(loc = paste0(site, "_", trans),
          tmean_reg = scale(tmean),
-         depth_reg = scale(depth))
+         depth_reg = scale(depth),
+         log_n = log10(sp.n))
 
-# TODO log abundances?
 # TODO merge protection levels - PROTECTED(2-3)/NOT_PROTECTED(0-1)
