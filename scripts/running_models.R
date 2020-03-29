@@ -12,13 +12,20 @@ source("scripts/model_func.R")
 # Temperature as covariate ------------------------------------------------
 
 # Func 1
-func_1_result <- create_spp_mat(dataset = med_raw, basin = all_med, group = groupers, covariate = "tmean_reg")
+func_1_result <- create_spp_mat(dataset = med_raw, basin = all_med,
+                                group = groupers, covariate = "tmean_reg")
 
+#########################################################################################################
 # a) Extract species matrix:
-spp_mat <- func_1_result[[1]]
 
-str(spp_mat)
+# Look for infinite values
+as.data.frame(func_1_result[[1]]) %>% unlist %>% is.infinite() %>% which()
+# Remove rows with inf. values
+spp_df <- func_1_result[[1]][!rowSums(!is.finite(func_1_result[[1]])),]
+
+spp_mat <- as.matrix(spp_df)
 nrow(spp_mat)
+#########################################################################################################
 
 # b) Extract coordinate dataframe:
 coords <- func_1_result[[2]]
@@ -28,7 +35,24 @@ class(coords)
   
 
 # Func 2
-run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian", coords = coords)
+# Having problems with the coords df, I'll run just the MRFcov for now (results are similar anyway)
+run_mod <- function(species_mat, n_covs, family){
+  mod <- MRFcov(data = species_mat, n_nodes = ncol(species_mat) - n_covs,
+                        n_covariates = n_covs, family = family)
+  boot <- bootstrap_MRF(data = species_mat, n_nodes = ncol(species_mat) - n_covs,
+                        n_covariates = n_covs, family = family)
+  pred <- predict_MRF(data = species_mat, MRF_mod = boot) %>% invlogit()
+  return(list(mod = mod, boot = boot, pred = pred))
+}
+
+model_temp <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian")
+model_temp$mod
+coef_temp <- model_temp$mod$direct_coefs
+model_temp$boot
+key_coef_temp <- model_temp$boot$mean_key_coefs
+str(model_temp$pred)
+predict_temp <- model_temp$pred
+
 
 # Func 3
 categories <- categorise_cov(species_mat = spp_mat, covariate = "tmean_reg")
