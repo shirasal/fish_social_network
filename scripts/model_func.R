@@ -11,11 +11,12 @@ create_spp_mat <- function(dataset, basin, group, covariate){
   # a) Create species matrix for `group` in `basin` with `covariate`
   spp_mat <- dataset %>%
     filter(country %in% basin) %>% 
-    group_by(lat, lon, loc, species, tmean_reg, enforcement, depth_reg) %>%
+    group_by(lat, lon, loc, species, tmean_reg, mpa, depth_reg) %>%
     summarise(n = sum(sp.n)) %>% 
     filter(species %in% group) %>% 
     spread(species, n, fill = 0) %>% 
     ungroup() %>% 
+    na.omit() %>% 
     mutate(loc = make.unique(.$loc, "_")) %>% 
     column_to_rownames("loc") %>%
     select(group, covariate) %>% 
@@ -24,7 +25,7 @@ create_spp_mat <- function(dataset, basin, group, covariate){
   # b) Create a coordinate dataframe:
   coords <- dataset %>%
     filter(country %in% basin) %>% 
-    group_by(lat, lon, loc, species, tmean_reg, enforcement, depth_reg) %>%
+    group_by(lat, lon, loc, species, tmean_reg, mpa, depth_reg) %>%
     summarise(n = sum(sp.n)) %>% 
     filter(species %in% group) %>% 
     spread(species, n, fill = 0) %>% 
@@ -32,6 +33,7 @@ create_spp_mat <- function(dataset, basin, group, covariate){
     mutate(loc = make.unique(.$loc, "_")) %>% 
     as.data.frame() %>% 
     column_to_rownames("loc") %>%
+    na.omit() %>% 
     select(lat, lon)
   
   return(list(spp_mat, coords))
