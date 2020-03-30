@@ -80,7 +80,7 @@ key_coef_enf <- model_enf$boot$mean_key_coefs
 predict_enf <- model_enf$pred
 
 # Func 3b (no need for 3a because it's already categorised) - nesting only
-nested_cats <- nested_data(categorised_data = spp_mat)
+nested_cats <- nested_data(categorised_data = as.data.frame(spp_mat))
 
 cat_model <- get_model(data = spp_mat, ncov = 1)
 
