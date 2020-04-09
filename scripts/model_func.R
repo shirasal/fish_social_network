@@ -43,7 +43,7 @@ create_spp_mat <- function(dataset, basin, group, covariate){
 # Func 2: Run model and create occurrence predictions
 run_mod <- function(species_mat, n_covs, family, coords){
   mod <- MRFcov_spatial(data = species_mat, n_nodes = ncol(species_mat) - n_covs,
-                        n_covariates = n_covs, family = family, coords = coords, bootstrap = TRUE)
+                        n_covariates = n_covs, family = family, coords = coords)
   boot <- bootstrap_MRF(data = species_mat, n_nodes = ncol(species_mat) - n_covs,
                         n_covariates = n_covs, family = family)
   pred <- predict_MRF(data = species_mat, MRF_mod = boot) %>% invlogit()
