@@ -130,3 +130,20 @@ depth_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
 # png("figures/groupers_allmed_depth_spatial.png", height = 450, width = 1200, res = 150)
 # plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
 # dev.off()
+
+
+# Quantifying networks ----------------------------------------------------
+
+library(rosalia)
+
+# Roaslia does not work on abundances but on binomial data:
+ros_mat <- ifelse(ros_mat > 0, 1, 0)
+rosalia_fit <- rosalia(x = ros_mat,
+                       prior = make_logistic_prior(scale = 2),
+                       trace = FALSE)
+rosalia_fit$alpha
+rosalia_fit$beta
+
+plotMRF_hm(MRF_mod = rosalia_fit, node_names = groupers, main = 'rosalia interactions')
+
+
