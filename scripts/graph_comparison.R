@@ -74,12 +74,67 @@ plot(groupers_network, mode = "circle")
 # igraph ------------------------------------------------------------------
 detach(package:network)
 library(igraph)
+groupers_network <- graph.adjacency(groupers_temp$graph, weighted = TRUE, mode = "undirected")
+deg <- degree(groupers_network, mode = "all")
+class(groupers_network)
 
-groupers_network <- graph_from_data_frame(edgelist, directed = FALSE, vertices = unique(edgelist$sp1))
-plot(groupers_network, mode = "circle", vertex.cex = 2, vertex.color = "lightblue", vertex.alpha = 0.3,
-     vertex.label = NA)
-# This is pretty but it doesn't represents shit haha
+plot(groupers_network,
+     layout = layout.circle(groupers_network),
+     vertex.cex = log10(deg),
+     vertex.color = adjustcolor("lightblue", .5),
+     edge.width = scale(abs(E(groupers_network)$weight)),
+     edge.color = ifelse(E(groupers_network)$weight < 0, '#3399CC', '#FF3333'), # blue = negative, red = positive
+     vertex.label.family = "sans",
+     vertex.label.font	= 3,
+     vertex.label.cex = 1,
+     vertex.label.color = adjustcolor("#333333", 0.85),
+     main = "Serranidae")
 
+
+# tidygraph & ggraph ------------------------------------------------------
+library(tidygraph)
+library(ggraph)
+
+groupers_tidy <- as_tbl_graph(groupers_network)
+
+# what's the difference?
+setdiff(class(groupers_tidy), class(groupers_network))
+# groupers_tidy is a tbl_graph object while groupers_network is only an igraph object
+groupers_tidy
+# waaaay tidier than igraph and details are a lot clearer
+# if I wanted to rearrange the rows in the edges tibble to list those with the highest “weight” first:
+groupers_tidy %>% 
+  activate(edges) %>% 
+  arrange(desc(magnitude))
+
+# Plot with ggraph
+ggraph(groupers_tidy, layout = "circle") + 
+  geom_node_point() +
+  geom_node_text(aes(label = name), repel = TRUE, check_overlap = TRUE) +
+  geom_edge_link(aes(width = magnitude, colour = ifelse(magnitude < 0, "lightblue", "brown1"))) +
+  scale_edge_width(range = c(0.2, 2)) +
+  theme(legend.position = "none")
+  
+# Another plotting option
+ggraph(groupers_tidy, layout = "linear") +
+  geom_node_point() +
+  geom_node_text(aes(label = name), repel = TRUE, check_overlap = TRUE) +
+  geom_edge_arc(aes(width = magnitude, colour = ifelse(magnitude < 0, "lightblue", "brown1"))) + 
+  scale_edge_width(range = c(0.2, 2)) +
+  theme(legend.position = "none") +
+  coord_fixed()
+
+
+# Announcement ------------------------------------------------------------
+
+# And the winner is...
+#                     ggraph!
+
+
+
+
+
+# Not important -----------------------------------------------------------
 
 # Just for fun: create a mandala (I don't really need different magnitude for each one but in case I'll use it for something else in the future..)
 edge_mand <- edgelist %>%
@@ -301,46 +356,6 @@ plot(mand_network, mode = "circle", vertex.cex = 2, vertex.color = "lightblue", 
 
 # This is fun but let's get back to work
 rm(list = c("mand_network", "edge_mand"))
-
-
-# tidygraph & ggraph ------------------------------------------------------
-library(tidygraph)
-library(ggraph)
-
-groupers_tidy <- as_tbl_graph(groupers_network)
-
-# what's the difference?
-setdiff(class(groupers_tidy), class(groupers_network))
-# groupers_tidy is a tbl_graph object while groupers_network is only an igraph object
-groupers_tidy
-# waaaay tidier than igraph and details are a lot clearer
-# if I wanted to rearrange the rows in the edges tibble to list those with the highest “weight” first:
-groupers_tidy %>% 
-  activate(edges) %>% 
-  arrange(desc(magnitude))
-
-# Plot with ggraph
-ggraph(groupers_tidy, layout = "circle") + 
-  geom_node_point() +
-  geom_node_text(aes(label = name), repel = TRUE, check_overlap = TRUE) +
-  geom_edge_link(aes(width = magnitude, colour = ifelse(magnitude < 0, "lightblue", "brown1"))) +
-  scale_edge_width(range = c(0.2, 2)) +
-  theme(legend.position = "none")
-  
-# Another plotting option
-ggraph(groupers_tidy, layout = "linear") +
-  geom_node_point() +
-  geom_node_text(aes(label = name), repel = TRUE, check_overlap = TRUE) +
-  geom_edge_arc(aes(width = magnitude, colour = ifelse(magnitude < 0, "lightblue", "brown1"))) + 
-  scale_edge_width(range = c(0.2, 2)) +
-  theme(legend.position = "none") +
-  coord_fixed()
-
-
-# Announcement ------------------------------------------------------------
-
-# And the winner is...
-#                     ggraph!
 
 
 
