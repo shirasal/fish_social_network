@@ -3,6 +3,8 @@
 
 library(parallel)
 library(igraph)
+library(tidygraph)
+library(ggraph)
 library(magrittr)
 library(tidyverse)
 library(MRFcov)
