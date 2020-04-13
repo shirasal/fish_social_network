@@ -9,5 +9,3 @@ plotting_func <- function(igraph, category, covariate, basin){
     theme(legend.position = "none") +
     ggtitle(category, subtitle = paste0(covriate, "; ", basin))
 }
-
-
