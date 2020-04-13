@@ -1,4 +1,6 @@
 
+# Use this script to test running the models before repeating it with all other groups
+
 # Load packages and functions ---------------------------------------------
 
 source("scripts/pckgs_preps.R")
@@ -17,11 +19,11 @@ func_1_result <- create_spp_mat(dataset = med_raw, basin = all_med,
 
 # a) Extract species matrix
 spp_mat <- func_1_result[[1]]
-nrow(spp_mat)
 
 # b) Extract coordinate dataframe:
 coords <- func_1_result[[2]]
-nrow(coords)
+
+nrow(spp_mat) == nrow(coords)
 
 # Func 2
 model_temp <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian", coords = coords)
@@ -44,7 +46,7 @@ nested_plot <- nested %>% mutate(plot = map(model, get_graph))
 # Func 8
 temperature_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
 
-# png("figures/groupers_allmed_temp_spatial.png", height = 450, width = 1200, res = 150)
+# png("figures/networks/groupers_allmed_temp_spatial.png", height = 450, width = 1200, res = 150)
 # plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
 # dev.off()
 
@@ -57,11 +59,11 @@ func_1_result <- create_spp_mat(dataset = med_raw, basin = all_med,
 
 # a) Extract species matrix
 spp_mat <- func_1_result[[1]]
-nrow(spp_mat)
 
 # b) Extract coordinate dataframe:
 coords <- func_1_result[[2]]
-nrow(coords)
+
+nrow(spp_mat) == nrow(coords)
 
 # Func 2
 model_enf <-  run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian", coords = coords)
@@ -83,26 +85,25 @@ nested <- nested_models(nested_df = nested_cats)
 nested_plot <- nested %>% mutate(plot = map(model, get_graph))
 
 # Func 8
-MPAs_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 4) 
+MPAs_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 2) 
 
-# png("figures/groupers_allmed_mpa_spatial.png", height = 450, width = 1600, res = 150)
+# png("figures/networks/groupers_allmed_mpa_spatial.png", height = 450, width = 1600, res = 150)
 # plot_multi_graphs(nested_df = nested_plot, n_graphs = 2)
 # dev.off()
 
 # Depth as covariate ------------------------------------------------------
 
 # Func 1
-# Func 1
 func_1_result <- create_spp_mat(dataset = med_raw, basin = all_med,
                                 group = groupers, covariate = "depth_reg")
 
 # a) Extract species matrix
 spp_mat <- func_1_result[[1]]
-nrow(spp_mat)
 
 # b) Extract coordinate dataframe:
 coords <- func_1_result[[2]]
-nrow(coords)
+
+nrow(spp_mat) == nrow(coords)
 
 # Func 2
 model_dep <- run_mod(species_mat = spp_mat, n_covs = 1, family = "gaussian", coords = coords)
@@ -127,7 +128,7 @@ nested_plot <- nested %>% mutate(plot = map(model, get_graph))
 # Func 8
 depth_graph <- plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
 
-# png("figures/groupers_allmed_depth_spatial.png", height = 450, width = 1200, res = 150)
+# png("figures/networks/groupers_allmed_depth_spatial.png", height = 450, width = 1200, res = 150)
 # plot_multi_graphs(nested_df = nested_plot, n_graphs = 3)
 # dev.off()
 
