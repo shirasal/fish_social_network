@@ -1,7 +1,7 @@
 # load packages:
 source("scripts/pckgs_preps.R")
 
-# TODO create defaults:
+# TODO create defaults --- try 'missing()':
 # FUNC 1: basin = all_med
 # FUNC 2: n_covs = 1
 
@@ -13,13 +13,13 @@ create_spp_mat <- function(dataset, basin, group, covariate){
     filter(country %in% basin) %>% 
     group_by(lat, lon, loc, species, tmean_reg, mpa, depth_reg) %>%
     summarise(n = sum(sp.n)) %>% 
-    filter(species %in% group) %>% 
+    filter(species %in% tidyselect::all_of(group)) %>% 
     spread(species, n, fill = 0) %>% 
     ungroup() %>% 
     na.omit() %>% 
     mutate(loc = make.unique(.$loc, "_")) %>% 
     column_to_rownames("loc") %>%
-    select(group, covariate) %>% 
+    select(tidyselect::all_of(group), tidyselect::all_of(covariate)) %>% 
     as.matrix()
   
   # b) Create a coordinate dataframe:
@@ -27,7 +27,7 @@ create_spp_mat <- function(dataset, basin, group, covariate){
     filter(country %in% basin) %>% 
     group_by(lat, lon, loc, species, tmean_reg, mpa, depth_reg) %>%
     summarise(n = sum(sp.n)) %>% 
-    filter(species %in% group) %>% 
+    filter(species %in% tidyselect::all_of(group)) %>% 
     spread(species, n, fill = 0) %>% 
     ungroup() %>% 
     mutate(loc = make.unique(.$loc, "_")) %>% 
@@ -104,7 +104,7 @@ plotting_func <- function(igraph, category){
   sub_graph <- igraph
   deg <- degree(sub_graph, mode = "all")
   plot <- plot.igraph(sub_graph, layout = layout.circle(sub_graph),
-                      edge.width = 20*E(sub_graph)$weight^2,
+                      edge.width = abs(E(sub_graph)$weight),
                       edge.color = ifelse(E(sub_graph)$weight < 0, '#3399CC', '#FF3333'),
                       vertex.size = deg,
                       vertex.label.family = "sans",
