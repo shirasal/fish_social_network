@@ -20,7 +20,7 @@ source("scripts/model_func.R")
 Networks for the whole Mediterranean sea, accounting for spatial autocorrelation.
 
 ## Groupers
-```{r}
+```{r include=FALSE}
 # Create datasets for each covariate
 
 # Temperature

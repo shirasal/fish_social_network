@@ -1,14 +1,90 @@
 ---
 title: "Results Quantification"
 author: "Shira Salingre"
-output: html
+output: html_document
 ---
 
+Quantifying networks for 
+
+```{r Source data from the results file, include=FALSE}
+source_rmd <- function(rmd_file){
+  knitr::knit(rmd_file, output = tempfile())
+}
+
+source_rmd("results_prelim.Rmd")
+source('scripts/quant_func.R')
+
+```
+
+# Groupers
+
+## Relative importance of species only
 
 ```{r}
+groupers_temp <- sapply(X = model_temp_grps$mod$key_coefs, rel_imp) %>% 
+  tibble::enframe() %>% 
+  rename("species" = name, "temp_model" = value)
 
-source("scripts/pckgs_preps.R")
-source("scripts/model_func.R")
+groupers_mpa <- sapply(X = model_mpa_grps$mod$key_coefs, rel_imp) %>% 
+  tibble::enframe() %>% 
+  rename("species" = name, "mpa_model" = value)
+
+groupers_depth <- sapply(X = model_depth_grps$mod$key_coefs, rel_imp) %>% 
+  tibble::enframe() %>% 
+  rename("species" = name, "depth_model" = value)
+
+(groupers_spp_relimp <- groupers_temp %>%
+  left_join(groupers_mpa, by = "species") %>% 
+  left_join(groupers_depth, by = "species"))
+
+```
+
+## Sum of mean association coefficients for each species
+
+
+# Diplodus
+
+## Relative importance of species only
+
+```{r}
+dip_temp <- sapply(X = model_temp_dip$mod$key_coefs, rel_imp) %>% 
+  tibble::enframe() %>% 
+  rename("species" = name, "temp_model" = value)
+
+dip_mpa <- sapply(X = model_mpa_dip$mod$key_coefs, rel_imp) %>% 
+  tibble::enframe() %>% 
+  rename("species" = name, "mpa_model" = value)
+
+dip_depth <- sapply(X = model_depth_dip$mod$key_coefs, rel_imp) %>% 
+  tibble::enframe() %>% 
+  rename("species" = name, "depth_model" = value)
+
+(dip_spp_relimp <- dip_temp %>%
+  left_join(dip_mpa, by = "species") %>% 
+  left_join(dip_depth, by = "species"))
+
+```
+
+# Herbivores
+
+## Relative importance of species only
+
+```{r}
+herb_temp <- sapply(X = model_temp_herb$mod$key_coefs, rel_imp) %>% 
+  tibble::enframe() %>% 
+  rename("species" = name, "temp_model" = value)
+
+herb_mpa <- sapply(X = model_mpa_herb$mod$key_coefs, rel_imp) %>% 
+  tibble::enframe() %>% 
+  rename("species" = name, "mpa_model" = value)
+
+herb_depth <- sapply(X = model_depth_herb$mod$key_coefs, rel_imp) %>% 
+  tibble::enframe() %>% 
+  rename("species" = name, "depth_model" = value)
+
+(herb_spp_relimp <- herb_temp %>%
+  left_join(herb_mpa, by = "species") %>% 
+  left_join(herb_depth, by = "species"))
 
 ```
 
