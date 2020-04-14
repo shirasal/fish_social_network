@@ -104,7 +104,7 @@ plotting_func <- function(igraph, category){
   sub_graph <- igraph
   deg <- degree(sub_graph, mode = "all")
   plot <- plot.igraph(sub_graph, layout = layout.circle(sub_graph),
-                      edge.width = abs(E(sub_graph)$weight),
+                      edge.width = scale(abs(E(sub_graph)$weight)),
                       edge.color = ifelse(E(sub_graph)$weight < 0, '#3399CC', '#FF3333'),
                       vertex.size = deg,
                       vertex.label.family = "sans",

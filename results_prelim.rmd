@@ -460,7 +460,7 @@ model_temp_herb <- run_mod(species_mat = herb_temp_mat, n_covs = 1,
 
 ```{r}
 # Non-spatial model for comparison
-model_temp_herb_nonspat <- MRFcov(data = herb_temp_mat, n_nodes = length(hebivores), n_covariates = 1,
+model_temp_herb_nonspat <- MRFcov(data = herb_temp_mat, n_nodes = length(herbivores), n_covariates = 1,
                                   family = "gaussian")
 model_temp_herb_nonspat$direct_coefs
 plotMRF_hm(model_temp_herb_nonspat, main = "Species association coefficients")
@@ -517,7 +517,7 @@ model_mpa_herb <- run_mod(species_mat = herb_mpa_mat, n_covs = 1,
 
 ```{r}
 # Non-spatial model for comparison
-model_mpa_herb_nonspat <- MRFcov(data = herb_mpa_mat, n_nodes = length(hebivores), n_covariates = 1,
+model_mpa_herb_nonspat <- MRFcov(data = herb_mpa_mat, n_nodes = length(herbivores), n_covariates = 1,
                                   family = "gaussian")
 model_mpa_herb_nonspat$direct_coefs
 plotMRF_hm(model_mpa_herb_nonspat, main = "Species association coefficients")
@@ -571,7 +571,7 @@ model_depth_herb <- run_mod(species_mat = herb_depth_mat, n_covs = 1,
 
 ```{r}
 # Non-spatial model for comparison
-model_depth_herb_nonspat <- MRFcov(data = herb_depth_mat, n_nodes = length(hebivores), n_covariates = 1,
+model_depth_herb_nonspat <- MRFcov(data = herb_depth_mat, n_nodes = length(herbivores), n_covariates = 1,
                                   family = "gaussian")
 model_depth_herb_nonspat$direct_coefs
 plotMRF_hm(model_depth_herb_nonspat, main = "Species association coefficients")

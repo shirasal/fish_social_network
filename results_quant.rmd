@@ -1,2 +1,14 @@
+---
+title: "Results Quantification"
+author: "Shira Salingre"
+output: html
+---
+
+
+```{r}
+
 source("scripts/pckgs_preps.R")
 source("scripts/model_func.R")
+
+```
+
