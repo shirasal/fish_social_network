@@ -579,7 +579,7 @@ herb_depth_nested_plot <- herb_depth_nested_mod %>% mutate(plot = map(model, get
 # Plot multiple graphs for gradient
 herb_depth_graph <- plot_multi_graphs(nested_df = herb_depth_nested_plot, n_graphs = 3)
 
-# png("figures/herb_allmed_depth.png", height = 450, width = 1200, res = 150)
+# png("figures/networks/herb_allmed_depth.png", height = 450, width = 1200, res = 150)
 # plot_multi_graphs(nested_df = herb_depth_nested_plot, n_graphs = 3)
 # dev.off()
 
