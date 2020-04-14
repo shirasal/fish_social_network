@@ -1,0 +1,2 @@
+source("scripts/pckgs_preps.R")
+source("scripts/model_func.R")
