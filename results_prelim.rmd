@@ -98,7 +98,7 @@ grps_temp_nested_plot <- grps_temp_nested_mod %>% mutate(plot = map(model, get_g
 # Plot multiple graphs for gradient
 grps_temp_graph <- plot_multi_graphs(nested_df = grps_temp_nested_plot, n_graphs = 3)
 
-# png("figures/groupers_allmed_temp.png", height = 450, width = 1200, res = 150)
+# png("figures/networks/groupers_allmed_temp.png", height = 450, width = 1200, res = 150)
 # plot_multi_graphs(nested_df = grps_temp_nested_plot, n_graphs = 3)
 # dev.off()
 
@@ -127,11 +127,6 @@ model_mpa_grps$boot$mean_key_coefs
 # Occurrence predictions
 predict_mpa_grps <- model_mpa_grps$pred
 
-# # Take a look at the mean coefficients
-# plotMRF_hm(model_mpa_grps$graph, main = "Association coeffiecients for grouper species")
-# # FIXME this isn't working at the moment because the output of MRFcov_spatial is not like MRFcov
-# # There is no graph object
-
 ```
 
 #### Visualising the change between inside and outside of MPAs
@@ -152,7 +147,7 @@ grps_mpa_nested_plot <- grps_mpa_nested_mod %>% mutate(plot = map(model, get_gra
 # Plot multiple graphs for gradient
 grps_mpa_graph <- plot_multi_graphs(nested_df = grps_mpa_nested_plot, n_graphs = 2)
 
-# png("figures/groupers_allmed_mpa.png", height = 450, width = 1200, res = 150)
+# png("figures/networks/groupers_allmed_mpa.png", height = 450, width = 1200, res = 150)
 # plot_multi_graphs(nested_df = grps_mpa_nested_plot, n_graphs = 2)
 # dev.off()
 
@@ -273,11 +268,6 @@ model_temp_dip$boot$mean_key_coefs
 # Occurrence predictions
 predict_temp_dip <- model_temp_dip$pred
 
-# # Take a look at the mean coefficients
-# plotMRF_hm(model_temp_dip$graph, main = "Association coeffiecients for diplodus species")
-# # FIXME this isn't working at the moment because the output of MRFcov_spatial is not like MRFcov
-# # There is no graph object
-
 ```
 
 #### Visualising the change along a temperature gradient
@@ -301,7 +291,7 @@ dip_temp_nested_plot <- dip_temp_nested_mod %>% mutate(plot = map(model, get_gra
 # Plot multiple graphs for gradient
 dip_temp_graph <- plot_multi_graphs(nested_df = dip_temp_nested_plot, n_graphs = 3)
 
-# png("figures/dip_allmed_temp.png", height = 450, width = 1200, res = 150)
+# png("figures/networks/dip_allmed_temp.png", height = 450, width = 1200, res = 150)
 # plot_multi_graphs(nested_df = dip_temp_nested_plot, n_graphs = 3)
 # dev.off()
 
@@ -330,11 +320,6 @@ model_mpa_dip$boot$mean_key_coefs
 # Occurrence predictions
 predict_mpa_dip <- model_mpa_dip$pred
 
-# # Take a look at the mean coefficients
-# plotMRF_hm(model_mpa_dip$graph, main = "Association coeffiecients for grouper species")
-# # FIXME this isn't working at the moment because the output of MRFcov_spatial is not like MRFcov
-# # There is no graph object
-
 ```
 
 #### Visualising the change between inside and outside of MPAs
@@ -355,7 +340,7 @@ dip_mpa_nested_plot <- dip_mpa_nested_mod %>% mutate(plot = map(model, get_graph
 # Plot multiple graphs for gradient
 dip_mpa_graph <- plot_multi_graphs(nested_df = dip_mpa_nested_plot, n_graphs = 2)
 
-# png("figures/dip_allmed_mpa.png", height = 450, width = 1200, res = 150)
+# png("figures/networks/dip_allmed_mpa.png", height = 450, width = 1200, res = 150)
 # plot_multi_graphs(nested_df = dip_mpa_nested_plot, n_graphs = 2)
 # dev.off()
 
@@ -384,10 +369,6 @@ model_depth_dip$boot$mean_key_coefs
 # Occurrence predictions
 predict_depth_dip <- model_depth_dip$pred
 
-# # Take a look at the mean coefficients
-# plotMRF_hm(model_depth_dip$graph, main = "Association coeffiecients for grouper species")
-# # FIXME this isn't working at the moment because the output of MRFcov_spatial is not like MRFcov
-# # There is no graph object
 
 ```
 
@@ -474,11 +455,6 @@ model_temp_herb$boot$mean_key_coefs
 # Occurrence predictions
 predict_temp_herb <- model_temp_herb$pred
 
-# # Take a look at the mean coefficients
-# plotMRF_hm(model_temp_herb$graph, main = "Association coeffiecients for herbivorous species")
-# # FIXME this isn't working at the moment because the output of MRFcov_spatial is not like MRFcov
-# # There is no graph object
-
 ```
 
 #### Visualising the change along a temperature gradient
@@ -502,7 +478,7 @@ herb_temp_nested_plot <- herb_temp_nested_mod %>% mutate(plot = map(model, get_g
 # Plot multiple graphs for gradient
 herb_temp_graph <- plot_multi_graphs(nested_df = herb_temp_nested_plot, n_graphs = 3)
 
-# png("figures/herb_allmed_temp.png", height = 450, width = 1200, res = 150)
+# png("figures/networks/herb_allmed_temp.png", height = 450, width = 1200, res = 150)
 # plot_multi_graphs(nested_df = herb_temp_nested_plot, n_graphs = 3)
 # dev.off()
 
@@ -531,11 +507,6 @@ model_mpa_herb$boot$mean_key_coefs
 # Occurrence predictions
 predict_mpa_herb <- model_mpa_herb$pred
 
-# # Take a look at the mean coefficients
-# plotMRF_hm(model_mpa_herb$graph, main = "Association coeffiecients for grouper species")
-# # FIXME this isn't working at the moment because the output of MRFcov_spatial is not like MRFcov
-# # There is no graph object
-
 ```
 
 #### Visualising the change between inside and outside of MPAs
@@ -556,7 +527,7 @@ herb_mpa_nested_plot <- herb_mpa_nested_mod %>% mutate(plot = map(model, get_gra
 # Plot multiple graphs for gradient
 herb_mpa_graph <- plot_multi_graphs(nested_df = herb_mpa_nested_plot, n_graphs = 2)
 
-# png("figures/herb_allmed_mpa.png", height = 450, width = 1200, res = 150)
+# png("figures/networks/herb_allmed_mpa.png", height = 450, width = 1200, res = 150)
 # plot_multi_graphs(nested_df = herb_mpa_nested_plot, n_graphs = 2)
 # dev.off()
 
@@ -584,11 +555,6 @@ model_depth_herb$boot$mean_key_coefs
 
 # Occurrence predictions
 predict_depth_herb <- model_depth_herb$pred
-
-# # Take a look at the mean coefficients
-# plotMRF_hm(model_depth_herb$graph, main = "Association coeffiecients for grouper species")
-# # FIXME this isn't working at the moment because the output of MRFcov_spatial is not like MRFcov
-# # There is no graph object
 
 ```
 
