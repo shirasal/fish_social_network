@@ -17,20 +17,21 @@ source('scripts/quant_func.R')
 
 ```
 
-# Groupers
+# Relative importance of species only
+**How much of the model is explained by the occurrence of other species?**
 
-## Relative importance of species only
+## Groupers
 
 ```{r}
-groupers_temp_relimp <- sapply(X = model_temp_grps$mod$key_coefs, rel_imp) %>% 
+groupers_temp_relimp <- sapply(X = model_temp_grps$mod$key_coefs, rel_imp, cov = "tmean_reg") %>% 
   tibble::enframe() %>% 
   rename("species" = name, "temp_model" = value)
 
-groupers_mpa_relimp <- sapply(X = model_mpa_grps$mod$key_coefs, rel_imp) %>% 
+groupers_mpa_relimp <- sapply(X = model_mpa_grps$mod$key_coefs, rel_imp, cov = "mpa") %>% 
   tibble::enframe() %>% 
   rename("species" = name, "mpa_model" = value)
 
-groupers_depth_relimp <- sapply(X = model_depth_grps$mod$key_coefs, rel_imp) %>% 
+groupers_depth_relimp <- sapply(X = model_depth_grps$mod$key_coefs, rel_imp, cov = "depth_reg") %>% 
   tibble::enframe() %>% 
   rename("species" = name, "depth_model" = value)
 
@@ -40,7 +41,53 @@ groupers_depth_relimp <- sapply(X = model_depth_grps$mod$key_coefs, rel_imp) %>%
 
 ```
 
-## Sum of mean association coefficients for each species
+## Diplodus
+
+```{r}
+dip_temp <- sapply(X = model_temp_dip$mod$key_coefs, rel_imp, cov = "tmean_reg") %>% 
+  tibble::enframe() %>% 
+  rename("species" = name, "temp_model" = value)
+
+dip_mpa <- sapply(X = model_mpa_dip$mod$key_coefs, rel_imp, cov = "mpa") %>% 
+  tibble::enframe() %>% 
+  rename("species" = name, "mpa_model" = value)
+
+dip_depth <- sapply(X = model_depth_dip$mod$key_coefs, rel_imp, cov = "depth_reg") %>% 
+  tibble::enframe() %>% 
+  rename("species" = name, "depth_model" = value)
+
+(dip_spp_relimp <- dip_temp %>%
+  left_join(dip_mpa, by = "species") %>% 
+  left_join(dip_depth, by = "species"))
+
+```
+
+## Herbivores
+
+Relative importance of species only
+
+
+```{r}
+herb_temp <- sapply(X = model_temp_herb$mod$key_coefs, rel_imp, cov = "tmean_reg") %>% 
+  tibble::enframe() %>% 
+  rename("species" = name, "temp_model" = value)
+
+herb_mpa <- sapply(X = model_mpa_herb$mod$key_coefs, rel_imp, cov = "mpa") %>% 
+  tibble::enframe() %>% 
+  rename("species" = name, "mpa_model" = value)
+
+herb_depth <- sapply(X = model_depth_herb$mod$key_coefs, rel_imp, cov = "depth_reg") %>% 
+  tibble::enframe() %>% 
+  rename("species" = name, "depth_model" = value)
+
+(herb_spp_relimp <- herb_temp %>%
+  left_join(herb_mpa, by = "species") %>% 
+  left_join(herb_depth, by = "species"))
+
+```
+
+# Sum of mean association coefficients for each species
+**What is the mean direction of the association of species _i_ with other species and a covariate** (everything that is included in the model)
 ```{r}
 grps_temp_meancoefs <- sapply(X = model_temp_grps$boot$mean_key_coefs, FUN = mean_coef) %>%
   tibble::enframe() %>% 
@@ -60,31 +107,8 @@ grps_depth_meancoefs <- sapply(X = model_depth_grps$boot$mean_key_coefs, FUN = m
 
 ```
 
+## Diplodus
 
-# Diplodus
-
-## Relative importance of species only
-
-```{r}
-dip_temp <- sapply(X = model_temp_dip$mod$key_coefs, rel_imp) %>% 
-  tibble::enframe() %>% 
-  rename("species" = name, "temp_model" = value)
-
-dip_mpa <- sapply(X = model_mpa_dip$mod$key_coefs, rel_imp) %>% 
-  tibble::enframe() %>% 
-  rename("species" = name, "mpa_model" = value)
-
-dip_depth <- sapply(X = model_depth_dip$mod$key_coefs, rel_imp) %>% 
-  tibble::enframe() %>% 
-  rename("species" = name, "depth_model" = value)
-
-(dip_spp_relimp <- dip_temp %>%
-  left_join(dip_mpa, by = "species") %>% 
-  left_join(dip_depth, by = "species"))
-
-```
-
-## Sum of mean association coefficients for each species
 ```{r}
 dip_temp_meancoefs <- sapply(X = model_temp_dip$boot$mean_key_coefs, FUN = mean_coef) %>%
   tibble::enframe() %>% 
@@ -104,30 +128,9 @@ dip_depth_meancoefs <- sapply(X = model_depth_dip$boot$mean_key_coefs, FUN = mea
 
 ```
 
-# Herbivores
 
-## Relative importance of species only
+## Herbivores
 
-```{r}
-herb_temp <- sapply(X = model_temp_herb$mod$key_coefs, rel_imp) %>% 
-  tibble::enframe() %>% 
-  rename("species" = name, "temp_model" = value)
-
-herb_mpa <- sapply(X = model_mpa_herb$mod$key_coefs, rel_imp) %>% 
-  tibble::enframe() %>% 
-  rename("species" = name, "mpa_model" = value)
-
-herb_depth <- sapply(X = model_depth_herb$mod$key_coefs, rel_imp) %>% 
-  tibble::enframe() %>% 
-  rename("species" = name, "depth_model" = value)
-
-(herb_spp_relimp <- herb_temp %>%
-  left_join(herb_mpa, by = "species") %>% 
-  left_join(herb_depth, by = "species"))
-
-```
-
-## Sum of mean association coefficients for each species
 ```{r}
 herb_temp_meancoefs <- sapply(X = model_temp_herb$boot$mean_key_coefs, FUN = mean_coef) %>%
   tibble::enframe() %>% 
@@ -149,3 +152,28 @@ herb_depth_meancoefs <- sapply(X = model_depth_herb$boot$mean_key_coefs, FUN = m
 
 _Siganus rivulatus_ coefficients seem to be inflated in all variables (this is also why the)
 
+# Networks comparison
+
+Connectance as a measure of comparison.
+Connectance by Delams _et al._:
+
+    C0 = [total # of edges] / [total # of nodes^2 (total possible connections)]
+
+## Temperature models
+
+### Groupers
+
+```{r}
+grps_temp_nested_mod$model[[2]]$graph %>%
+  diag(grps_temp_nested_mod$model[[2]]$graph) = NA 
+  as.data.frame() %>% 
+  pivot_longer(cols = all_of(groupers))
+  
+
+```
+
+This isn't working yet.. I need to:
+
+- [ ] L = count(edges) for each network
+- [ ] S = count(nodes) for each network
+- [ ] Calculate L/(S^2)
