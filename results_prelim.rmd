@@ -24,42 +24,42 @@ Networks for the whole Mediterranean sea, accounting for spatial autocorrelation
 # Create datasets for each covariate
 
 # Temperature
-groupers_temp <- create_spp_mat(dataset = med_raw, basin = all_med,
+grps_temp <- create_spp_mat(dataset = med_raw, basin = all_med,
                                 group = groupers, covariate = "tmean_reg")
 # MPA
-groupers_mpa <- create_spp_mat(dataset = med_raw, basin = all_med,
+grps_mpa <- create_spp_mat(dataset = med_raw, basin = all_med,
                                group = groupers, covariate = "mpa")
 
 # Depth
-groupers_depth <- create_spp_mat(dataset = med_raw, basin = all_med,
+grps_depth <- create_spp_mat(dataset = med_raw, basin = all_med,
                                  group = groupers, covariate = "depth_reg")
 
 
-groupers_temp_mat <- groupers_temp[[1]]
-groupers_temp_coords <- groupers_temp[[2]]
-nrow(groupers_temp_mat) == nrow(groupers_temp_coords)
+grps_temp_mat <- grps_temp[[1]]
+grps_temp_coords <- grps_temp[[2]]
+nrow(grps_temp_mat) == nrow(grps_temp_coords)
 
-groupers_mpa_mat <- groupers_mpa[[1]]
-groupers_mpa_coords <- groupers_mpa[[2]]
-nrow(groupers_mpa_mat) == nrow(groupers_mpa_coords)
+grps_mpa_mat <- grps_mpa[[1]]
+grps_mpa_coords <- grps_mpa[[2]]
+nrow(grps_mpa_mat) == nrow(grps_mpa_coords)
 
-groupers_depth_mat <- groupers_depth[[1]]
-groupers_depth_coords <- groupers_depth[[2]]
-nrow(groupers_depth_mat) == nrow(groupers_depth_coords)
+grps_depth_mat <- grps_depth[[1]]
+grps_depth_coords <- grps_depth[[2]]
+nrow(grps_depth_mat) == nrow(grps_depth_coords)
 
 ```
 
 ### Model for Temperature
 ```{r include=FALSE}
 # Run model and create occurrence predictions
-model_temp_grps <- run_mod(species_mat = groupers_temp_mat, n_covs = 1,
-                           family = "gaussian", coords = groupers_temp_coords)
+model_temp_grps <- run_mod(species_mat = grps_temp_mat, n_covs = 1,
+                           family = "gaussian", coords = grps_temp_coords)
 ```
 
 I'll run also the model without accounting for spatial autocorrelation and see if there are differences
 ```{r}
 # Non-spatial model for comparison
-model_temp_grps_nonspat <- MRFcov(data = groupers_temp_mat, n_nodes = 5, n_covariates = 1,
+model_temp_grps_nonspat <- MRFcov(data = grps_temp_mat, n_nodes = 5, n_covariates = 1,
                                   family = "gaussian")
 model_temp_grps_nonspat$direct_coefs
 plotMRF_hm(model_temp_grps_nonspat, main = "Species association coefficients")
@@ -81,13 +81,13 @@ predict_temp_grps <- model_temp_grps$pred
 
 ```{r}
 # Categorise continuous data
-grps_temp_cats <- categorise_cov(species_mat = groupers_temp_mat, covariate = "tmean_reg")
+grps_temp_cats <- categorise_cov(species_mat = grps_temp_mat, covariate = "tmean_reg")
 
 # Nest categorical (nominal) data
 grps_temp_cat_nested <- nested_data(categorised_data = grps_temp_cats)
 
 # Run MRFcov model for each sub-graph
-grps_temp_cat_model <- get_model(data = groupers_temp_mat, ncov = 1)
+grps_temp_cat_model <- get_model(data = grps_temp_mat, ncov = 1)
 
 # Run model on each category
 grps_temp_nested_mod <- nested_models(nested_df = grps_temp_cat_nested)
@@ -98,7 +98,7 @@ grps_temp_nested_plot <- grps_temp_nested_mod %>% mutate(plot = map(model, get_g
 # Plot multiple graphs for gradient
 grps_temp_graph <- plot_multi_graphs(nested_df = grps_temp_nested_plot, n_graphs = 3)
 
-# png("figures/networks/groupers_allmed_temp.png", height = 450, width = 1200, res = 150)
+# png("figures/networks/grps_allmed_temp.png", height = 450, width = 1200, res = 150)
 # plot_multi_graphs(nested_df = grps_temp_nested_plot, n_graphs = 3)
 # dev.off()
 
@@ -107,13 +107,13 @@ grps_temp_graph <- plot_multi_graphs(nested_df = grps_temp_nested_plot, n_graphs
 ### Model for MPAs
 ```{r include=FALSE}
 # Run model and create occurrence predictions
-model_mpa_grps <- run_mod(species_mat = groupers_mpa_mat, n_covs = 1,
-                           family = "gaussian", coords = groupers_mpa_coords)
+model_mpa_grps <- run_mod(species_mat = grps_mpa_mat, n_covs = 1,
+                           family = "gaussian", coords = grps_mpa_coords)
 ```
 
 ```{r}
 # Non-spatial model for comparison
-model_mpa_grps_nonspat <- MRFcov(data = groupers_mpa_mat, n_nodes = 5, n_covariates = 1,
+model_mpa_grps_nonspat <- MRFcov(data = grps_mpa_mat, n_nodes = 5, n_covariates = 1,
                                   family = "gaussian")
 model_mpa_grps_nonspat$direct_coefs
 plotMRF_hm(model_mpa_grps_nonspat, main = "Species association coefficients")
@@ -133,10 +133,10 @@ predict_mpa_grps <- model_mpa_grps$pred
 
 ```{r}
 # Nest categorical data
-grps_mpa_cat_nested <- nested_data(categorised_data = as.data.frame(groupers_mpa_mat))
+grps_mpa_cat_nested <- nested_data(categorised_data = as.data.frame(grps_mpa_mat))
 
 # Run MRFcov model for each sub-graph
-grps_mpa_cat_model <- get_model(data = groupers_mpa_mat, ncov = 1)
+grps_mpa_cat_model <- get_model(data = grps_mpa_mat, ncov = 1)
 
 # Run model on each category
 grps_mpa_nested_mod <- nested_models(nested_df = grps_mpa_cat_nested)
@@ -147,7 +147,7 @@ grps_mpa_nested_plot <- grps_mpa_nested_mod %>% mutate(plot = map(model, get_gra
 # Plot multiple graphs for gradient
 grps_mpa_graph <- plot_multi_graphs(nested_df = grps_mpa_nested_plot, n_graphs = 2)
 
-# png("figures/networks/groupers_allmed_mpa.png", height = 450, width = 1200, res = 150)
+# png("figures/networks/grps_allmed_mpa.png", height = 450, width = 1200, res = 150)
 # plot_multi_graphs(nested_df = grps_mpa_nested_plot, n_graphs = 2)
 # dev.off()
 
@@ -156,13 +156,13 @@ grps_mpa_graph <- plot_multi_graphs(nested_df = grps_mpa_nested_plot, n_graphs =
 ### Model for depth
 ```{r include=FALSE}
 # Run model and create occurrence predictions
-model_depth_grps <- run_mod(species_mat = groupers_depth_mat, n_covs = 1,
-                           family = "gaussian", coords = groupers_depth_coords)
+model_depth_grps <- run_mod(species_mat = grps_depth_mat, n_covs = 1,
+                           family = "gaussian", coords = grps_depth_coords)
 ```
 
 ```{r}
 # Non-spatial model for comparison
-model_depth_grps_nonspat <- MRFcov(data = groupers_depth_mat, n_nodes = 5, n_covariates = 1,
+model_depth_grps_nonspat <- MRFcov(data = grps_depth_mat, n_nodes = 5, n_covariates = 1,
                                   family = "gaussian")
 model_depth_grps_nonspat$direct_coefs
 plotMRF_hm(model_temp_grps_nonspat, main = "Species association coefficients")
@@ -189,13 +189,13 @@ This is problematic because the depth range is not distributed well enough:
 
 ```{r}
 # # Categorise continuous data
-# grps_depth_cats <- categorise_cov(species_mat = groupers_depth_mat, covariate = "depth_reg")
+# grps_depth_cats <- categorise_cov(species_mat = grps_depth_mat, covariate = "depth_reg")
 # 
 # # Nest categorical (nominal) data
 # grps_depth_cat_nested <- nested_data(categorised_data = grps_depth_cats)
 # 
 # # Run MRFcov model for each sub-graph
-# grps_depth_cat_model <- get_model(data = groupers_depth_mat, ncov = 1)
+# grps_depth_cat_model <- get_model(data = grps_depth_mat, ncov = 1)
 # 
 # # Run model on each category
 # grps_depth_nested_mod <- nested_models(nested_df = grps_depth_cat_nested)
@@ -206,12 +206,12 @@ This is problematic because the depth range is not distributed well enough:
 # # Plot multiple graphs for gradient
 # grps_depth_graph <- plot_multi_graphs(nested_df = grps_depth_nested_plot, n_graphs = 3)
 # 
-# # png("figures/groupers_allmed_depth.png", height = 450, width = 1200, res = 150)
+# # png("figures/grps_allmed_depth.png", height = 450, width = 1200, res = 150)
 # # plot_multi_graphs(nested_df = grps_depth_nested_plot, n_graphs = 3)
 # # dev.off()
 
-groupers_depth <- med_raw %>% filter(species == groupers)
-ggplot(groupers_depth) +
+grps_depth <- med_raw %>% filter(species == groupers)
+ggplot(grps_depth) +
   geom_histogram(aes(x = depth, fill = data.origin), binwidth = 1)
 
 ```
