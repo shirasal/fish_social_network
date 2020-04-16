@@ -15,6 +15,8 @@ mean_coef <- function(j){
     sum()
 }
 
+
+
 ## Sum separately negative coefficients and positive coefficients
 # coef_dir <- function(j){
 #   j %>% 
