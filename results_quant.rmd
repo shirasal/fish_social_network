@@ -84,6 +84,26 @@ dip_depth <- sapply(X = model_depth_dip$mod$key_coefs, rel_imp) %>%
 
 ```
 
+## Sum of mean association coefficients for each species
+```{r}
+dip_temp_meancoefs <- sapply(X = model_temp_dip$boot$mean_key_coefs, FUN = mean_coef) %>%
+  tibble::enframe() %>% 
+  rename("species" = name, "sum_mean_coefs_temp" = value)
+
+dip_mpa_meancoefs <- sapply(X = model_mpa_dip$boot$mean_key_coefs, FUN = mean_coef) %>%
+  tibble::enframe() %>% 
+  rename("species" = name, "sum_mean_coefs_mpa" = value)
+
+dip_depth_meancoefs <- sapply(X = model_depth_dip$boot$mean_key_coefs, FUN = mean_coef) %>%
+  tibble::enframe() %>% 
+  rename("species" = name, "sum_mean_coefs_depth" = value)
+
+(dip_spp_meancoef <- dip_temp_meancoefs %>%
+  left_join(dip_mpa_meancoefs, by = "species") %>% 
+  left_join(dip_depth_meancoefs, by = "species"))
+
+```
+
 # Herbivores
 
 ## Relative importance of species only
@@ -107,4 +127,25 @@ herb_depth <- sapply(X = model_depth_herb$mod$key_coefs, rel_imp) %>%
 
 ```
 
+## Sum of mean association coefficients for each species
+```{r}
+herb_temp_meancoefs <- sapply(X = model_temp_herb$boot$mean_key_coefs, FUN = mean_coef) %>%
+  tibble::enframe() %>% 
+  rename("species" = name, "sum_mean_coefs_temp" = value)
+
+herb_mpa_meancoefs <- sapply(X = model_mpa_herb$boot$mean_key_coefs, FUN = mean_coef) %>%
+  tibble::enframe() %>% 
+  rename("species" = name, "sum_mean_coefs_mpa" = value)
+
+herb_depth_meancoefs <- sapply(X = model_depth_herb$boot$mean_key_coefs, FUN = mean_coef) %>%
+  tibble::enframe() %>% 
+  rename("species" = name, "sum_mean_coefs_depth" = value)
+
+(herb_spp_meancoef <- herb_temp_meancoefs %>%
+  left_join(herb_mpa_meancoefs, by = "species") %>% 
+  left_join(herb_depth_meancoefs, by = "species"))
+
+```
+
+_Siganus rivulatus_ coefficients seem to be inflated in all variables (this is also why the)
 
