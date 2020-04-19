@@ -33,18 +33,9 @@ mean_coef <- function(j){
 
 # Get the connectance value
 connectance <- function(x, group){
-  edgelist <- x %>%
-    as.data.frame() %>% 
-    rownames_to_column() %>%
-    pivot_longer(cols = c(contains("."), contains("."))) %>%
-    rename("spp_1" = rowname, "spp_2" = name, "edge_value" = value) %>% 
-    filter(spp_1 != spp_2)
-  
-  L <- edgelist %>%
-    select(edge_value) %>% 
-    sum()
+  L <- sum(x)/2# devided by 2 because it is calculated with the whole data, including the diagonal
   M <- (length(group))^2
-  connect <- (L/2)/M # L devided to 2 because it is calculated with the whole data, including diag
+  connect <- (L)/M 
   print(connect)
   
 }
