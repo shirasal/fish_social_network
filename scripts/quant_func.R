@@ -16,7 +16,6 @@ mean_coef <- function(j){
 }
 
 
-
 ## Sum separately negative coefficients and positive coefficients
 # coef_dir <- function(j){
 #   j %>% 
@@ -32,3 +31,20 @@ mean_coef <- function(j){
 #           mutate(pos = sum(), mutate(neg = sum())))
 
 
+# Get the connectance value
+connectance <- function(x, group){
+  edgelist <- x %>%
+    as.data.frame() %>% 
+    rownames_to_column() %>%
+    pivot_longer(cols = c(contains("."), contains("."))) %>%
+    rename("spp_1" = rowname, "spp_2" = name, "edge_value" = value) %>% 
+    distinct(spp_1, spp_2, edge_value)
+  
+  L <- edgelist %>%
+    select(edge_value) %>% 
+    sum()
+  M <- (length(group))^2
+  connect <- (L/2)/M # L devided to 2 because it is calculated with the whole data, including diag
+  print(connect)
+  
+}
