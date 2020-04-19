@@ -150,7 +150,7 @@ herb_depth_meancoefs <- sapply(X = model_depth_herb$boot$mean_key_coefs, FUN = m
 
 ```
 
-_Siganus rivulatus_ coefficients seem to be inflated in all variables (this is also why the)
+_Siganus rivulatus_ coefficients seem to be inflated in all variables
 
 # Networks comparison
 
@@ -159,21 +159,63 @@ Connectance by Delams _et al._:
 
     C0 = [total # of edges] / [total # of nodes^2 (total possible connections)]
 
+L = count(edges) for each network
+S = count(nodes) for each network
+M = S^2
+connectance (C0) = L/M
+
 ## Temperature models
 
 ### Groupers
 
 ```{r}
-grps_temp_nested_mod$model[[2]]$graph %>%
-  diag(grps_temp_nested_mod$model[[2]]$graph) = NA 
-  as.data.frame() %>% 
-  pivot_longer(cols = all_of(groupers))
-  
+grps_temp_low_connect <- connectance(x = grps_temp_nested_mod$model[[1]]$graph, group = "groupers")
+grps_temp_med_connect <- connectance(x = grps_temp_nested_mod$model[[2]]$graph, group = "groupers")
+grps_temp_hi_connect <- connectance(x = grps_temp_nested_mod$model[[3]]$graph, group = "groupers")
 
 ```
 
-This isn't working yet.. I need to:
+### Diplodus
 
-- [ ] L = count(edges) for each network
-- [ ] S = count(nodes) for each network
-- [ ] Calculate L/(S^2)
+```{r}
+dip_temp_low_connect <- connectance(x = dip_temp_nested_mod$model[[1]]$graph, group = "diplodus")
+dip_temp_med_connect <- connectance(x = dip_temp_nested_mod$model[[2]]$graph, group = "diplodus")
+dip_temp_hi_connect <- connectance(x = dip_temp_nested_mod$model[[3]]$graph, group = "diplodus")
+
+```
+
+### Herbivores
+
+```{r}
+herb_temp_low_connect <- connectance(x = herb_temp_nested_mod$model[[1]]$graph, group = "herbivores")
+herb_temp_med_connect <- connectance(x = herb_temp_nested_mod$model[[2]]$graph, group = "herbivores")
+herb_temp_hi_connect <- connectance(x = herb_temp_nested_mod$model[[3]]$graph, group = "herbivores")
+
+```
+
+## MPA models
+
+### Groupers
+
+```{r}
+grps_mpa_out_connect <- connectance(x = grps_mpa_nested_mod$model[[1]]$graph, group = "groupers")
+grps_mpa_in_connect <- connectance(x = grps_mpa_nested_mod$model[[2]]$graph, group = "groupers")
+
+```
+
+### Diplodus
+
+```{r}
+dip_mpa_out_connect <- connectance(x = dip_mpa_nested_mod$model[[1]]$graph, group = "diplodus")
+dip_mpa_in_connect <- connectance(x = dip_mpa_nested_mod$model[[2]]$graph, group = "diplodus")
+
+```
+
+### Herbivores
+
+```{r}
+herb_mpa_out_connect <- connectance(x = herb_mpa_nested_mod$model[[1]]$graph, group = "herbivores")
+herb_mpa_in_connect <- connectance(x = herb_mpa_nested_mod$model[[2]]$graph, group = "herbivores")
+
+```
+
