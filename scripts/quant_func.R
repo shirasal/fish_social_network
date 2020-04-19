@@ -38,7 +38,7 @@ connectance <- function(x, group){
     rownames_to_column() %>%
     pivot_longer(cols = c(contains("."), contains("."))) %>%
     rename("spp_1" = rowname, "spp_2" = name, "edge_value" = value) %>% 
-    distinct(spp_1, spp_2, edge_value)
+    filter(spp_1 != spp_2)
   
   L <- edgelist %>%
     select(edge_value) %>% 
