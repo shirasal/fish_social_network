@@ -35,7 +35,7 @@ mean_coef <- function(j){
 connectance <- function(x, group){
   L <- sum(x)/2# devided by 2 because it is calculated with the whole data, including the diagonal
   M <- (length(group))^2
-  connect <- (L)/M 
+  connect <- L/M 
   print(connect)
   
 }
