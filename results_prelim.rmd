@@ -634,11 +634,17 @@ ggplot(med_raw, aes(depth)) + geom_histogram(binwidth = 1, aes(fill = ..x..)) +
 ```
 
 ### MPAs (enforcement) distribution
-```{r echo=FALSE}
-ggplot(med_raw, aes(enforcement)) + geom_histogram(binwidth = 1, aes(fill = ..x..)) +
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+p1 <- ggplot(med_raw, aes(enforcement)) + geom_histogram(binwidth = 1, aes(fill = ..x..)) +
   labs(x = "Level of enforcement", subtitle = "0 = No enforcement; 3 = Fully protected",
        y = "Frequency", title = "Enforcement") +
   guides(fill = FALSE)
+
+p2 <- ggplot(med_raw, aes(mpa)) + geom_histogram(stat = "count") +
+  labs(x = "MPA", subtitle = "MPAs",
+       y = "Frequency", title = "Marine Protected Areas")
+
+grid.arrange(p1, p2, nrow = 2)
 
 ```
 
