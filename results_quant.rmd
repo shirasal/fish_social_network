@@ -13,6 +13,8 @@ _Run `results_prelim.Rmd` to get all data sets and subsets_
 # }
 # 
 # source_rmd("results_prelim.Rmd")
+
+# file.edit("results_prelim.rmd")
 source('scripts/quant_func.R')
 
 ```
@@ -169,27 +171,27 @@ connectance (C0) = L/M
 ### Groupers
 
 ```{r}
-grps_temp_low_connect <- connectance(x = grps_temp_nested_mod$model[[1]]$graph, group = "groupers")
-grps_temp_med_connect <- connectance(x = grps_temp_nested_mod$model[[2]]$graph, group = "groupers")
-grps_temp_hi_connect <- connectance(x = grps_temp_nested_mod$model[[3]]$graph, group = "groupers")
+grps_temp_low_connect <- connectance(x = grps_temp_nested_mod$model[[1]]$graph)
+grps_temp_med_connect <- connectance(x = grps_temp_nested_mod$model[[2]]$graph)
+grps_temp_hi_connect <- connectance(x = grps_temp_nested_mod$model[[3]]$graph)
 
 ```
 
 ### Diplodus
 
 ```{r}
-dip_temp_low_connect <- connectance(x = dip_temp_nested_mod$model[[1]]$graph, group = "diplodus")
-dip_temp_med_connect <- connectance(x = dip_temp_nested_mod$model[[2]]$graph, group = "diplodus")
-dip_temp_hi_connect <- connectance(x = dip_temp_nested_mod$model[[3]]$graph, group = "diplodus")
+dip_temp_low_connect <- connectance(x = dip_temp_nested_mod$model[[1]]$graph)
+dip_temp_med_connect <- connectance(x = dip_temp_nested_mod$model[[2]]$graph)
+dip_temp_hi_connect <- connectance(x = dip_temp_nested_mod$model[[3]]$graph)
 
 ```
 
 ### Herbivores
 
 ```{r}
-herb_temp_low_connect <- connectance(x = herb_temp_nested_mod$model[[1]]$graph, group = "herbivores")
-herb_temp_med_connect <- connectance(x = herb_temp_nested_mod$model[[2]]$graph, group = "herbivores")
-herb_temp_hi_connect <- connectance(x = herb_temp_nested_mod$model[[3]]$graph, group = "herbivores")
+herb_temp_low_connect <- connectance(x = herb_temp_nested_mod$model[[1]]$graph)
+herb_temp_med_connect <- connectance(x = herb_temp_nested_mod$model[[2]]$graph)
+herb_temp_hi_connect <- connectance(x = herb_temp_nested_mod$model[[3]]$graph)
 
 ```
 
@@ -198,24 +200,24 @@ herb_temp_hi_connect <- connectance(x = herb_temp_nested_mod$model[[3]]$graph, g
 ### Groupers
 
 ```{r}
-grps_mpa_out_connect <- connectance(x = grps_mpa_nested_mod$model[[1]]$graph, group = "groupers")
-grps_mpa_in_connect <- connectance(x = grps_mpa_nested_mod$model[[2]]$graph, group = "groupers")
+grps_mpa_out_connect <- connectance(x = grps_mpa_nested_mod$model[[1]]$graph)
+grps_mpa_in_connect <- connectance(x = grps_mpa_nested_mod$model[[2]]$graph)
 
 ```
 
 ### Diplodus
 
 ```{r}
-dip_mpa_out_connect <- connectance(x = dip_mpa_nested_mod$model[[1]]$graph, group = "diplodus")
-dip_mpa_in_connect <- connectance(x = dip_mpa_nested_mod$model[[2]]$graph, group = "diplodus")
+dip_mpa_out_connect <- connectance(x = dip_mpa_nested_mod$model[[1]]$graph)
+dip_mpa_in_connect <- connectance(x = dip_mpa_nested_mod$model[[2]]$graph)
 
 ```
 
 ### Herbivores
 
 ```{r}
-herb_mpa_out_connect <- connectance(x = herb_mpa_nested_mod$model[[1]]$graph, group = "herbivores")
-herb_mpa_in_connect <- connectance(x = herb_mpa_nested_mod$model[[2]]$graph, group = "herbivores")
+herb_mpa_out_connect <- connectance(x = herb_mpa_nested_mod$model[[1]]$graph)
+herb_mpa_in_connect <- connectance(x = herb_mpa_nested_mod$model[[2]]$graph)
 
 ```
 
