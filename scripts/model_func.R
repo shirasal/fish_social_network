@@ -26,15 +26,15 @@ create_spp_mat <- function(dataset, basin, group, covariate){
   # b) Create a coordinate dataframe:
   coords <- dataset %>%
     filter(country %in% basin) %>% 
-    group_by(lat, lon, loc, species, tmean_reg, mpa, depth_reg) %>%
+    group_by(lat, lon, site, trans, species, tmean_reg, mpa, depth_reg) %>%
     summarise(n = sum(sp.n)) %>% 
     filter(species %in% tidyselect::all_of(group)) %>% 
     spread(species, n, fill = 0) %>% 
+    sample_n(size = 1) %>% 
     ungroup() %>% 
-    mutate(loc = make.unique(.$loc, "_")) %>% 
-    as.data.frame() %>% 
-    column_to_rownames("loc") %>%
     na.omit() %>% 
+    mutate(loc = paste(site, trans)) %>% 
+    column_to_rownames("loc") %>% 
     select(lat, lon)
   
   return(list(spp_mat, coords))

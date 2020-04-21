@@ -55,6 +55,8 @@ nrow(grps_depth_mat) == nrow(grps_depth_coords)
 model_temp_grps <- run_mod(species_mat = grps_temp_mat, n_covs = 1,
                            family = "gaussian", coords = grps_temp_coords)
 
+plotMRF_hm(model_temp_grps$mod, main = "Species association coefficients")
+
 plotMRF_hm(model_temp_grps$boot)
 
 ```
@@ -112,8 +114,8 @@ grps_temp_graph <- plot_multi_graphs(nested_df = grps_temp_nested_plot, n_graphs
 # Run model and create occurrence predictions
 model_mpa_grps <- run_mod(species_mat = grps_mpa_mat, n_covs = 1,
                            family = "gaussian", coords = grps_mpa_coords)
-
-plotMRF_hm(model_temp_dip$boot)
+plotMRF_hm(model_mpa_grps$mod, main = "Species association coefficients")
+plotMRF_hm(model_mpa_grps$boot)
 
 ```
 
@@ -164,7 +166,7 @@ grps_mpa_graph <- plot_multi_graphs(nested_df = grps_mpa_nested_plot, n_graphs =
 # Run model and create occurrence predictions
 model_depth_grps <- run_mod(species_mat = grps_depth_mat, n_covs = 1,
                            family = "gaussian", coords = grps_depth_coords)
-
+plotMRF_hm(model_depth_grps$mod, main = "Species association coefficients")
 plotMRF_hm(model_depth_grps$boot)
 
 ```
@@ -259,7 +261,7 @@ nrow(dip_depth_mat) == nrow(dip_depth_coords)
 # Run model and create occurrence predictions
 model_temp_dip <- run_mod(species_mat = dip_temp_mat, n_covs = 1,
                            family = "gaussian", coords = dip_temp_coords)
-
+plotMRF_hm(model_temp_dip$mod)
 plotMRF_hm(model_temp_dip$boot)
 
 ```
@@ -314,7 +316,7 @@ dip_temp_graph <- plot_multi_graphs(nested_df = dip_temp_nested_plot, n_graphs =
 # Run model and create occurrence predictions
 model_mpa_dip <- run_mod(species_mat = dip_mpa_mat, n_covs = 1,
                            family = "gaussian", coords = dip_mpa_coords)
-
+plotMRF_hm(model_mpa_dip$mod, main = "Species association coefficients")
 plotMRF_hm(model_mpa_dip$boot)
 
 ```
@@ -366,7 +368,7 @@ dip_mpa_graph <- plot_multi_graphs(nested_df = dip_mpa_nested_plot, n_graphs = 2
 # Run model and create occurrence predictions
 model_depth_dip <- run_mod(species_mat = dip_depth_mat, n_covs = 1,
                            family = "gaussian", coords = dip_depth_coords)
-
+plotMRF_hm(model_depth_dip$mod, main = "Species association coefficients")
 plotMRF_hm(model_depth_dip$boot)
 
 ```
@@ -455,7 +457,7 @@ nrow(herb_depth_mat) == nrow(herb_depth_coords)
 # Run model and create occurrence predictions
 model_temp_herb <- run_mod(species_mat = herb_temp_mat, n_covs = 1,
                            family = "gaussian", coords = herb_temp_coords)
-
+plotMRF_hm(model_temp_herb$mod, main = "Species association coefficients")
 plotMRF_hm(model_temp_herb$boot)
 
 ```
@@ -510,7 +512,7 @@ herb_temp_graph <- plot_multi_graphs(nested_df = herb_temp_nested_plot, n_graphs
 # Run model and create occurrence predictions
 model_mpa_herb <- run_mod(species_mat = herb_mpa_mat, n_covs = 1,
                            family = "gaussian", coords = herb_mpa_coords)
-
+plotMRF_hm(model_mpa_herb$mod, main = "Species association coefficients")
 plotMRF_hm(model_mpa_herb$boot)
 
 ```
@@ -562,6 +564,7 @@ herb_mpa_graph <- plot_multi_graphs(nested_df = herb_mpa_nested_plot, n_graphs =
 # Run model and create occurrence predictions
 model_depth_herb <- run_mod(species_mat = herb_depth_mat, n_covs = 1,
                            family = "gaussian", coords = herb_depth_coords)
+plotMRF_hm(model_depth_herb$mod, main = "Species association coefficients")
 
 plotMRF_hm(model_depth_herb$boot)
 
