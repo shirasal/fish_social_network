@@ -31,8 +31,7 @@ herbivores <- c("Siganus.rivulatus", "Siganus.luridus", "Sarpa.salpa",
 
 med_raw <- read_rds("data/medata.Rds") %>%
   filter(data.origin != "azz_asi") %>% # presence-absence
-  mutate(loc = paste0(site, "_", trans),
-         tmean_reg = scale(tmean),
+  mutate(tmean_reg = scale(tmean),
          depth_reg = scale(depth),
          # log_n = log10(sp.n),
          mpa = if_else(enforcement <= 1, FALSE, TRUE))
