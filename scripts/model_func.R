@@ -15,9 +15,9 @@ create_spp_mat <- function(dataset, basin, group, covariate){
     summarise(n = sum(sp.n)) %>% 
     filter(species %in% tidyselect::all_of(group)) %>% 
     spread(species, n, fill = 0) %>% 
+    sample_n(size = 1) %>% 
     ungroup() %>% 
     na.omit() %>% 
-    mutate(loc = make.unique(.$loc, "_")) %>% 
     column_to_rownames("loc") %>%
     select(tidyselect::all_of(group), tidyselect::all_of(covariate)) %>% 
     as.matrix()
@@ -82,16 +82,26 @@ nested_data <- function(categorised_data) {
   } 
 }
 
-
 # Func 4: Run MRFcov model with some defaults
 get_model <- function(data, ncov){
   MRFcov(data = data, n_nodes = ncol(data) - ncov, n_covariates = ncov, family = "gaussian")
 }
 
-# Func 5: Run model on each category
+# Assistance function: Get the connectance value
+connectance <- function(x){
+  L <- sum(x)/2 # divided by 2 because it is calculated with the whole data, including the diagonal
+  M <- (nrow(x))^2
+  connect <- L/M 
+  print(connect)
+  
+}
+
+# Func 5: Run model on each category ad calculate connectance
 nested_models <- function(nested_df){
   nested_df %>%
-    mutate(model = map(data, function(x) get_model(data = x, ncov = 1)))
+    mutate(model = map(data, function(x) get_model(data = x, ncov = 1)),
+           connectance = map(model, function(x) connectance(x$graph))) %>% 
+    unnest(connectance)
 }
 
 # Func 6: Get graph data

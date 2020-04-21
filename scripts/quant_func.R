@@ -31,11 +31,4 @@ mean_coef <- function(j){
 #           mutate(pos = sum(), mutate(neg = sum())))
 
 
-# Get the connectance value
-connectance <- function(x, group){
-  L <- sum(x)/2# devided by 2 because it is calculated with the whole data, including the diagonal
-  M <- (length(group))^2
-  connect <- L/M 
-  print(connect)
-  
-}
+
