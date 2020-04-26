@@ -1,0 +1,502 @@
+---
+title: "Results"
+author: "Shira Salingre"
+output: 
+  html_document:
+    theme: united
+    code_folding: hide
+    toc: true
+    toc_depth: 3
+    toc_float:
+      collapsed: false
+---
+
+```{r setup, include=FALSE}
+source("scripts/pckgs_preps.R")
+source("scripts/model_func.R")
+
+```
+
+In order to examine the association between species and how this association changes along environmental gradient, I chose three groups of representative fish species: groupers (Epinephelus species + Serranus species), Diplodus species and herbivore species.
+
+```{r Create matrices and coordinate dfs include=FALSE}
+
+# Groupers ----------------------------------------------------------------
+
+grps_temp <- create_spp_mat(dataset = med_raw, basin = all_med,
+                            group = groupers, covariate = "tmean_reg")
+grps_temp_mat <- grps_temp[[1]]
+grps_temp_coords <- grps_temp[[2]]
+# nrow(grps_temp_mat) == nrow(grps_temp_coords)
+rm(grps_temp)
+
+grps_mpa <- create_spp_mat(dataset = med_raw, basin = all_med,
+                           group = groupers, covariate = "mpa")
+grps_mpa_mat <- grps_mpa[[1]]
+grps_mpa_coords <- grps_mpa[[2]]
+# nrow(grps_mpa_mat) == nrow(grps_mpa_coords)
+rm(grps_mpa)
+
+grps_depth <- create_spp_mat(dataset = med_raw, basin = all_med,
+                             group = groupers, covariate = "depth_reg")
+grps_depth_mat <- grps_depth[[1]]
+grps_depth_coords <- grps_depth[[2]]
+# nrow(grps_depth_mat) == nrow(grps_depth_coords)
+rm(grps_depth)
+
+
+# Diplodus ----------------------------------------------------------------
+
+dip_temp <- create_spp_mat(dataset = med_raw, basin = all_med,
+                           group = diplodus, covariate = "tmean_reg")
+dip_temp_mat <- dip_temp[[1]]
+dip_temp_coords <- dip_temp[[2]]
+# nrow(dip_temp_mat) == nrow(dip_temp_coords)
+rm(dip_temp)
+
+dip_mpa <- create_spp_mat(dataset = med_raw, basin = all_med,
+                          group = diplodus, covariate = "mpa")
+dip_mpa_mat <- dip_mpa[[1]]
+dip_mpa_coords <- dip_mpa[[2]]
+# nrow(dip_mpa_mat) == nrow(dip_mpa_coords)
+rm(dip_mpa)
+
+dip_depth <- create_spp_mat(dataset = med_raw, basin = all_med,
+                            group = diplodus, covariate = "depth_reg")
+dip_depth_mat <- dip_depth[[1]]
+dip_depth_coords <- dip_depth[[2]]
+# nrow(dip_depth_mat) == nrow(dip_depth_coords)
+rm(dip_depth)
+
+
+# Herbivores --------------------------------------------------------------
+
+herb_temp <- create_spp_mat(dataset = med_raw, basin = all_med,
+                            group = herbivores, covariate = "tmean_reg")
+herb_temp_mat <- herb_temp[[1]]
+herb_temp_coords <- herb_temp[[2]]
+# nrow(herb_temp_mat) == nrow(herb_temp_coords)
+rm(herb_temp)
+
+herb_mpa <- create_spp_mat(dataset = med_raw, basin = all_med,
+                           group = herbivores, covariate = "mpa")
+herb_mpa_mat <- herb_mpa[[1]]
+herb_mpa_coords <- herb_mpa[[2]]
+# nrow(herb_mpa_mat) == nrow(herb_mpa_coords)
+rm(herb_mpa)
+
+herb_depth <- create_spp_mat(dataset = med_raw, basin = all_med,
+                             group = herbivores, covariate = "depth_reg")
+herb_depth_mat <- herb_depth[[1]]
+herb_depth_coords <- herb_depth[[2]]
+# nrow(herb_depth_mat) == nrow(herb_depth_coords)
+rm(herb_depth)
+
+```
+
+## Association evaluation from MRF model (Clark _et al._ [^1].)
+
+*NOTE:* strapboot results do not consider spatial autocorrelation
+<!-- figure out the strapboot method -->
+
+### Temperature
+```{r message=FALSE, warning=FALSE}
+# Groupers ----------------------------------------------------------------
+
+model_temp_grps <- run_mod(species_mat = grps_temp_mat, n_covs = 1,
+                           family = "gaussian", coords = grps_temp_coords)
+plotMRF_hm(model_temp_grps$mod, main = "Species association coefficients")
+plotMRF_hm(model_temp_grps$boot)
+
+
+# Diplodus ----------------------------------------------------------------
+
+model_temp_dip <- run_mod(species_mat = dip_temp_mat, n_covs = 1,
+                           family = "gaussian", coords = dip_temp_coords)
+plotMRF_hm(model_temp_dip$mod, main = "Species association coefficients")
+plotMRF_hm(model_temp_dip$boot)
+
+# Herbivores --------------------------------------------------------------
+
+model_temp_herb <- run_mod(species_mat = herb_temp_mat, n_covs = 1,
+                           family = "gaussian", coords = herb_temp_coords)
+plotMRF_hm(model_temp_herb$mod, main = "Species association coefficients")
+plotMRF_hm(model_temp_herb$boot)
+
+```
+
+### MPAs
+MPAs are defined as unprotected (enforcement level 0-1) or protected (2-3); therefore this is not a gradient.
+<!--Does this affect the model?-->
+
+```{r message=FALSE, warning=FALSE}
+# Groupers ----------------------------------------------------------------
+
+model_mpa_grps <- run_mod(species_mat = grps_mpa_mat, n_covs = 1,
+                           family = "gaussian", coords = grps_mpa_coords)
+plotMRF_hm(model_mpa_grps$mod, main = "Species association coefficients")
+plotMRF_hm(model_mpa_grps$boot)
+
+
+# Diplodus ----------------------------------------------------------------
+
+model_mpa_dip <- run_mod(species_mat = dip_mpa_mat, n_covs = 1,
+                           family = "gaussian", coords = dip_mpa_coords)
+plotMRF_hm(model_mpa_dip$mod, main = "Species association coefficients")
+plotMRF_hm(model_mpa_dip$boot)
+
+# Herbivores --------------------------------------------------------------
+
+model_mpa_herb <- run_mod(species_mat = herb_mpa_mat, n_covs = 1,
+                           family = "gaussian", coords = herb_mpa_coords)
+plotMRF_hm(model_mpa_herb$mod, main = "Species association coefficients")
+plotMRF_hm(model_mpa_herb$boot)
+```
+
+### Depth
+```{r message=FALSE, warning=FALSE}
+# Groupers ----------------------------------------------------------------
+
+model_depth_grps <- run_mod(species_mat = grps_depth_mat, n_covs = 1,
+                           family = "gaussian", coords = grps_depth_coords)
+plotMRF_hm(model_depth_grps$mod, main = "Species association coefficients")
+plotMRF_hm(model_depth_grps$boot)
+
+
+# Diplodus ----------------------------------------------------------------
+
+model_depth_dip <- run_mod(species_mat = dip_depth_mat, n_covs = 1,
+                           family = "gaussian", coords = dip_depth_coords)
+plotMRF_hm(model_depth_dip$mod, main = "Species association coefficients")
+plotMRF_hm(model_depth_dip$boot)
+
+# Herbivores --------------------------------------------------------------
+
+model_depth_herb <- run_mod(species_mat = herb_depth_mat, n_covs = 1,
+                           family = "gaussian", coords = herb_depth_coords)
+plotMRF_hm(model_depth_herb$mod, main = "Species association coefficients")
+plotMRF_hm(model_depth_herb$boot)
+```
+
+## Visualising networks along environmental gradients
+
+### Temperature
+```{r message=FALSE, warning=FALSE}
+
+# Groupers ----------------------------------------------------------------
+
+grps_temp_cats <- categorise_cov(species_mat = grps_temp_mat, covariate = "tmean_reg")
+grps_temp_cat_nested <- nested_data(categorised_data = grps_temp_cats)
+grps_temp_cat_model <- get_model(data = grps_temp_mat, ncov = 1)
+grps_temp_nested_mod <- nested_models(nested_df = grps_temp_cat_nested)
+grps_temp_nested_plot <- grps_temp_nested_mod %>% mutate(plot = map(model, get_graph))
+grps_temp_graph <- plot_multi_graphs(nested_df = grps_temp_nested_plot, n_graphs = 3)
+
+# Diplodus ----------------------------------------------------------------
+
+dip_temp_cats <- categorise_cov(species_mat = dip_temp_mat, covariate = "tmean_reg")
+dip_temp_cat_nested <- nested_data(categorised_data = dip_temp_cats)
+dip_temp_cat_model <- get_model(data = dip_temp_mat, ncov = 1)
+dip_temp_nested_mod <- nested_models(nested_df = dip_temp_cat_nested)
+dip_temp_nested_plot <- dip_temp_nested_mod %>% mutate(plot = map(model, get_graph))
+dip_temp_graph <- plot_multi_graphs(nested_df = dip_temp_nested_plot, n_graphs = 3)
+
+# Herbivores --------------------------------------------------------------
+herb_temp_cats <- categorise_cov(species_mat = herb_temp_mat, covariate = "tmean_reg")
+herb_temp_cat_nested <- nested_data(categorised_data = herb_temp_cats)
+herb_temp_cat_model <- get_model(data = herb_temp_mat, ncov = 1)
+herb_temp_nested_mod <- nested_models(nested_df = herb_temp_cat_nested)
+herb_temp_nested_plot <- herb_temp_nested_mod %>% mutate(plot = map(model, get_graph))
+herb_temp_graph <- plot_multi_graphs(nested_df = herb_temp_nested_plot, n_graphs = 3)
+
+```
+
+### MPAs
+
+```{r message=FALSE, warning=FALSE}
+# Groupers ----------------------------------------------------------------
+
+grps_mpa_cat_nested <- nested_data(categorised_data = as.data.frame(grps_mpa_mat))
+grps_mpa_cat_model <- get_model(data = grps_mpa_mat, ncov = 1)
+grps_mpa_nested_mod <- nested_models(nested_df = grps_mpa_cat_nested)
+grps_mpa_nested_plot <- grps_mpa_nested_mod %>% mutate(plot = map(model, get_graph))
+grps_mpa_graph <- plot_multi_graphs(nested_df = grps_mpa_nested_plot, n_graphs = 2)
+
+# Diplodus ----------------------------------------------------------------
+
+dip_mpa_cat_nested <- nested_data(categorised_data = as.data.frame(dip_mpa_mat))
+dip_mpa_cat_model <- get_model(data = dip_mpa_mat, ncov = 1)
+dip_mpa_nested_mod <- nested_models(nested_df = dip_mpa_cat_nested)
+dip_mpa_nested_plot <- dip_mpa_nested_mod %>% mutate(plot = map(model, get_graph))
+dip_mpa_graph <- plot_multi_graphs(nested_df = dip_mpa_nested_plot, n_graphs = 2)
+
+# Herbivores --------------------------------------------------------------
+
+herb_mpa_cat_nested <- nested_data(categorised_data = as.data.frame(herb_mpa_mat))
+herb_mpa_cat_model <- get_model(data = herb_mpa_mat, ncov = 1)
+herb_mpa_nested_mod <- nested_models(nested_df = herb_mpa_cat_nested)
+herb_mpa_nested_plot <- herb_mpa_nested_mod %>% mutate(plot = map(model, get_graph))
+herb_mpa_graph <- plot_multi_graphs(nested_df = herb_mpa_nested_plot, n_graphs = 2)
+
+```
+
+### Depth
+
+```{r message=FALSE, warning=FALSE}
+
+# Herbivores --------------------------------------------------------------
+
+herb_depth_cats <- categorise_cov(species_mat = herb_depth_mat, covariate = "depth_reg")
+herb_depth_cat_nested <- nested_data(categorised_data = herb_depth_cats)
+herb_depth_cat_model <- get_model(data = herb_depth_mat, ncov = 1)
+herb_depth_nested_mod <- nested_models(nested_df = herb_depth_cat_nested)
+herb_depth_nested_plot <- herb_depth_nested_mod %>% mutate(plot = map(model, get_graph))
+herb_depth_graph <- plot_multi_graphs(nested_df = herb_depth_nested_plot, n_graphs = 3)
+
+
+```
+Depth is a bit problematic because the samples are not distributed evenly between depths and spatialy:
+```{r echo=FALSE}
+ggplot(med_raw, aes(depth)) + geom_histogram(binwidth = 1, aes(fill = ..x..)) +
+  labs(x = "Depth of transect", y = "Frequency", title = "Depth") +
+  guides(fill = FALSE)
+
+```
+
+The problem is mainly with Sala's data:
+```{r message=FALSE, warning=FALSE}
+
+grps_depth <- med_raw %>% filter(species == groupers)
+ggplot(grps_depth) +
+  geom_histogram(aes(x = depth, fill = data.origin), binwidth = 1) +
+  ggtitle("Groupers depth distribution")
+
+diplodus_depth <- med_raw %>% filter(species == diplodus)
+ggplot(diplodus_depth) +
+  geom_histogram(aes(x = depth, fill = data.origin), binwidth = 1) +
+  ggtitle("Diplodus depth distribution")
+
+rm(list = c("grps_depth", "diplodus_depth"))
+
+```
+
+# Networks comparison
+
+Connectance as a measure of comparison.
+Connectance by Delams _et al._:
+
+    C0 = [total # of edges] / [total # of nodes^2 (total possible connections)]
+
+L = count(edges) for each network
+S = count(nodes) for each network
+M = S^2
+connectance (C0) = L/M
+
+## Temperature models
+
+### Groupers
+
+```{r}
+
+grps_temp_low_connect
+
+grps_temp_low_connect <- connectance(x = grps_temp_nested_mod$model[[1]]$graph)
+grps_temp_med_connect <- connectance(x = grps_temp_nested_mod$model[[2]]$graph)
+grps_temp_hi_connect <- connectance(x = grps_temp_nested_mod$model[[3]]$graph)
+
+```
+
+### Diplodus
+
+```{r}
+dip_temp_low_connect <- connectance(x = dip_temp_nested_mod$model[[1]]$graph)
+dip_temp_med_connect <- connectance(x = dip_temp_nested_mod$model[[2]]$graph)
+dip_temp_hi_connect <- connectance(x = dip_temp_nested_mod$model[[3]]$graph)
+
+```
+
+### Herbivores
+
+```{r}
+herb_temp_low_connect <- connectance(x = herb_temp_nested_mod$model[[1]]$graph)
+herb_temp_med_connect <- connectance(x = herb_temp_nested_mod$model[[2]]$graph)
+herb_temp_hi_connect <- connectance(x = herb_temp_nested_mod$model[[3]]$graph)
+
+```
+
+## MPA models
+
+### Groupers
+
+```{r}
+grps_mpa_out_connect <- connectance(x = grps_mpa_nested_mod$model[[1]]$graph)
+grps_mpa_in_connect <- connectance(x = grps_mpa_nested_mod$model[[2]]$graph)
+
+```
+
+### Diplodus
+
+```{r}
+dip_mpa_out_connect <- connectance(x = dip_mpa_nested_mod$model[[1]]$graph)
+dip_mpa_in_connect <- connectance(x = dip_mpa_nested_mod$model[[2]]$graph)
+
+```
+
+### Herbivores
+
+```{r}
+herb_mpa_out_connect <- connectance(x = herb_mpa_nested_mod$model[[1]]$graph)
+herb_mpa_in_connect <- connectance(x = herb_mpa_nested_mod$model[[2]]$graph)
+
+```
+
+
+## Relative importance of species only
+**How much of the model is explained by the occurrence of other species?**
+
+### Groupers
+
+```{r}
+groupers_temp_relimp <- sapply(X = model_temp_grps$mod$key_coefs, rel_imp, cov = "tmean_reg") %>% 
+  tibble::enframe() %>% 
+  rename("species" = name, "temp_model" = value)
+
+groupers_mpa_relimp <- sapply(X = model_mpa_grps$mod$key_coefs, rel_imp, cov = "mpa") %>% 
+  tibble::enframe() %>% 
+  rename("species" = name, "mpa_model" = value)
+
+groupers_depth_relimp <- sapply(X = model_depth_grps$mod$key_coefs, rel_imp, cov = "depth_reg") %>% 
+  tibble::enframe() %>% 
+  rename("species" = name, "depth_model" = value)
+
+(groupers_spp_relimp <- groupers_temp_relimp %>%
+  left_join(groupers_mpa_relimp, by = "species") %>% 
+  left_join(groupers_depth_relimp, by = "species"))
+
+```
+
+
+Most grouper species are affected mainly by other species occurrence rather than covatiates (temperature, MPAs and depth).
+_Mycteroperca rubra_ shows a different pattern whereas temperature and MPAs are stronger factors than species.
+
+### Diplodus
+
+```{r}
+dip_temp <- sapply(X = model_temp_dip$mod$key_coefs, rel_imp, cov = "tmean_reg") %>% 
+  tibble::enframe() %>% 
+  rename("species" = name, "temp_model" = value)
+
+dip_mpa <- sapply(X = model_mpa_dip$mod$key_coefs, rel_imp, cov = "mpa") %>% 
+  tibble::enframe() %>% 
+  rename("species" = name, "mpa_model" = value)
+
+dip_depth <- sapply(X = model_depth_dip$mod$key_coefs, rel_imp, cov = "depth_reg") %>% 
+  tibble::enframe() %>% 
+  rename("species" = name, "depth_model" = value)
+
+(dip_spp_relimp <- dip_temp %>%
+  left_join(dip_mpa, by = "species") %>% 
+  left_join(dip_depth, by = "species"))
+
+```
+
+
+Diplodus species are not greatly affected by other species accept _Diplodus cervinus_, which seem to show a different pattern with temperature and depth effects.
+
+### Herbivores
+
+```{r}
+herb_temp <- sapply(X = model_temp_herb$mod$key_coefs, rel_imp, cov = "tmean_reg") %>% 
+  tibble::enframe() %>% 
+  rename("species" = name, "temp_model" = value)
+
+herb_mpa <- sapply(X = model_mpa_herb$mod$key_coefs, rel_imp, cov = "mpa") %>% 
+  tibble::enframe() %>% 
+  rename("species" = name, "mpa_model" = value)
+
+herb_depth <- sapply(X = model_depth_herb$mod$key_coefs, rel_imp, cov = "depth_reg") %>% 
+  tibble::enframe() %>% 
+  rename("species" = name, "depth_model" = value)
+
+(herb_spp_relimp <- herb_temp %>%
+  left_join(herb_mpa, by = "species") %>% 
+  left_join(herb_depth, by = "species"))
+
+```
+
+
+## Sum of mean association coefficients for each species
+**What is the mean direction of the association of species _i_ with other species and a covariate** (everything that is included in the model)
+
+### Groupers
+
+```{r}
+grps_temp_meancoefs <- sapply(X = model_temp_grps$boot$mean_key_coefs, FUN = mean_coef) %>%
+  tibble::enframe() %>% 
+  rename("species" = name, "sum_mean_coefs_temp" = value)
+
+grps_mpa_meancoefs <- sapply(X = model_mpa_grps$boot$mean_key_coefs, FUN = mean_coef) %>%
+  tibble::enframe() %>% 
+  rename("species" = name, "sum_mean_coefs_mpa" = value)
+
+grps_depth_meancoefs <- sapply(X = model_depth_grps$boot$mean_key_coefs, FUN = mean_coef) %>%
+  tibble::enframe() %>% 
+  rename("species" = name, "sum_mean_coefs_depth" = value)
+
+(groupers_spp_meancoef <- grps_temp_meancoefs %>%
+  left_join(grps_mpa_meancoefs, by = "species") %>% 
+  left_join(grps_depth_meancoefs, by = "species"))
+
+```
+
+### Diplodus
+
+```{r}
+dip_temp_meancoefs <- sapply(X = model_temp_dip$boot$mean_key_coefs, FUN = mean_coef) %>%
+  tibble::enframe() %>% 
+  rename("species" = name, "sum_mean_coefs_temp" = value)
+
+dip_mpa_meancoefs <- sapply(X = model_mpa_dip$boot$mean_key_coefs, FUN = mean_coef) %>%
+  tibble::enframe() %>% 
+  rename("species" = name, "sum_mean_coefs_mpa" = value)
+
+dip_depth_meancoefs <- sapply(X = model_depth_dip$boot$mean_key_coefs, FUN = mean_coef) %>%
+  tibble::enframe() %>% 
+  rename("species" = name, "sum_mean_coefs_depth" = value)
+
+(dip_spp_meancoef <- dip_temp_meancoefs %>%
+  left_join(dip_mpa_meancoefs, by = "species") %>% 
+  left_join(dip_depth_meancoefs, by = "species"))
+
+```
+
+
+### Herbivores
+
+```{r}
+herb_temp_meancoefs <- sapply(X = model_temp_herb$boot$mean_key_coefs, FUN = mean_coef) %>%
+  tibble::enframe() %>% 
+  rename("species" = name, "sum_mean_coefs_temp" = value)
+
+herb_mpa_meancoefs <- sapply(X = model_mpa_herb$boot$mean_key_coefs, FUN = mean_coef) %>%
+  tibble::enframe() %>% 
+  rename("species" = name, "sum_mean_coefs_mpa" = value)
+
+herb_depth_meancoefs <- sapply(X = model_depth_herb$boot$mean_key_coefs, FUN = mean_coef) %>%
+  tibble::enframe() %>% 
+  rename("species" = name, "sum_mean_coefs_depth" = value)
+
+(herb_spp_meancoef <- herb_temp_meancoefs %>%
+  left_join(herb_mpa_meancoefs, by = "species") %>% 
+  left_join(herb_depth_meancoefs, by = "species"))
+
+```
+
+_Siganus rivulatus_ coefficients seem to be inflated in all variables
+
+
+
+
+___
+
+[^1]: Clark, Nicholas J., Konstans Wells, and Oscar Lindberg. "Unravelling changing interspecific interactions across environmental gradients using Markov random fields." Ecology 99.6 (2018): 1277-1283.
