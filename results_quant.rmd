@@ -4,8 +4,6 @@ author: "Shira Salingre"
 output: html_document
 ---
 
-Quantifying networks for 
-
 _Run `results_prelim.Rmd` to get all data sets and subsets_
 ```{r Source data from the results file, include=FALSE}
 # source_rmd <- function(rmd_file){
