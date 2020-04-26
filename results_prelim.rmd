@@ -647,6 +647,7 @@ p2 <- ggplot(med_raw, aes(mpa)) + geom_histogram(stat = "count") +
   labs(x = "MPA", subtitle = "MPAs",
        y = "Frequency", title = "Marine Protected Areas")
 
+library(gridExtra)
 grid.arrange(p1, p2, nrow = 2)
 
 ```
