@@ -293,10 +293,10 @@ connectance (C0) = L/M
 
 ```{r}
 
-(temp_connect <- tibble(grps_connect = grps_temp_nested_mod$connectance) %>% 
+(temp_connect <- tibble(grps_connect = unlist(grps_temp_nested_mod$connectance)) %>% 
   add_column(network = factor(c("low", "medium", "high"))) %>% 
-  add_column(dip_connect = dip_temp_nested_mod$connectance) %>% 
-  add_column(herb_connect = herb_temp_nested_mod$connectance) %>% 
+  add_column(dip_connect = unlist(dip_temp_nested_mod$connectance)) %>% 
+  add_column(herb_connect = unlist(herb_temp_nested_mod$connectance)) %>% 
   select(network, grps_connect, dip_connect, herb_connect))
 
 ```
@@ -304,10 +304,10 @@ connectance (C0) = L/M
 ## MPA models
 
 ```{r}
-(mpa_connect <- tibble(grps_connect = grps_mpa_nested_mod$connectance) %>% 
+(mpa_connect <- tibble(grps_connect = unlist(grps_mpa_nested_mod$connectance)) %>% 
   add_column(network = factor(c("out", "in"))) %>% 
-  add_column(dip_connect = dip_mpa_nested_mod$connectance) %>% 
-  add_column(herb_connect = herb_mpa_nested_mod$connectance) %>% 
+  add_column(dip_connect = unlist(dip_mpa_nested_mod$connectance)) %>% 
+  add_column(herb_connect = unlist(herb_mpa_nested_mod$connectance)) %>% 
   select(network, grps_connect, dip_connect, herb_connect))
 
 ```
