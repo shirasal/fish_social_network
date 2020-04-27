@@ -101,8 +101,7 @@ connectance <- function(x){
 nested_models <- function(nested_df){
   nested_df %>%
     mutate(model = map(data, function(x) get_model(data = x, ncov = 1)),
-           connectance = map(model, function(x) connectance(x$graph))) %>% 
-    unnest(connectance)
+           connectance = map(model, function(x) connectance(x$graph)))
 }
 
 # Func 6: Get graph data
