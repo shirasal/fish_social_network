@@ -46,7 +46,7 @@ run_mod <- function(species_mat, n_covs, family, coords){
   mod <- MRFcov_spatial(data = species_mat, n_nodes = ncol(species_mat) - n_covs,
                         n_covariates = n_covs, family = family, coords = coords)
   boot <- bootstrap_MRF(data = species_mat, n_nodes = ncol(species_mat) - n_covs,
-                        n_covariates = n_covs, family = family)
+                        n_covariates = n_covs, family = family, spatial = TRUE, coords = coords)
   pred <- predict_MRF(data = species_mat, MRF_mod = boot) %>% invlogit()
   return(list(mod = mod, boot = boot, pred = pred))
 }
