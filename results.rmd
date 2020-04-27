@@ -282,76 +282,39 @@ rm(list = c("grps_depth", "diplodus_depth"))
 
 # Networks comparison
 
-Connectance as a measure of comparison.
-Connectance by Delams _et al._:
+Connectance (Delams _et al._ [^2]) is a measure of comparison between networks. Essentially, it describes the level of connectedness of species in the network as a proportion the potential associations in the network:
 
     C0 = [total # of edges] / [total # of nodes^2 (total possible connections)]
 
-L = count(edges) for each network
-S = count(nodes) for each network
+L = number of edges (associations)
+S = number of nodes (species)
 M = S^2
 connectance (C0) = L/M
 
 ## Temperature models
 
-### Groupers
-
 ```{r}
 
-grps_temp_low_connect
-
-grps_temp_low_connect <- connectance(x = grps_temp_nested_mod$model[[1]]$graph)
-grps_temp_med_connect <- connectance(x = grps_temp_nested_mod$model[[2]]$graph)
-grps_temp_hi_connect <- connectance(x = grps_temp_nested_mod$model[[3]]$graph)
-
-```
-
-### Diplodus
-
-```{r}
-dip_temp_low_connect <- connectance(x = dip_temp_nested_mod$model[[1]]$graph)
-dip_temp_med_connect <- connectance(x = dip_temp_nested_mod$model[[2]]$graph)
-dip_temp_hi_connect <- connectance(x = dip_temp_nested_mod$model[[3]]$graph)
-
-```
-
-### Herbivores
-
-```{r}
-herb_temp_low_connect <- connectance(x = herb_temp_nested_mod$model[[1]]$graph)
-herb_temp_med_connect <- connectance(x = herb_temp_nested_mod$model[[2]]$graph)
-herb_temp_hi_connect <- connectance(x = herb_temp_nested_mod$model[[3]]$graph)
+(temp_connect <- tibble(grps_connect = grps_temp_nested_mod$connectance) %>% 
+  add_column(network = factor(c("low", "medium", "high"))) %>% 
+  add_column(dip_connect = dip_temp_nested_mod$connectance) %>% 
+  add_column(herb_connect = herb_temp_nested_mod$connectance) %>% 
+  select(network, grps_connect, dip_connect, herb_connect))
 
 ```
 
 ## MPA models
 
-### Groupers
-
 ```{r}
-grps_mpa_out_connect <- connectance(x = grps_mpa_nested_mod$model[[1]]$graph)
-grps_mpa_in_connect <- connectance(x = grps_mpa_nested_mod$model[[2]]$graph)
+(mpa_connect <- tibble(grps_connect = grps_mpa_nested_mod$connectance) %>% 
+  add_column(network = factor(c("out", "in"))) %>% 
+  add_column(dip_connect = dip_mpa_nested_mod$connectance) %>% 
+  add_column(herb_connect = herb_mpa_nested_mod$connectance) %>% 
+  select(network, grps_connect, dip_connect, herb_connect))
 
 ```
 
-### Diplodus
-
-```{r}
-dip_mpa_out_connect <- connectance(x = dip_mpa_nested_mod$model[[1]]$graph)
-dip_mpa_in_connect <- connectance(x = dip_mpa_nested_mod$model[[2]]$graph)
-
-```
-
-### Herbivores
-
-```{r}
-herb_mpa_out_connect <- connectance(x = herb_mpa_nested_mod$model[[1]]$graph)
-herb_mpa_in_connect <- connectance(x = herb_mpa_nested_mod$model[[2]]$graph)
-
-```
-
-
-## Relative importance of species only
+## Relative importance of species association
 **How much of the model is explained by the occurrence of other species?**
 
 ### Groupers
@@ -500,3 +463,6 @@ _Siganus rivulatus_ coefficients seem to be inflated in all variables
 ___
 
 [^1]: Clark, Nicholas J., Konstans Wells, and Oscar Lindberg. "Unravelling changing interspecific interactions across environmental gradients using Markov random fields." Ecology 99.6 (2018): 1277-1283.
+
+[^2]: Delmas, E., Besson, M., Brice, M. H., Burkle, L. A., Dalla Riva, G. V., Fortin, M. J., ... & Olesen, J. M. (2019). Analysing ecological networks of species interactions. Biological Reviews, 94(1), 16-36.
+
