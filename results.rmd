@@ -340,7 +340,7 @@ groupers_depth_relimp <- sapply(X = model_depth_grps$mod$key_coefs, rel_imp, cov
 
 
 Most grouper species are affected mainly by other species occurrence rather than covatiates (temperature, MPAs and depth).
-_Mycteroperca rubra_ shows a different pattern whereas temperature and MPAs are stronger factors than species.
+_Mycteroperca rubra_ shows a different pattern whereas temperature and MPAs are stronger factors than biotic interactions.
 
 ### Diplodus
 
