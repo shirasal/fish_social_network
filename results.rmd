@@ -93,11 +93,9 @@ herb_depth_coords <- herb_depth[[2]]
 rm(herb_depth)
 
 ```
+# MRF models
 
 ## Association evaluation from MRF model (Clark _et al._ [^1].)
-
-*NOTE:* strapboot results do not consider spatial autocorrelation
-<!-- figure out the strapboot method -->
 
 ### Temperature
 ```{r message=FALSE, warning=FALSE}
