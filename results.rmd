@@ -19,7 +19,7 @@ source("scripts/model_func.R")
 
 In order to examine the association between species and how this association changes along environmental gradient, I chose three groups of representative fish species: groupers (Epinephelus species + Serranus species), Diplodus species and herbivore species.
 
-```{r Create matrices and coordinate dfs include=FALSE}
+```{r Create matrices and coordinate dfs, include=FALSE}
 
 # Groupers ----------------------------------------------------------------
 
@@ -319,7 +319,7 @@ connectance (C0) = L/M
 
 ### Groupers
 
-```{r}
+```{r echo=FALSE}
 groupers_temp_relimp <- sapply(X = model_temp_grps$mod$key_coefs, rel_imp, cov = "tmean_reg") %>% 
   tibble::enframe() %>% 
   rename("species" = name, "temp_model" = value)
@@ -344,7 +344,7 @@ _Mycteroperca rubra_ shows a different pattern whereas temperature and MPAs are 
 
 ### Diplodus
 
-```{r}
+```{r echo=FALSE}
 dip_temp <- sapply(X = model_temp_dip$mod$key_coefs, rel_imp, cov = "tmean_reg") %>% 
   tibble::enframe() %>% 
   rename("species" = name, "temp_model" = value)
@@ -368,7 +368,7 @@ Diplodus species are not greatly affected by other species accept _Diplodus cerv
 
 ### Herbivores
 
-```{r}
+```{r echo=FALSE}
 herb_temp <- sapply(X = model_temp_herb$mod$key_coefs, rel_imp, cov = "tmean_reg") %>% 
   tibble::enframe() %>% 
   rename("species" = name, "temp_model" = value)
@@ -393,7 +393,7 @@ herb_depth <- sapply(X = model_depth_herb$mod$key_coefs, rel_imp, cov = "depth_r
 
 ### Groupers
 
-```{r}
+```{r echo=FALSE}
 grps_temp_meancoefs <- sapply(X = model_temp_grps$boot$mean_key_coefs, FUN = mean_coef) %>%
   tibble::enframe() %>% 
   rename("species" = name, "sum_mean_coefs_temp" = value)
@@ -414,7 +414,7 @@ grps_depth_meancoefs <- sapply(X = model_depth_grps$boot$mean_key_coefs, FUN = m
 
 ### Diplodus
 
-```{r}
+```{r echo=FALSE}
 dip_temp_meancoefs <- sapply(X = model_temp_dip$boot$mean_key_coefs, FUN = mean_coef) %>%
   tibble::enframe() %>% 
   rename("species" = name, "sum_mean_coefs_temp" = value)
@@ -436,7 +436,7 @@ dip_depth_meancoefs <- sapply(X = model_depth_dip$boot$mean_key_coefs, FUN = mea
 
 ### Herbivores
 
-```{r}
+```{r echo=FALSE}
 herb_temp_meancoefs <- sapply(X = model_temp_herb$boot$mean_key_coefs, FUN = mean_coef) %>%
   tibble::enframe() %>% 
   rename("species" = name, "sum_mean_coefs_temp" = value)
