@@ -2,6 +2,7 @@
 # Load packages -----------------------------------------------------------
 
 library(parallel)
+library(formattable)
 library(igraph)
 library(tidygraph)
 library(ggraph)

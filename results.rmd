@@ -103,23 +103,23 @@ rm(herb_depth)
 
 model_temp_grps <- run_mod(species_mat = grps_temp_mat, n_covs = 1,
                            family = "gaussian", coords = grps_temp_coords)
-plotMRF_hm(model_temp_grps$mod, main = "Species association coefficients")
-plotMRF_hm(model_temp_grps$boot)
+plotMRF_hm(model_temp_grps$mod, main = "Groupers - association coefficients")
+plotMRF_hm(model_temp_grps$boot, main = "Groupers")
 
 
 # Diplodus ----------------------------------------------------------------
 
 model_temp_dip <- run_mod(species_mat = dip_temp_mat, n_covs = 1,
                            family = "gaussian", coords = dip_temp_coords)
-plotMRF_hm(model_temp_dip$mod, main = "Species association coefficients")
-plotMRF_hm(model_temp_dip$boot)
+plotMRF_hm(model_temp_dip$mod, main = "Diplodus - association coefficients")
+plotMRF_hm(model_temp_dip$boot, main = "Diplodus")
 
 # Herbivores --------------------------------------------------------------
 
 model_temp_herb <- run_mod(species_mat = herb_temp_mat, n_covs = 1,
                            family = "gaussian", coords = herb_temp_coords)
-plotMRF_hm(model_temp_herb$mod, main = "Species association coefficients")
-plotMRF_hm(model_temp_herb$boot)
+plotMRF_hm(model_temp_herb$mod, main = "Herbivores - association coefficients")
+plotMRF_hm(model_temp_herb$boot, main = "Herbivores")
 
 ```
 
@@ -293,22 +293,25 @@ connectance (C0) = L/M
 
 ```{r}
 
-(temp_connect <- tibble(grps_connect = unlist(grps_temp_nested_mod$connectance)) %>% 
+temp_connect <- tibble(grps_connect = unlist(grps_temp_nested_mod$connectance)) %>% 
   add_column(network = factor(c("low", "medium", "high"))) %>% 
   add_column(dip_connect = unlist(dip_temp_nested_mod$connectance)) %>% 
   add_column(herb_connect = unlist(herb_temp_nested_mod$connectance)) %>% 
-  select(network, grps_connect, dip_connect, herb_connect))
+  select(network, grps_connect, dip_connect, herb_connect)
+
+formattable(temp_connect)
 
 ```
 
 ## MPA models
 
 ```{r}
-(mpa_connect <- tibble(grps_connect = unlist(grps_mpa_nested_mod$connectance)) %>% 
+mpa_connect <- tibble(grps_connect = unlist(grps_mpa_nested_mod$connectance)) %>% 
   add_column(network = factor(c("out", "in"))) %>% 
   add_column(dip_connect = unlist(dip_mpa_nested_mod$connectance)) %>% 
   add_column(herb_connect = unlist(herb_mpa_nested_mod$connectance)) %>% 
-  select(network, grps_connect, dip_connect, herb_connect))
+  select(network, grps_connect, dip_connect, herb_connect)
+formattable(mpa_connect)
 
 ```
 
@@ -330,9 +333,11 @@ groupers_depth_relimp <- sapply(X = model_depth_grps$mod$key_coefs, rel_imp, cov
   tibble::enframe() %>% 
   rename("species" = name, "depth_model" = value)
 
-(groupers_spp_relimp <- groupers_temp_relimp %>%
+groupers_spp_relimp <- groupers_temp_relimp %>%
   left_join(groupers_mpa_relimp, by = "species") %>% 
-  left_join(groupers_depth_relimp, by = "species"))
+  left_join(groupers_depth_relimp, by = "species")
+
+formattable(groupers_spp_relimp)
 
 ```
 
@@ -355,9 +360,11 @@ dip_depth <- sapply(X = model_depth_dip$mod$key_coefs, rel_imp, cov = "depth_reg
   tibble::enframe() %>% 
   rename("species" = name, "depth_model" = value)
 
-(dip_spp_relimp <- dip_temp %>%
+dip_spp_relimp <- dip_temp %>%
   left_join(dip_mpa, by = "species") %>% 
-  left_join(dip_depth, by = "species"))
+  left_join(dip_depth, by = "species")
+
+formattable(dip_spp_relimp)
 
 ```
 
@@ -379,9 +386,11 @@ herb_depth <- sapply(X = model_depth_herb$mod$key_coefs, rel_imp, cov = "depth_r
   tibble::enframe() %>% 
   rename("species" = name, "depth_model" = value)
 
-(herb_spp_relimp <- herb_temp %>%
+herb_spp_relimp <- herb_temp %>%
   left_join(herb_mpa, by = "species") %>% 
-  left_join(herb_depth, by = "species"))
+  left_join(herb_depth, by = "species")
+
+formattable(herb_spp_relimp)
 
 ```
 
@@ -404,9 +413,11 @@ grps_depth_meancoefs <- sapply(X = model_depth_grps$boot$mean_key_coefs, FUN = m
   tibble::enframe() %>% 
   rename("species" = name, "sum_mean_coefs_depth" = value)
 
-(groupers_spp_meancoef <- grps_temp_meancoefs %>%
+groupers_spp_meancoef <- grps_temp_meancoefs %>%
   left_join(grps_mpa_meancoefs, by = "species") %>% 
-  left_join(grps_depth_meancoefs, by = "species"))
+  left_join(grps_depth_meancoefs, by = "species")
+
+formattable(groupers_spp_meancoef)
 
 ```
 
@@ -425,9 +436,11 @@ dip_depth_meancoefs <- sapply(X = model_depth_dip$boot$mean_key_coefs, FUN = mea
   tibble::enframe() %>% 
   rename("species" = name, "sum_mean_coefs_depth" = value)
 
-(dip_spp_meancoef <- dip_temp_meancoefs %>%
+dip_spp_meancoef <- dip_temp_meancoefs %>%
   left_join(dip_mpa_meancoefs, by = "species") %>% 
-  left_join(dip_depth_meancoefs, by = "species"))
+  left_join(dip_depth_meancoefs, by = "species")
+
+formattable(dip_spp_meancoef)
 
 ```
 
@@ -447,9 +460,11 @@ herb_depth_meancoefs <- sapply(X = model_depth_herb$boot$mean_key_coefs, FUN = m
   tibble::enframe() %>% 
   rename("species" = name, "sum_mean_coefs_depth" = value)
 
-(herb_spp_meancoef <- herb_temp_meancoefs %>%
+herb_spp_meancoef <- herb_temp_meancoefs %>%
   left_join(herb_mpa_meancoefs, by = "species") %>% 
-  left_join(herb_depth_meancoefs, by = "species"))
+  left_join(herb_depth_meancoefs, by = "species")
+
+formattable(herb_spp_meancoef)
 
 ```
 
