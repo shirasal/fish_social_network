@@ -90,6 +90,7 @@ get_model <- function(data, ncov){
 
 # Assistance function: Get the connectance value
 connectance <- function(x){
+  x[x > 0] = 1
   L <- sum(x)/2 # divided by 2 because it is calculated with the whole data, including the diagonal
   M <- (nrow(x))^2
   connect <- L/M 

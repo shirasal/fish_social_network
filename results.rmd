@@ -320,7 +320,7 @@ formattable(mpa_connect)
 
 ### Groupers
 
-```{r echo=FALSE}
+```{r}
 groupers_temp_relimp <- sapply(X = model_temp_grps$mod$key_coefs, rel_imp, cov = "tmean_reg") %>% 
   tibble::enframe() %>% 
   rename("species" = name, "temp_model" = value)
@@ -347,7 +347,7 @@ _Mycteroperca rubra_ shows a different pattern whereas temperature and MPAs are 
 
 ### Diplodus
 
-```{r echo=FALSE}
+```{r}
 dip_temp <- sapply(X = model_temp_dip$mod$key_coefs, rel_imp, cov = "tmean_reg") %>% 
   tibble::enframe() %>% 
   rename("species" = name, "temp_model" = value)
@@ -373,7 +373,7 @@ Diplodus species are not greatly affected by other species accept _Diplodus cerv
 
 ### Herbivores
 
-```{r echo=FALSE}
+```{r}
 herb_temp <- sapply(X = model_temp_herb$mod$key_coefs, rel_imp, cov = "tmean_reg") %>% 
   tibble::enframe() %>% 
   rename("species" = name, "temp_model" = value)
@@ -400,7 +400,7 @@ formattable(herb_spp_relimp)
 
 ### Groupers
 
-```{r echo=FALSE}
+```{r}
 grps_temp_meancoefs <- sapply(X = model_temp_grps$boot$mean_key_coefs, FUN = mean_coef) %>%
   tibble::enframe() %>% 
   rename("species" = name, "sum_mean_coefs_temp" = value)
@@ -423,7 +423,7 @@ formattable(groupers_spp_meancoef)
 
 ### Diplodus
 
-```{r echo=FALSE}
+```{r}
 dip_temp_meancoefs <- sapply(X = model_temp_dip$boot$mean_key_coefs, FUN = mean_coef) %>%
   tibble::enframe() %>% 
   rename("species" = name, "sum_mean_coefs_temp" = value)
@@ -447,7 +447,7 @@ formattable(dip_spp_meancoef)
 
 ### Herbivores
 
-```{r echo=FALSE}
+```{r}
 herb_temp_meancoefs <- sapply(X = model_temp_herb$boot$mean_key_coefs, FUN = mean_coef) %>%
   tibble::enframe() %>% 
   rename("species" = name, "sum_mean_coefs_temp" = value)
