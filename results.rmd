@@ -95,7 +95,8 @@ rm(herb_depth)
 ```
 # MRF models
 
-## Association evaluation from MRF model (Clark _et al._ [^1].)
+## Association evaluation from MRF model  
+(Clark _et al._ [^1].)  
 
 ### Temperature
 ```{r message=FALSE, warning=FALSE}
@@ -122,6 +123,8 @@ plotMRF_hm(model_temp_herb$mod, main = "Herbivores - association coefficients")
 plotMRF_hm(model_temp_herb$boot, main = "Herbivores")
 
 ```
+
+Only two _Siganus rivulatus_ is associated with other species ( _Scarus ghobban_ and _Sparisoma cretense_), other herbivore species
 
 ### MPAs
 MPAs are defined as unprotected (enforcement level 0-1) or protected (2-3); therefore this is not a gradient.
@@ -464,11 +467,14 @@ herb_spp_meancoef <- herb_temp_meancoefs %>%
   left_join(herb_mpa_meancoefs, by = "species") %>% 
   left_join(herb_depth_meancoefs, by = "species")
 
+herb_spp_meancoef %<>%
+  rename(temp = sum_mean_coefs_temp, mpa = sum_mean_coefs_mpa, depth = sum_mean_coefs_depth)
+
 formattable(herb_spp_meancoef)
 
 ```
 
-_Siganus rivulatus_ coefficients seem to be inflated in all variables
+_Siganus rivulatus_ coefficients are very high compared to other species. This is also the only species that seem to have a species asoociation coefficient that is different from 0 (see [heatmap](#Association evaluation from MRF model)
 
 
 
