@@ -17,7 +17,7 @@ source("scripts/model_func.R")
 
 ```
 
-In order to examine the association between species and how this association changes along environmental gradient, I chose three groups of representative fish species: groupers (Epinephelus species + Serranus species), Diplodus species and herbivore species.
+In order to examine the association between species and how this association changes along environmental gradient, I chose three groups of representative fish species: groupers (Epinephelus species + Serranus species), Seabream species and herbivore species.
 
 ```{r Create matrices and coordinate dfs, include=FALSE}
 
@@ -45,7 +45,7 @@ grps_depth_coords <- grps_depth[[2]]
 rm(grps_depth)
 
 
-# Diplodus ----------------------------------------------------------------
+# Seabreams ----------------------------------------------------------------
 
 dip_temp <- create_spp_mat(dataset = med_raw, basin = all_med,
                            group = diplodus, covariate = "tmean_reg")
@@ -108,12 +108,12 @@ plotMRF_hm(model_temp_grps$mod, main = "Groupers - association coefficients")
 plotMRF_hm(model_temp_grps$boot, main = "Groupers")
 
 
-# Diplodus ----------------------------------------------------------------
+# Seabreams ----------------------------------------------------------------
 
 model_temp_dip <- run_mod(species_mat = dip_temp_mat, n_covs = 1,
                            family = "gaussian", coords = dip_temp_coords)
-plotMRF_hm(model_temp_dip$mod, main = "Diplodus - association coefficients")
-plotMRF_hm(model_temp_dip$boot, main = "Diplodus")
+plotMRF_hm(model_temp_dip$mod, main = "Seabreams - association coefficients")
+plotMRF_hm(model_temp_dip$boot, main = "Seabreams")
 
 # Herbivores --------------------------------------------------------------
 
@@ -123,7 +123,9 @@ plotMRF_hm(model_temp_herb$mod, main = "Herbivores - association coefficients")
 plotMRF_hm(model_temp_herb$boot, main = "Herbivores")
 
 ```
-
+<!--*Groupers*-->
+<!--*Seabreams*-->
+*Herboivores*: 
 Only two _Siganus rivulatus_ is associated with other species ( _Scarus ghobban_ and _Sparisoma cretense_), other herbivore species
 
 ### MPAs
@@ -139,7 +141,7 @@ plotMRF_hm(model_mpa_grps$mod, main = "Species association coefficients")
 plotMRF_hm(model_mpa_grps$boot)
 
 
-# Diplodus ----------------------------------------------------------------
+# Seabreams ----------------------------------------------------------------
 
 model_mpa_dip <- run_mod(species_mat = dip_mpa_mat, n_covs = 1,
                            family = "gaussian", coords = dip_mpa_coords)
@@ -164,7 +166,7 @@ plotMRF_hm(model_depth_grps$mod, main = "Species association coefficients")
 plotMRF_hm(model_depth_grps$boot)
 
 
-# Diplodus ----------------------------------------------------------------
+# Seabreams ----------------------------------------------------------------
 
 model_depth_dip <- run_mod(species_mat = dip_depth_mat, n_covs = 1,
                            family = "gaussian", coords = dip_depth_coords)
@@ -193,7 +195,7 @@ grps_temp_nested_mod <- nested_models(nested_df = grps_temp_cat_nested)
 grps_temp_nested_plot <- grps_temp_nested_mod %>% mutate(plot = map(model, get_graph))
 grps_temp_graph <- plot_multi_graphs(nested_df = grps_temp_nested_plot, n_graphs = 3)
 
-# Diplodus ----------------------------------------------------------------
+# Seabreams ----------------------------------------------------------------
 
 dip_temp_cats <- categorise_cov(species_mat = dip_temp_mat, covariate = "tmean_reg")
 dip_temp_cat_nested <- nested_data(categorised_data = dip_temp_cats)
@@ -223,7 +225,7 @@ grps_mpa_nested_mod <- nested_models(nested_df = grps_mpa_cat_nested)
 grps_mpa_nested_plot <- grps_mpa_nested_mod %>% mutate(plot = map(model, get_graph))
 grps_mpa_graph <- plot_multi_graphs(nested_df = grps_mpa_nested_plot, n_graphs = 2)
 
-# Diplodus ----------------------------------------------------------------
+# Seabreams ----------------------------------------------------------------
 
 dip_mpa_cat_nested <- nested_data(categorised_data = as.data.frame(dip_mpa_mat))
 dip_mpa_cat_model <- get_model(data = dip_mpa_mat, ncov = 1)
@@ -256,6 +258,8 @@ herb_depth_graph <- plot_multi_graphs(nested_df = herb_depth_nested_plot, n_grap
 
 
 ```
+
+
 Depth is a bit problematic because the samples are not distributed evenly between depths and spatialy:
 ```{r echo=FALSE}
 ggplot(med_raw, aes(depth)) + geom_histogram(binwidth = 1, aes(fill = ..x..)) +
@@ -275,7 +279,7 @@ ggplot(grps_depth) +
 diplodus_depth <- med_raw %>% filter(species == diplodus)
 ggplot(diplodus_depth) +
   geom_histogram(aes(x = depth, fill = data.origin), binwidth = 1) +
-  ggtitle("Diplodus depth distribution")
+  ggtitle("Seabreams depth distribution")
 
 rm(list = c("grps_depth", "diplodus_depth"))
 
@@ -348,7 +352,7 @@ formattable(groupers_spp_relimp)
 Most grouper species are affected mainly by other species occurrence rather than covatiates (temperature, MPAs and depth).
 _Mycteroperca rubra_ shows a different pattern whereas temperature and MPAs are stronger factors than biotic interactions.
 
-### Diplodus
+### Seabreams
 
 ```{r}
 dip_temp <- sapply(X = model_temp_dip$mod$key_coefs, rel_imp, cov = "tmean_reg") %>% 
@@ -372,7 +376,7 @@ formattable(dip_spp_relimp)
 ```
 
 
-Diplodus species are not greatly affected by other species accept _Diplodus cervinus_, which seem to show a different pattern with temperature and depth effects.
+Seabream species are not greatly affected by other species accept _Diplodus cervinus_, which seem to show a different pattern with temperature and depth effects.
 
 ### Herbivores
 
@@ -424,7 +428,7 @@ formattable(groupers_spp_meancoef)
 
 ```
 
-### Diplodus
+### Seabreams
 
 ```{r}
 dip_temp_meancoefs <- sapply(X = model_temp_dip$boot$mean_key_coefs, FUN = mean_coef) %>%
