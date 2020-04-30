@@ -145,7 +145,7 @@ rel_imp <- function(i, cov){
 # Calculate the sum of mean_coefficient, see the general direction
 mean_coef <- function(j){
   j %>% 
-    .$Mean_coef %>% 
+    .$Standardised_coef %>% 
     sum()
 }
 
