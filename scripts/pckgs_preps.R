@@ -49,7 +49,8 @@ coords_all <- med_raw %>%
   ungroup() %>% 
   na.omit() %>% 
   mutate(loc = paste(site, trans)) %>% 
-  column_to_rownames("loc")
+  column_to_rownames("loc") %>% 
+  select(lat, lon)
 
 coords_w <- med_raw %>%
   filter(country %in% west) %>% 
@@ -60,7 +61,8 @@ coords_w <- med_raw %>%
   ungroup() %>% 
   na.omit() %>% 
   mutate(loc = paste(site, trans)) %>% 
-  column_to_rownames("loc")
+  column_to_rownames("loc") %>% 
+  select(lat, lon)
 
 coords_e <- med_raw %>%
   filter(country %in% east) %>% 
@@ -71,4 +73,5 @@ coords_e <- med_raw %>%
   ungroup() %>% 
   na.omit() %>% 
   mutate(loc = paste(site, trans)) %>% 
-  column_to_rownames("loc")
+  column_to_rownames("loc") %>% 
+  select(lat, lon)
