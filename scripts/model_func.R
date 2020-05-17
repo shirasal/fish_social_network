@@ -8,12 +8,11 @@ source("scripts/pckgs_preps.R")
 # Func 1: Create species matrix and coordinate dataframe
 
 create_spp_mat <- function(dataset, basin, group, covariate){
-  # a) Create species matrix for `group` in `basin` with `covariate`
-  spp_mat <- dataset %>%
+  # Create species matrix for `group` in `basin` with `covariate`
+  dataset %>%
     filter(country %in% basin) %>% 
     group_by(lat, lon, site, trans, species, tmean_reg, mpa, depth_reg) %>%
     summarise(n = sum(sp.n)) %>% 
-    filter(species %in% tidyselect::all_of(group)) %>% 
     spread(species, n, fill = 0) %>% 
     sample_n(size = 1) %>% 
     ungroup() %>% 
@@ -22,22 +21,6 @@ create_spp_mat <- function(dataset, basin, group, covariate){
     column_to_rownames("loc") %>%
     select(tidyselect::all_of(group), tidyselect::all_of(covariate)) %>% 
     as.matrix()
-  
-  # b) Create a coordinate dataframe:
-  coords <- dataset %>%
-    filter(country %in% basin) %>% 
-    group_by(lat, lon, site, trans, species, tmean_reg, mpa, depth_reg) %>%
-    summarise(n = sum(sp.n)) %>% 
-    filter(species %in% tidyselect::all_of(group)) %>% 
-    spread(species, n, fill = 0) %>% 
-    sample_n(size = 1) %>% 
-    ungroup() %>% 
-    na.omit() %>% 
-    mutate(loc = paste(site, trans)) %>% 
-    column_to_rownames("loc") %>% 
-    select(lat, lon)
-  
-  return(list(spp_mat, coords))
 }
 
 
