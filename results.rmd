@@ -15,6 +15,14 @@ output:
 source("scripts/pckgs_preps.R")
 source("scripts/model_func.R")
 library(usethis)
+library(formattable)
+
+# For mean coefficient tables
+neg_col <- '#3399CC'
+pos_col <- '#FF3333'
+col_formatter <- formatter("span",
+                           style = x ~ style(color =
+                                               ifelse(x > 0, pos_col, ifelse(x < 0, neg_col, "black"))))
 
 ```
 
@@ -36,46 +44,37 @@ connectance (C0) = L/M
 
 
 # Groupers
-```{r warning=FALSE, fig.align='center'}
+```{r warning=FALSE, fig.align='center', fig.show='hold'}
 
 ## Create matrices --------------------------------------------------------
 # Temperature and depth ---------------------------------------------------
 grps_temp_dep <- create_spp_mat(dataset = med_raw, basin = all_med,
                                 group = groupers, covariate = c("tmean_reg", "depth_reg"))
-grps_temp_dep_mat <- grps_temp_dep[[1]]
-grps_temp_dep_coords <- grps_temp_dep[[2]]
-rm(grps_temp_dep)
+
 # Temperature -------------------------------------------------------------
 grps_temp <- create_spp_mat(dataset = med_raw, basin = all_med,
                             group = groupers, covariate = "tmean_reg")
-grps_temp_mat <- grps_temp[[1]]
-grps_temp_coords <- grps_temp[[2]]
-rm(grps_temp)
+
 # MPAs and depth ----------------------------------------------------------
 grps_mpa_dep <- create_spp_mat(dataset = med_raw, basin = all_med,
                                group = groupers, covariate = c("mpa", "depth_reg"))
-grps_mpa_dep_mat <- grps_mpa_dep[[1]]
-grps_mpa_dep_coords <- grps_mpa_dep[[2]]
-rm(grps_mpa)
+
 # MPAs --------------------------------------------------------------------
 grps_mpa <- create_spp_mat(dataset = med_raw, basin = all_med,
                            group = groupers, covariate = "mpa")
-grps_mpa_mat <- grps_mpa[[1]]
-grps_mpa_coords <- grps_mpa[[2]]
-rm(grps_mpa)
 
 ## Run models -------------------------------------------------------------
 
 # Temperature and depth ---------------------------------------------------
 
-grps_temp_dep_model <- run_mod(species_mat = grps_temp_dep_mat, n_covs = 2,
-                           family = "gaussian", coords = grps_temp_dep_coords)
+grps_temp_dep_model <- run_mod(species_mat = grps_temp_dep, n_covs = 2, 
+                           family = "gaussian", coords = coords_all)
 plotMRF_hm(grps_temp_dep_model$mod, main = "Groupers and temperature (incl. depth) - association coefficients")
 
 # MPAs and depth ----------------------------------------------------------
 
-grps_mpa_dep_model <- run_mod(species_mat = grps_mpa_dep_mat, n_covs = 2,
-                          family = "gaussian", coords = grps_mpa_dep_coords)
+grps_mpa_dep_model <- run_mod(species_mat = grps_mpa_dep, n_covs = 2,
+                          family = "gaussian", coords = coords_all)
 plotMRF_hm(grps_mpa_dep_model$mod, main = "Groupers and MPAs (incl. depth) - association coefficients")
 
 
@@ -83,9 +82,9 @@ plotMRF_hm(grps_mpa_dep_model$mod, main = "Groupers and MPAs (incl. depth) - ass
 
 # Temperature -------------------------------------------------------------
 # without depth
-grps_temp_cats <- categorise_cov(species_mat = grps_temp_mat, covariate = "tmean_reg")
+grps_temp_cats <- categorise_cov(species = grps_temp, covariate = "tmean_reg")
 grps_temp_cat_nested <- nested_data(categorised_data = grps_temp_cats)
-grps_temp_cat_model <- get_model(data = grps_temp_mat, ncov = 1)
+grps_temp_cat_model <- get_model(data = grps_temp, ncov = 1)
 grps_temp_nested_mod <- nested_models(nested_df = grps_temp_cat_nested)
 grps_temp_nested_plot <- grps_temp_nested_mod %>% mutate(plot = map(model, get_graph))
 grps_temp_graph <- plot_multi_graphs(nested_df = grps_temp_nested_plot, n_graphs = 3)
@@ -97,8 +96,8 @@ grps_temp_graph <- plot_multi_graphs(nested_df = grps_temp_nested_plot, n_graphs
 
 # MPAs --------------------------------------------------------------------
 # without depth
-grps_mpa_cat_nested <- nested_data(categorised_data = as.data.frame(grps_mpa_mat))
-grps_mpa_cat_model <- get_model(data = grps_mpa_mat, ncov = 1)
+grps_mpa_cat_nested <- nested_data(categorised_data = as.data.frame(grps_mpa))
+grps_mpa_cat_model <- get_model(data = grps_mpa, ncov = 1)
 grps_mpa_nested_mod <- nested_models(nested_df = grps_mpa_cat_nested)
 grps_mpa_nested_plot <- grps_mpa_nested_mod %>% mutate(plot = map(model, get_graph))
 grps_mpa_graph <- plot_multi_graphs(nested_df = grps_mpa_nested_plot, n_graphs = 2)
@@ -131,11 +130,19 @@ grps_mpa_meancoefs <- sapply(X = grps_mpa_dep_model$mod$key_coefs, FUN = mean_co
   tibble::enframe() %>% 
   rename("species" = name, "mpa_model" = value)
 
-(grps_spp_meancoef <- grps_temp_meancoefs %>%
-  left_join(grps_mpa_meancoefs, by = "species"))
+grps_spp_meancoef <- grps_temp_meancoefs %>%
+  left_join(grps_mpa_meancoefs, by = "species")
+
+formattable(grps_spp_meancoef, align = c("l","c"), list(
+  `species` = formatter("span", style = ~ style(color = "grey", font.weight = "bold")), 
+  `temp_model` = col_formatter,
+  `mpa_model` = col_formatter
+))
+
+
 ```
 
-Most grouper species are affected mainly by other species occurrence rather than covatiates (temperature, MPAs and depth).  
+Most grouper species are affected mainly by other species occurrence rather than covariates (temperature, MPAs and depth).  
 _Mycteroperca rubra_ shows a different pattern whereas temperature and MPAs are stronger factors than biotic interactions.  
 
 # Seabreams
@@ -145,40 +152,31 @@ _Mycteroperca rubra_ shows a different pattern whereas temperature and MPAs are 
 # Temperature and depth ---------------------------------------------------
 dip_temp_dep <- create_spp_mat(dataset = med_raw, basin = all_med,
                                 group = diplodus, covariate = c("tmean_reg", "depth_reg"))
-dip_temp_dep_mat <- dip_temp_dep[[1]]
-dip_temp_dep_coords <- dip_temp_dep[[2]]
-rm(dip_temp_dep)
+
 # Temperature -------------------------------------------------------------
 dip_temp <- create_spp_mat(dataset = med_raw, basin = all_med,
                             group = diplodus, covariate = "tmean_reg")
-dip_temp_mat <- dip_temp[[1]]
-dip_temp_coords <- dip_temp[[2]]
-rm(dip_temp)
+
 # MPAs and depth ----------------------------------------------------------
 dip_mpa_dep <- create_spp_mat(dataset = med_raw, basin = all_med,
                                group = diplodus, covariate = c("mpa", "depth_reg"))
-dip_mpa_dep_mat <- dip_mpa_dep[[1]]
-dip_mpa_dep_coords <- dip_mpa_dep[[2]]
-rm(dip_mpa)
+
 # MPAs --------------------------------------------------------------------
 dip_mpa <- create_spp_mat(dataset = med_raw, basin = all_med,
                            group = diplodus, covariate = "mpa")
-dip_mpa_mat <- dip_mpa[[1]]
-dip_mpa_coords <- dip_mpa[[2]]
-rm(dip_mpa)
 
 ## Run models -------------------------------------------------------------
 
 # Temperature and depth ---------------------------------------------------
 
-dip_temp_dep_model <- run_mod(species_mat = dip_temp_dep_mat, n_covs = 2,
-                           family = "gaussian", coords = dip_temp_dep_coords)
+dip_temp_dep_model <- run_mod(species = dip_temp_dep, n_covs = 2,
+                           family = "gaussian", coords = coords_all)
 plotMRF_hm(dip_temp_dep_model$mod, main = "Seabreams and temperature (incl. depth) - association coefficients")
 
 # MPAs and depth ----------------------------------------------------------
 
-dip_mpa_dep_model <- run_mod(species_mat = dip_mpa_dep_mat, n_covs = 2,
-                          family = "gaussian", coords = dip_mpa_dep_coords)
+dip_mpa_dep_model <- run_mod(species = dip_mpa_dep, n_covs = 2,
+                          family = "gaussian", coords = coords_all)
 plotMRF_hm(dip_mpa_dep_model$mod, main = "Seabreams and MPAs (incl. depth) - association coefficients")
 
 
@@ -186,9 +184,9 @@ plotMRF_hm(dip_mpa_dep_model$mod, main = "Seabreams and MPAs (incl. depth) - ass
 
 # Temperature -------------------------------------------------------------
 # without depth
-dip_temp_cats <- categorise_cov(species_mat = dip_temp_mat, covariate = "tmean_reg")
+dip_temp_cats <- categorise_cov(species = dip_temp, covariate = "tmean_reg")
 dip_temp_cat_nested <- nested_data(categorised_data = dip_temp_cats)
-dip_temp_cat_model <- get_model(data = dip_temp_mat, ncov = 1)
+dip_temp_cat_model <- get_model(data = dip_temp, ncov = 1)
 dip_temp_nested_mod <- nested_models(nested_df = dip_temp_cat_nested)
 dip_temp_nested_plot <- dip_temp_nested_mod %>% mutate(plot = map(model, get_graph))
 dip_temp_graph <- plot_multi_graphs(nested_df = dip_temp_nested_plot, n_graphs = 3)
@@ -200,8 +198,8 @@ dip_temp_graph <- plot_multi_graphs(nested_df = dip_temp_nested_plot, n_graphs =
 
 # MPAs --------------------------------------------------------------------
 # without depth
-dip_mpa_cat_nested <- nested_data(categorised_data = as.data.frame(dip_mpa_mat))
-dip_mpa_cat_model <- get_model(data = dip_mpa_mat, ncov = 1)
+dip_mpa_cat_nested <- nested_data(categorised_data = as.data.frame(dip_mpa))
+dip_mpa_cat_model <- get_model(data = dip_mpa, ncov = 1)
 dip_mpa_nested_mod <- nested_models(nested_df = dip_mpa_cat_nested)
 dip_mpa_nested_plot <- dip_mpa_nested_mod %>% mutate(plot = map(model, get_graph))
 dip_mpa_graph <- plot_multi_graphs(nested_df = dip_mpa_nested_plot, n_graphs = 2)
@@ -234,8 +232,15 @@ dip_mpa_meancoefs <- sapply(X = dip_mpa_dep_model$mod$key_coefs, FUN = mean_coef
   tibble::enframe() %>% 
   rename("species" = name, "mpa_model" = value)
 
-(dip_spp_meancoef <- dip_temp_meancoefs %>%
-  left_join(dip_mpa_meancoefs, by = "species"))
+dip_spp_meancoef <- dip_temp_meancoefs %>%
+  left_join(dip_mpa_meancoefs, by = "species")
+
+formattable(dip_spp_meancoef, align = c("l","c"), list(
+  `species` = formatter("span", style = ~ style(color = "grey", font.weight = "bold")), 
+  `temp_model` = col_formatter,
+  `mpa_model` = col_formatter
+))
+
 
 ```
 
@@ -250,40 +255,31 @@ herb_west <- c("Sparisoma.cretense", "Sarpa.salpa", "Siganus.luridus")
 # Temperature and depth ---------------------------------------------------
 herb_west_temp_dep <- create_spp_mat(dataset = med_raw, basin = west,
                                 group = herb_west, covariate = c("tmean_reg", "depth_reg"))
-herb_west_temp_dep_mat <- herb_west_temp_dep[[1]]
-herb_west_temp_dep_coords <- herb_west_temp_dep[[2]]
-rm(herb_west_temp_dep)
+
 # Temperature -------------------------------------------------------------
 herb_west_temp <- create_spp_mat(dataset = med_raw, basin = west,
                             group = herb_west, covariate = "tmean_reg")
-herb_west_temp_mat <- herb_west_temp[[1]]
-herb_west_temp_coords <- herb_west_temp[[2]]
-rm(herb_west_temp)
+
 # MPAs and depth ----------------------------------------------------------
 herb_west_mpa_dep <- create_spp_mat(dataset = med_raw, basin = west,
                                group = herb_west, covariate = c("mpa", "depth_reg"))
-herb_west_mpa_dep_mat <- herb_west_mpa_dep[[1]]
-herb_west_mpa_dep_coords <- herb_west_mpa_dep[[2]]
-rm(herb_west_mpa)
+
 # MPAs --------------------------------------------------------------------
 herb_west_mpa <- create_spp_mat(dataset = med_raw, basin = west,
                            group = herb_west, covariate = "mpa")
-herb_west_mpa_mat <- herb_west_mpa[[1]]
-herb_west_mpa_coords <- herb_west_mpa[[2]]
-rm(herb_west_mpa)
 
 ## Run models -------------------------------------------------------------
 
 # Temperature and depth ---------------------------------------------------
 
-herb_west_temp_dep_model <- run_mod(species_mat = herb_west_temp_dep_mat, n_covs = 2,
-                           family = "gaussian", coords = herb_west_temp_dep_coords)
+herb_west_temp_dep_model <- run_mod(species_mat = herb_west_temp_dep, n_covs = 2,
+                           family = "gaussian", coords = coords_w)
 plotMRF_hm(herb_west_temp_dep_model$mod, main = "Herbivores and temperature (incl. depth) in the west - association coefficients")
 
 # MPAs and depth ----------------------------------------------------------
 
-herb_west_mpa_dep_model <- run_mod(species_mat = herb_west_mpa_dep_mat, n_covs = 2,
-                          family = "gaussian", coords = herb_west_mpa_dep_coords)
+herb_west_mpa_dep_model <- run_mod(species_mat = herb_west_mpa_dep, n_covs = 2,
+                          family = "gaussian", coords = coords_w)
 plotMRF_hm(herb_west_mpa_dep_model$mod, main = "Herbivores and MPAs (incl. depth) in the west - association coefficients")
 
 
@@ -291,9 +287,9 @@ plotMRF_hm(herb_west_mpa_dep_model$mod, main = "Herbivores and MPAs (incl. depth
 
 # Temperature -------------------------------------------------------------
 # without depth
-herb_west_temp_cats <- categorise_cov(species_mat = herb_west_temp_mat, covariate = "tmean_reg")
+herb_west_temp_cats <- categorise_cov(species_mat = herb_west_temp, covariate = "tmean_reg")
 herb_west_temp_cat_nested <- nested_data(categorised_data = herb_west_temp_cats)
-herb_west_temp_cat_model <- get_model(data = herb_west_temp_mat, ncov = 1)
+herb_west_temp_cat_model <- get_model(data = herb_west_temp, ncov = 1)
 herb_west_temp_nested_mod <- nested_models(nested_df = herb_west_temp_cat_nested)
 herb_west_temp_nested_plot <- herb_west_temp_nested_mod %>% mutate(plot = map(model, get_graph))
 # herb_west_temp_graph <- plot_multi_graphs(nested_df = herb_west_temp_nested_plot, n_graphs = 3)
@@ -306,8 +302,8 @@ ui_oops("Problem with igraph here :(")
 
 # MPAs --------------------------------------------------------------------
 # without depth
-herb_west_mpa_cat_nested <- nested_data(categorised_data = as.data.frame(herb_west_mpa_mat))
-herb_west_mpa_cat_model <- get_model(data = herb_west_mpa_mat, ncov = 1)
+herb_west_mpa_cat_nested <- nested_data(categorised_data = as.data.frame(herb_west_mpa))
+herb_west_mpa_cat_model <- get_model(data = herb_west_mpa, ncov = 1)
 herb_west_mpa_nested_mod <- nested_models(nested_df = herb_west_mpa_cat_nested)
 herb_west_mpa_nested_plot <- herb_west_mpa_nested_mod %>% mutate(plot = map(model, get_graph))
 # herb_west_mpa_graph <- plot_multi_graphs(nested_df = herb_west_mpa_nested_plot, n_graphs = 2)
@@ -341,8 +337,14 @@ herb_west_mpa_meancoefs <- sapply(X = herb_west_mpa_dep_model$mod$key_coefs, FUN
   tibble::enframe() %>% 
   rename("species" = name, "mpa_model" = value)
 
-(herb_west_spp_meancoef <- herb_west_temp_meancoefs %>%
-  left_join(herb_west_mpa_meancoefs, by = "species"))
+herb_west_spp_meancoef <- herb_west_temp_meancoefs %>%
+  left_join(herb_west_mpa_meancoefs, by = "species")
+
+formattable(herb_west_spp_meancoef, align = c("l","c"), list(
+  `species` = formatter("span", style = ~ style(color = "grey", font.weight = "bold")), 
+  `temp_model` = col_formatter,
+  `mpa_model` = col_formatter
+))
 
 ```
 
@@ -353,40 +355,31 @@ herb_west_mpa_meancoefs <- sapply(X = herb_west_mpa_dep_model$mod$key_coefs, FUN
 # Temperature and depth ---------------------------------------------------
 herb_temp_dep <- create_spp_mat(dataset = med_raw, basin = all_med,
                                 group = herbivores, covariate = c("tmean_reg", "depth_reg"))
-herb_temp_dep_mat <- herb_temp_dep[[1]]
-herb_temp_dep_coords <- herb_temp_dep[[2]]
-rm(herb_temp_dep)
+
 # Temperature -------------------------------------------------------------
 herb_temp <- create_spp_mat(dataset = med_raw, basin = all_med,
                             group = herbivores, covariate = "tmean_reg")
-herb_temp_mat <- herb_temp[[1]]
-herb_temp_coords <- herb_temp[[2]]
-rm(herb_temp)
+
 # MPAs and depth ----------------------------------------------------------
 herb_mpa_dep <- create_spp_mat(dataset = med_raw, basin = all_med,
                                group = herbivores, covariate = c("mpa", "depth_reg"))
-herb_mpa_dep_mat <- herb_mpa_dep[[1]]
-herb_mpa_dep_coords <- herb_mpa_dep[[2]]
-rm(herb_mpa)
+
 # MPAs --------------------------------------------------------------------
 herb_mpa <- create_spp_mat(dataset = med_raw, basin = all_med,
                            group = herbivores, covariate = "mpa")
-herb_mpa_mat <- herb_mpa[[1]]
-herb_mpa_coords <- herb_mpa[[2]]
-rm(herb_mpa)
 
 ## Run models -------------------------------------------------------------
 
 # Temperature and depth ---------------------------------------------------
 
-herb_temp_dep_model <- run_mod(species_mat = herb_temp_dep_mat, n_covs = 2,
-                           family = "gaussian", coords = herb_temp_dep_coords)
+herb_temp_dep_model <- run_mod(species = herb_temp_dep, n_covs = 2,
+                           family = "gaussian", coords = coords_all)
 plotMRF_hm(herb_temp_dep_model$mod, main = "Herbivores and temperature (incl. depth) - association coefficients")
 
 # MPAs and depth ----------------------------------------------------------
 
-herb_mpa_dep_model <- run_mod(species_mat = herb_mpa_dep_mat, n_covs = 2,
-                          family = "gaussian", coords = herb_mpa_dep_coords)
+herb_mpa_dep_model <- run_mod(species = herb_mpa_dep, n_covs = 2,
+                          family = "gaussian", coords = coords_all)
 plotMRF_hm(herb_mpa_dep_model$mod, main = "Herbivores and MPAs (incl. depth) - association coefficients")
 
 
@@ -394,9 +387,9 @@ plotMRF_hm(herb_mpa_dep_model$mod, main = "Herbivores and MPAs (incl. depth) - a
 
 # Temperature -------------------------------------------------------------
 # without depth
-herb_temp_cats <- categorise_cov(species_mat = herb_temp_mat, covariate = "tmean_reg")
+herb_temp_cats <- categorise_cov(species = herb_temp, covariate = "tmean_reg")
 herb_temp_cat_nested <- nested_data(categorised_data = herb_temp_cats)
-herb_temp_cat_model <- get_model(data = herb_temp_mat, ncov = 1)
+herb_temp_cat_model <- get_model(data = herb_temp, ncov = 1)
 herb_temp_nested_mod <- nested_models(nested_df = herb_temp_cat_nested)
 herb_temp_nested_plot <- herb_temp_nested_mod %>% mutate(plot = map(model, get_graph))
 herb_temp_graph <- plot_multi_graphs(nested_df = herb_temp_nested_plot, n_graphs = 3)
@@ -408,8 +401,8 @@ herb_temp_graph <- plot_multi_graphs(nested_df = herb_temp_nested_plot, n_graphs
 
 # MPAs --------------------------------------------------------------------
 # without depth
-herb_mpa_cat_nested <- nested_data(categorised_data = as.data.frame(herb_mpa_mat))
-herb_mpa_cat_model <- get_model(data = herb_mpa_mat, ncov = 1)
+herb_mpa_cat_nested <- nested_data(categorised_data = as.data.frame(herb_mpa))
+herb_mpa_cat_model <- get_model(data = herb_mpa, ncov = 1)
 herb_mpa_nested_mod <- nested_models(nested_df = herb_mpa_cat_nested)
 herb_mpa_nested_plot <- herb_mpa_nested_mod %>% mutate(plot = map(model, get_graph))
 herb_mpa_graph <- plot_multi_graphs(nested_df = herb_mpa_nested_plot, n_graphs = 2)
@@ -442,8 +435,14 @@ herb_mpa_meancoefs <- sapply(X = herb_mpa_dep_model$mod$key_coefs, FUN = mean_co
   tibble::enframe() %>% 
   rename("species" = name, "mpa_model" = value)
 
-(herb_spp_meancoef <- herb_temp_meancoefs %>%
-  left_join(herb_mpa_meancoefs, by = "species"))
+herb_spp_meancoef <- herb_temp_meancoefs %>%
+  left_join(herb_mpa_meancoefs, by = "species")
+
+formattable(herb_spp_meancoef, align = c("l","c"), list(
+  `species` = formatter("span", style = ~ style(color = "grey", font.weight = "bold")), 
+  `temp_model` = col_formatter,
+  `mpa_model` = col_formatter
+))
 
 ```
 
