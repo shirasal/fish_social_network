@@ -449,6 +449,9 @@ formattable(herb_spp_meancoef, align = c("l","c"), list(
 
 In the whole Mediterranean we seen some associations but when not considering _Siganus rivulatus_ (according to the data it appears only in the eastern basin) - there are no other associations.  
 
+Species relationships appear to be stationary in the groupers case and the seabreams case, but in the herbivores subset the raltionships were different when considering covariates. This was only relevant when the species from the eastern basin were considered.
+
+# Data exploration
 
 The depth factor is a bit problematic because the samples are not distributed evenly between depths and spatialy:  
 ```{r echo=FALSE}
