@@ -1,0 +1,56 @@
+---
+title: "The Data Explorer - fish_social_network"
+output: html_notebook
+---
+
+```{r Setup, include=FALSE}
+library(magrittr)
+library(tidyverse)
+
+```
+
+* Run the 'results.Rmd' file first
+
+# Species dispersal
+
+## Groupers
+
+![Epinephelus marginatus](figures/ObserveMaps/Epinephelus.marginatus_obs.png)
+
+![Epinephelus costae](figures/ObserveMaps/Epinephelus.costae_obs.png)
+
+![Mycteroperca rubra](figures/ObserveMaps/Mycteroperca.rubra_obs.png)
+
+
+![Serranus cabrilla](figures/ObserveMaps/Serranus.cabrilla_obs.png)
+
+
+![Serranus scriba](figures/ObserveMaps/Serranus.scriba_obs.png)
+
+
+## Seabreams
+
+![Diplodus vulgaris](figures/ObserveMaps/Diplodus.vulgaris_obs.png)
+
+![Diplodus sargus](figures/ObserveMaps/Diplodus.sargus_obs.png)
+
+
+![Diplodus puntazzo](figures/ObserveMaps/Diplodus.puntazzo_obs.png)
+
+![Diplodus annularis](figures/ObserveMaps/Diplodus.annularis_obs.png)
+```{r}
+herbivores
+
+```
+
+## Herbivores
+![Siganus rivulatus](figures/ObserveMaps/Siganus.rivulatus_obs.png)
+
+![Siganus luridus](figures/ObserveMaps/Siganus.luridus_obs.png)
+
+![Sarpa salpa](figures/ObserveMaps/Sarpa.salpa_obs.png)
+
+![Scarus ghobban](figures/ObserveMaps/Scarus.ghobban_obs.png)
+
+![Sparisoma cretense](figures/ObserveMaps/Sparisoma.cretense_obs.png)
+
