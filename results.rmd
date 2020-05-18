@@ -451,6 +451,139 @@ In the whole Mediterranean we seen some associations but when not considering _S
 
 Species relationships appear to be stationary in the groupers case and the seabreams case, but in the herbivores subset the raltionships were different when considering covariates. This was only relevant when the species from the eastern basin were considered.
 
+# All species in all basins  
+
+**Currently not running (MRFcov)**
+
+```{r eval=FALSE, fig.align='center', warning=FALSE, include=FALSE}
+
+all_spps <- med_raw %>% distinct(species)
+
+## Create matrices --------------------------------------------------------
+# Filter out species that appear less than 10 times in the dataset
+full_med <- med_raw %>%
+  group_by(lat, lon, site, trans, species, tmean_reg, mpa, depth_reg) %>%
+  summarise(n = sum(sp.n)) %>% 
+  filter(n > 10) %>% 
+  spread(species, n, fill = 0) %>% 
+  sample_n(size = 1) %>% 
+  ungroup() %>% 
+  na.omit() %>% 
+  mutate(loc = paste(site, trans)) %>% 
+  column_to_rownames("loc")
+
+# And coordinate
+full_coords <- med_raw %>%
+  group_by(lat, lon, site, trans, species, tmean_reg, mpa, depth_reg) %>%
+  summarise(n = sum(sp.n)) %>% 
+  filter(n > 10) %>% 
+  spread(species, n, fill = 0) %>% 
+  sample_n(size = 1) %>% 
+  ungroup() %>% 
+  na.omit() %>% 
+  mutate(loc = paste(site, trans)) %>% 
+  column_to_rownames("loc") %>% 
+  select(lat, lon)
+
+# Temperature and depth ---------------------------------------------------
+full_temp_dep <- full_med %>% 
+  select(8:ncol(.), tmean_reg, depth_reg) %>% 
+  as.matrix()
+
+# Temperature -------------------------------------------------------------
+full_temp <- full_med %>% 
+  select(8:ncol(.), tmean_reg) %>% 
+  as.matrix()
+
+# MPAs and depth ----------------------------------------------------------
+full_mpa_dep <- full_med %>% 
+  select(8:ncol(.), mpa, depth_reg) %>% 
+  as.matrix()
+
+# MPAs --------------------------------------------------------------------
+full_mpa <- full_med %>% 
+  select(8:ncol(.), mpa) %>% 
+  as.matrix()
+
+## Run models -------------------------------------------------------------
+
+# Temperature and depth ---------------------------------------------------
+
+full_temp_dep_model <- run_mod(species = full_temp_dep, n_covs = 2,
+                           family = "gaussian", coords = full_coords)
+plotMRF_hm(full_temp_dep_model$mod, main = "Species and temperature (incl. depth) - association coefficients")
+
+# MPAs and depth ----------------------------------------------------------
+
+full_mpa_dep_model <- run_mod(species = full_mpa_dep, n_covs = 2,
+                          family = "gaussian", coords = full_coords)
+plotMRF_hm(full_mpa_dep_model$mod, main = "Species and MPAs (incl. depth) - association coefficients")
+
+
+## Networks ---------------------------------------------------------------
+
+# Temperature -------------------------------------------------------------
+# without depth
+full_temp_cats <- categorise_cov(species = full_temp, covariate = "tmean_reg")
+full_temp_cat_nested <- nested_data(categorised_data = full_temp_cats)
+full_temp_cat_model <- get_model(data = full_temp, ncov = 1)
+full_temp_nested_mod <- nested_models(nested_df = full_temp_cat_nested)
+full_temp_nested_plot <- full_temp_nested_mod %>% mutate(plot = map(model, get_graph))
+full_temp_graph <- plot_multi_graphs(nested_df = full_temp_nested_plot, n_graphs = 3)
+
+# Connectance 
+(full_temp_connect <- tibble(connectance = unlist(full_temp_nested_mod$connectance)) %>% 
+    add_column(network = factor(c("low", "medium", "high"))) %>% 
+    select(network, connectance))
+
+# MPAs --------------------------------------------------------------------
+# without depth
+full_mpa_cat_nested <- nested_data(categorised_data = as.data.frame(full_mpa))
+full_mpa_cat_model <- get_model(data = full_mpa, ncov = 1)
+full_mpa_nested_mod <- nested_models(nested_df = full_mpa_cat_nested)
+full_mpa_nested_plot <- full_mpa_nested_mod %>% mutate(plot = map(model, get_graph))
+full_mpa_graph <- plot_multi_graphs(nested_df = full_mpa_nested_plot, n_graphs = 2)
+
+# Connectance 
+(full_mpa_connect <- tibble(connectance = unlist(full_mpa_nested_mod$connectance)) %>% 
+  add_column(network = factor(c("outside MPA", "inside MPA"))) %>% 
+  select(network, connectance))
+
+
+## Stationarity -----------------------------------------------------------
+# Relative importance
+full_temp_relimp <- sapply(X = full_temp_dep_model$mod$key_coefs, rel_imp, cov = ("tmean_reg")) %>% 
+  tibble::enframe() %>% 
+  rename("species" = name, "temp_model" = value)
+
+full_mpa_relimp <- sapply(X = full_mpa_dep_model$mod$key_coefs, rel_imp, cov = "mpa") %>% 
+  tibble::enframe() %>% 
+  rename("species" = name, "mpa_model" = value)
+
+(full_relimp <- full_temp_relimp %>%
+  left_join(full_mpa_relimp, by = "species"))
+
+# Mean coefficients
+full_temp_meancoefs <- sapply(X = full_temp_dep_model$mod$key_coefs, FUN = mean_coef) %>%
+  tibble::enframe() %>% 
+  rename("species" = name, "temp_model" = value)
+
+full_mpa_meancoefs <- sapply(X = full_mpa_dep_model$mod$key_coefs, FUN = mean_coef) %>%
+  tibble::enframe() %>% 
+  rename("species" = name, "mpa_model" = value)
+
+full_spp_meancoef <- full_temp_meancoefs %>%
+  left_join(full_mpa_meancoefs, by = "species")
+
+formattable(full_spp_meancoef, align = c("l","c"), list(
+  `species` = formatter("span", style = ~ style(color = "grey", font.weight = "bold")), 
+  `temp_model` = col_formatter,
+  `mpa_model` = col_formatter
+))
+
+```
+
+
 # Data exploration
 
 The depth factor is a bit problematic because the samples are not distributed evenly between depths and spatialy:  
