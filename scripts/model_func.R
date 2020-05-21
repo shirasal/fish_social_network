@@ -19,7 +19,7 @@ create_spp_mat <- function(dataset, basin, group, covariate){
     na.omit() %>% 
     mutate(loc = paste(site, trans)) %>% 
     column_to_rownames("loc") %>%
-    select(tidyselect::all_of(group), tidyselect::all_of(covariate)) %>% 
+    select(group, covariate) %>% 
     as.matrix()
 }
 
