@@ -26,7 +26,7 @@ col_formatter <- formatter("span",
 
 ```
 
-In order to examine the association between species and how this association changes along environmental gradient, I chose three groups of representative fish species: groupers (Epinephelus species + Serranus species), Seabream species and herbivore species.  
+In order to examine the association between species and how this association changes along environmental gradient, I chose three groups of representative fish species (taxa): groupers (Epinephelus species + Serranus species), seabream species and herbivore species.  
 
 I'm using the MRF-based model from `MRFcov` package (Clark _et al._ [^1]) to detemine the level and direction of species association in each group.  
 
