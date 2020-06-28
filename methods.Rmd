@@ -3,6 +3,7 @@ title: "Thesis - Methods"
 author: "Shira Salingre"
 date: "13/04/2020"
 output: word_document
+bibliography: references.bib
 ---
 
 ```{r setup, include=FALSE}
@@ -10,11 +11,13 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 # Methods
-The data for this project has largely been gathered already. Visual fish census surveys took place in 85 locations along the Mediterranean Sea (figure 2) by teams of skilled SCUBA divers. Locations were comprised of sites within MPAs with varying size, age and enforcement level, and unprotected sites which are adjacent to these MPAs. To date, the database is comprised of approximately 49,000 observations of 93 species of fish and includes abundance data, as well as presence-absence data. Additional data will be collected during 2019 and will be added to the main database.
+The data for this project has largely been gathered already. Visual fish census surveys took place in 85 locations along the Mediterranean Sea (figure 2) by teams of skilled SCUBA divers. Locations were comprised of sites within MPAs with varying size, age and enforcement level, and unprotected sites which are adjacent to these MPAs. To date, the database is comprised of approximately 49,000 observations of 93 species of fish and includes abundance data, as well as presence-absence data.
+
+<!-- Summarise Medata so each species has one line per one location -->
 
 {r, fig.align="center", fig.width=6, fig.height=6, fig.cap="Figure 2: Sampling locations along the Mediterranean Sea. Each green point represents a sampling site"}
 ![]("figures/location_map_old.png")
 
 Data will be analysed using the MRFcov R package (Clark et al. 2018, R Core Team 2019), which expands MRFs into Conditional Random Fields (CRFs) by incorporating environmental covariates (predictors) in the estimation of conditional dependencies between species pairs. This model assesses a species probability of occurrence  given the probability of occurrence of all other species and environmental predictors (temperature, protection level). These probabilities are estimated through a series of logistic regressions which are then combined into a joint network. Since species dependencies can vary over gradients the output of this model allows to explore the relationships between species along these gradients. Additionally, it provides the option to measure the relative input of species co-occurrence patterns versus that of the environmental factors, by comparing their coefficients. This is an important improvement to existing jSDMs were the scales of the unexplained variance effect (which refers to species interaction) and the explained variance effect (usually environmental predictors) are not directly comparable.
 
-
+Using co-occurrence networks allows us to explore trends and patterns in the community but is controversial at making inference on the interactions that might have created these patterns (Petereson et al. 2020).
