@@ -70,7 +70,7 @@ nested_data <- function(categorised_data) {
 
 # Func 4: Run MRFcov model with some defaults
 get_model <- function(data, ncov, coords){
-  MRFcov_spatial(data = data, n_nodes = ncol(data) - ncov, n_covariates = ncov, family = "gaussian", coords)
+  MRFcov_spatial(data = data, n_nodes = ncol(data) - ncov, n_covariates = ncov, family = "gaussian", coords = coords)
 }
 
 # Assistance function: Get the connectance value
