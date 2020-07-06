@@ -19,7 +19,7 @@ create_spp_mat <- function(dataset, basin, group, covariate){
     na.omit() %>% 
     mutate(loc = paste(site, trans)) %>% 
     column_to_rownames("loc") %>%
-    select(group, covariate) %>% 
+    select(all_of(group), all_of(covariate)) %>% 
     as.matrix()
 }
 
@@ -69,8 +69,8 @@ nested_data <- function(categorised_data) {
 }
 
 # Func 4: Run MRFcov model with some defaults
-get_model <- function(data, ncov){
-  MRFcov(data = data, n_nodes = ncol(data) - ncov, n_covariates = ncov, family = "gaussian")
+get_model <- function(data, ncov, coords){
+  MRFcov_spatial(data = data, n_nodes = ncol(data) - ncov, n_covariates = ncov, family = "gaussian", coords)
 }
 
 # Assistance function: Get the connectance value
