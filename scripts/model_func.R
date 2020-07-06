@@ -84,9 +84,9 @@ connectance <- function(x){
 }
 
 # Func 5: Run model on each category ad calculate connectance
-nested_models <- function(nested_df){
+nested_models <- function(nested_df, ncov, coords){
   nested_df %>%
-    mutate(model = map(data, function(x) get_model(data = x, ncov = 1)),
+    mutate(model = map(data, function(x) get_model(data = x, ncov = ncov, coords = coords)),
            connectance = map(model, function(x) connectance(x$graph)))
 }
 
