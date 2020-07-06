@@ -26,11 +26,11 @@ create_spp_mat <- function(dataset, basin, group, covariate){
 
 # Func 2: Run model and create occurrence predictions
 run_mod <- function(species_mat, n_covs, family){
-  mod <- MRFcov_spatial(data = species_mat, n_nodes = ncol(species_mat) - n_covs,
+  mod <- MRFcov(data = species_mat, n_nodes = ncol(species_mat) - n_covs,
                         n_covariates = n_covs, family = family,
                         n_cores = parallel::detectCores())
   boot <- bootstrap_MRF(data = species_mat, n_nodes = ncol(species_mat) - n_covs,
-                        n_covariates = n_covs, family = family, spatial = TRUE,
+                        n_covariates = n_covs, family = family,
                         n_cores = parallel::detectCores())
   pred <- predict_MRF(data = species_mat, MRF_mod = boot) %>% invlogit()
   return(list(mod = mod, boot = boot, pred = pred))
@@ -70,7 +70,7 @@ nested_data <- function(categorised_data) {
 
 # Func 4: Run MRFcov model with some defaults
 get_model <- function(data, ncov){
-  MRFcov_spatial(data = data, n_nodes = ncol(data) - ncov, n_covariates = ncov, family = "gaussian")
+  MRFcov(data = data, n_nodes = ncol(data) - ncov, n_covariates = ncov, family = "gaussian")
 }
 
 # Assistance function: Get the connectance value
