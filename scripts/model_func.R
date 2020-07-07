@@ -51,26 +51,44 @@ categorise_cov <- function(species_mat, covariate){
 }
 
 # Func 3b: Nest categorical (nominal) data
-nested_data <- function(categorised_data) {
-  if ("category" %in% colnames(categorised_data)){
-    categorised_data %>%
-      arrange(category) %>%
-      group_by(category) %>%
-      nest() %>% 
-      return()
+nested_data <- function(categorised_data, ncov) {
+  if (ncov > 1){
+    if ("category" %in% colnames(categorised_data)){
+      categorised_data %>%
+        arrange(category) %>%
+        group_by(category) %>%
+        nest() %>% 
+        return()
+    } else {
+      categorised_data %>%
+        mutate(category = as.factor(.[, ncol(.)-1])) %>%
+        arrange(category) %>%
+        group_by(category) %>%
+        nest() %>% 
+        return()
+    } 
   } else {
-    categorised_data %>%
-      mutate(category = as.factor(.[, ncol(.)])) %>%
-      arrange(category) %>%
-      group_by(category) %>%
-      nest() %>% 
-      return()
-  } 
+    if ("category" %in% colnames(categorised_data)){
+      categorised_data %>%
+        arrange(category) %>%
+        group_by(category) %>%
+        nest() %>% 
+        return()
+    } else {
+      categorised_data %>%
+        mutate(category = as.factor(.[, ncol(.)])) %>%
+        arrange(category) %>%
+        group_by(category) %>%
+        nest() %>% 
+        return()
+    } 
+  }
 }
 
 # Func 4: Run MRFcov model with some defaults
 get_model <- function(data, ncov, coords){
-  MRFcov_spatial(data = data, n_nodes = ncol(data) - ncov, n_covariates = ncov, family = "gaussian", coords = coords)
+  MRFcov_spatial(data = data, n_nodes = ncol(data) - ncov, n_covariates = ncov,
+                 family = "gaussian", coords = coords)
 }
 
 # Assistance function: Get the connectance value
