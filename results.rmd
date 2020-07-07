@@ -13,7 +13,7 @@ output:
 
 ```{r setup, include=FALSE}
 source("scripts/pckgs_preps.R")
-source("scripts/model_func.R")
+source("scripts/model_func_nonspat.R")
 library(usethis)
 library(formattable)
 
@@ -42,14 +42,47 @@ S = number of nodes (species)
 M = S^2  
 connectance (C0) = L/M  
 
+# Objectives  
 
-# Groupers
+1. To estimate the amount of non-stationarity in interspecific interactions within fish communities across the Mediterranean Sea.  
+2. To estimate the amount of non-stationarity in interspecific interactions within fish communities within and outside MPAs.  
+
+# Predictions:
+
+1. Temperature effect:
+  a. More **positive** associations  
+  b. More **negative** associations
+  * CREATE A GRAPH (X = TEMPERATURE; Y = SUM OF ASSOCIATIONS or COUNT OF POSITIVE/NEGATIVE ASSOCIATIONS)  
+2. MPA effect:
+  a. More species/individuals/biomass can be translated to more associations
+  b. In biomass model - more associations
+  
+
+<!-- From Roi's comments on proposal: 
+
+- Is there any grounds to hypothesise that in warmer areas the associations will be going a certain direction? (more/less associations, weaker/stringer associations) --- NETWORK LEVEL  
+- How to identify patterns?  
+- Invasive species gradient --- WE CAN MAKE A SORT OF INDEX OF INVASION  
+- What variable is being measured? Strength of associations? Direction of associations? Count of associations?  
+
+**I THINK WE SHOULD USE DIFFERENT VARIABLES FOR DIFFERENT QUESTIONS**  
+
+
+-->
+
+
+# Groupers community
+
+## Matrices for each covariate
+
 ```{r warning=FALSE, fig.align='center', fig.show='hold'}
 
-## Create matrices --------------------------------------------------------
 # Temperature and depth ---------------------------------------------------
 grps_temp_dep <- create_spp_mat(dataset = med_raw, basin = all_med,
                                 group = groupers, covariate = c("tmean_reg", "depth_reg"))
+
+
+
 
 # Temperature -------------------------------------------------------------
 grps_temp <- create_spp_mat(dataset = med_raw, basin = all_med,
@@ -63,29 +96,39 @@ grps_mpa_dep <- create_spp_mat(dataset = med_raw, basin = all_med,
 grps_mpa <- create_spp_mat(dataset = med_raw, basin = all_med,
                            group = groupers, covariate = "mpa")
 
-## Run models -------------------------------------------------------------
 
+test <- (grps_temp_dep[,1:5] != 0)*1
+test %>% colSums() %>% 
+  knitr::kable(digits = 0, caption = "Count of observations per species", col.names = "obs", format = "pandoc")
+rm(test)
+# Same for temp and mpa
+
+```
+
+## Run models
+
+```{r, message='hide', warning='hide'}
 # Temperature and depth ---------------------------------------------------
 
-grps_temp_dep_model <- run_mod(species_mat = grps_temp_dep, n_covs = 2, 
-                           family = "gaussian", coords = coords_all)
+grps_temp_dep_model <- run_mod(species_mat = grps_temp_dep, n_covs = 2, family = "gaussian")
 plotMRF_hm(grps_temp_dep_model$mod, main = "Groupers and temperature (incl. depth) - association coefficients")
 
 # MPAs and depth ----------------------------------------------------------
 
-grps_mpa_dep_model <- run_mod(species_mat = grps_mpa_dep, n_covs = 2,
-                          family = "gaussian", coords = coords_all)
+grps_mpa_dep_model <- run_mod(species_mat = grps_mpa_dep, n_covs = 2, family = "gaussian")
 plotMRF_hm(grps_mpa_dep_model$mod, main = "Groupers and MPAs (incl. depth) - association coefficients")
 
+```
 
-## Networks ---------------------------------------------------------------
+## Networks
 
+```{r}
 # Temperature -------------------------------------------------------------
 # without depth
-grps_temp_cats <- categorise_cov(species = grps_temp, covariate = "tmean_reg")
+grps_temp_cats <- categorise_cov(species = grps_temp_dep, covariate = "tmean_reg")
 grps_temp_cat_nested <- nested_data(categorised_data = grps_temp_cats)
 grps_temp_cat_model <- get_model(data = grps_temp, ncov = 1)
-grps_temp_nested_mod <- nested_models(nested_df = grps_temp_cat_nested)
+grps_temp_nested_mod <- nested_models(nested_df = grps_temp_cat_nested, ncov = 1)
 grps_temp_nested_plot <- grps_temp_nested_mod %>% mutate(plot = map(model, get_graph))
 grps_temp_graph <- plot_multi_graphs(nested_df = grps_temp_nested_plot, n_graphs = 3)
 
@@ -97,7 +140,7 @@ grps_temp_graph <- plot_multi_graphs(nested_df = grps_temp_nested_plot, n_graphs
 # MPAs --------------------------------------------------------------------
 # without depth
 grps_mpa_cat_nested <- nested_data(categorised_data = as.data.frame(grps_mpa))
-grps_mpa_cat_model <- get_model(data = grps_mpa, ncov = 1)
+grps_mpa_cat_model <- get_model(data = grps_mpa, ncov = 2)
 grps_mpa_nested_mod <- nested_models(nested_df = grps_mpa_cat_nested)
 grps_mpa_nested_plot <- grps_mpa_nested_mod %>% mutate(plot = map(model, get_graph))
 grps_mpa_graph <- plot_multi_graphs(nested_df = grps_mpa_nested_plot, n_graphs = 2)
@@ -107,8 +150,11 @@ grps_mpa_graph <- plot_multi_graphs(nested_df = grps_mpa_nested_plot, n_graphs =
   add_column(network = factor(c("outside MPA", "inside MPA"))) %>% 
   select(network, connectance))
 
+```
 
-## Stationarity -----------------------------------------------------------
+## Stationarity
+
+```{r}
 # Relative importance
 grps_temp_relimp <- sapply(X = grps_temp_dep_model$mod$key_coefs, rel_imp, cov = ("tmean_reg")) %>% 
   tibble::enframe() %>% 
