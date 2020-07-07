@@ -19,6 +19,8 @@ One approach which can address this challenge uses Markov Random Fields (MRFs) t
 {r, fig.align="center", fig.width=6, fig.height=6, fig.cap="Figure 1: A hypothetic graphic representation of community networks along a gradient of covariate (predictor) x. Species (nodes) are connected by links that depict their co-occurrence probabilities: orange links show a positive association and blue links show negative association"}
 ![]("figures/example_fig.png")
 
+Although species interactions inference from co-occurrence networks can be problematic (Peterson et al. 2019), we can learn from previous studies what kind of interactions may result in positive or negative associations and link them.
+
 The Mediterranean Sea contains strong spatio-environmental gradients. Exploring ecological communities along these gradients, will allow me to gain insights into how community interactions change with temperature. The Mediterranean Sea includes Marine Protected Areas (MPAs) whose varying size, protection level and age have been shown to influence local fish populations (Claudet et al. 2006, 2008, Lester et al. 2009) and therefore, can provide another layer of spatial predictors, potentially affecting species (co-)occurrence. 
 
 In this study, I intend to examine the variation in co-occurrence patterns of fish within and outside MPAs and along east-west gradients in the Mediterranean Sea . For this I will use MRFs and graphic networks that account for the non-stationarity in species associations. I will then asses to what degree co-occurrence patterns are stationary along these two gradients. This will provide an insight onto how ecological communities can function in altered environments, and how protected areas can affect their abilities.
