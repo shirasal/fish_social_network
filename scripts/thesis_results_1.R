@@ -110,4 +110,23 @@ seabreamHM_nocov <- plotMRF_hm(seabream_mod_nocov, main = "without covariates")
 # Compare relationships between species with and without covariates:
 gridExtra::grid.arrange(seabreamHM_cov, seabreamHM_nocov, nrow = 1, top = "Seabream co-occurrence")
 
+# Create species matrix to run the model on, this time for herbivores
+# This matrix should include all species from the taxa I'm interested in
+# and the covariates I'd like to include in the model (these are pre-determined in FUNC 1)
+herb_mat <- create_spp_mat(dataset = med_clean, taxa = herbivores, covariate = c("temp", "depth", "mpa"))
+herb_mat %>% View()
+
+# Run MRF model with covariates
+herb_mod <- MRFcov(data = herb_mat, n_nodes = length(herbivores), n_covariates = 3, family = "gaussian")
+herbHM_cov <- plotMRF_hm(herb_mod, main = "with covariates")
+
+herb_mod$indirect_coefs$temp
+herb_mod$indirect_coefs$depth
+herb_mod$indirect_coefs$mpa
+
+herb_mod_nocov <- MRFcov(data = herb_mat, n_nodes = length(herbivores), n_covariates = 3, family = "gaussian")
+herbHM_nocov <- plotMRF_hm(herb_mod_nocov, main = "without covariates")
+
+# Compare relationships between species with and without covariates:
+gridExtra::grid.arrange(herbHM_cov, herbHM_nocov, nrow = 1, top = "Herbivores co-occurrence")
 
