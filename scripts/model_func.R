@@ -25,12 +25,12 @@ create_spp_mat <- function(dataset, basin, group, covariate){
 
 
 # Func 2: Run model and create occurrence predictions
-run_mod <- function(species_mat, n_covs, family, coords){
-  mod <- MRFcov_spatial(data = species_mat, n_nodes = ncol(species_mat) - n_covs,
-                        n_covariates = n_covs, family = family, coords = coords,
+run_mod <- function(species_mat, n_covs, family){
+  mod <- MRFcov(data = species_mat, n_nodes = ncol(species_mat) - n_covs,
+                        n_covariates = n_covs, family = family,
                         n_cores = parallel::detectCores())
   boot <- bootstrap_MRF(data = species_mat, n_nodes = ncol(species_mat) - n_covs,
-                        n_covariates = n_covs, family = family, spatial = TRUE, coords = coords,
+                        n_covariates = n_covs, family = family, spatial = FALSE,
                         n_cores = parallel::detectCores())
   pred <- predict_MRF(data = species_mat, MRF_mod = boot) %>% invlogit()
   return(list(mod = mod, boot = boot, pred = pred))
@@ -38,6 +38,7 @@ run_mod <- function(species_mat, n_covs, family, coords){
 
 # Func 3: Categorise continuous data
 categorise_cov <- function(species_mat, covariate){
+  # data
   covariate_vector <- as.data.frame(species_mat)[[covariate]]
   categories <- species_mat %>%
     as_tibble() %>% 
@@ -48,7 +49,10 @@ categorise_cov <- function(species_mat, covariate){
                                      Inf),
                           labels = c("low", "med", "hi"),
                           ordered_result = TRUE))
+
 }
+
+
 
 # Func 3b: Nest categorical (nominal) data
 nested_data <- function(categorised_data, ncov) {
@@ -86,9 +90,9 @@ nested_data <- function(categorised_data, ncov) {
 }
 
 # Func 4: Run MRFcov model with some defaults
-get_model <- function(data, ncov, coords){
-  MRFcov_spatial(data = data, n_nodes = ncol(data) - ncov, n_covariates = ncov,
-                 family = "gaussian", coords = coords)
+get_model <- function(data, ncov){
+  MRFcov(data = data, n_nodes = ncol(data) - ncov, n_covariates = ncov,
+                 family = "gaussian")
 }
 
 # Assistance function: Get the connectance value
@@ -102,9 +106,9 @@ connectance <- function(x){
 }
 
 # Func 5: Run model on each category ad calculate connectance
-nested_models <- function(nested_df, ncov, coords){
+nested_models <- function(nested_df, ncov){
   nested_df %>%
-    mutate(model = map(data, function(x) get_model(data = x, ncov = ncov, coords = coords)),
+    mutate(model = map(data, function(x) get_model(data = x, ncov = ncov)),
            connectance = map(model, function(x) connectance(x$graph)))
 }
 
