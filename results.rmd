@@ -13,7 +13,7 @@ output:
 
 ```{r setup, include=FALSE}
 source("scripts/pckgs_preps.R")
-source("scripts/model_func_nonspat.R")
+source("scripts/model_func.R")
 library(usethis)
 library(formattable)
 
@@ -33,14 +33,14 @@ I'm using the MRF-based model from `MRFcov` package (Clark _et al._ [^1]) to det
 MPAs are defined as unprotected (enforcement level 0-1) or protected (2-3); therefore this is not a gradient.  
 <!--Does this affect the model?-->
 
-Connectance (Delams _et al._ [^2]) is a measure of comparison between networks. Essentially, it describes the level of connectedness of species in the network as a proportion the potential associations in the network:
+<!-- Connectance (Delams _et al._ [^2]) is a measure of comparison between networks. Essentially, it describes the level of connectedness of species in the network as a proportion the potential associations in the network: -->
 
-    C0 = [total # of edges] / [total # of nodes^2 (total possible connections)]
+<!--     C0 = [total # of edges] / [total # of nodes^2 (total possible connections)] -->
 
-L = number of edges (associations)  
-S = number of nodes (species)  
-M = S^2  
-connectance (C0) = L/M  
+<!-- L = number of edges (associations)   -->
+<!-- S = number of nodes (species)   -->
+<!-- M = S^2   -->
+<!-- connectance (C0) = L/M   -->
 
 # Objectives  
 
@@ -105,54 +105,119 @@ rm(test)
 
 ```
 
-## Run models
+## Compare association coefficients
+
+Association coefficients describe the relationship between species. First it is calculated for the whole dataset and the mean coefficient is extracted:
 
 ```{r, message='hide', warning='hide'}
+
 # Temperature and depth ---------------------------------------------------
 
-grps_temp_dep_model <- run_mod(species_mat = grps_temp_dep, n_covs = 2, family = "gaussian")
-plotMRF_hm(grps_temp_dep_model$mod, main = "Groupers and temperature (incl. depth) - association coefficients")
+grps_temp_dep_model <- MRFcov(data = grps_temp_dep, n_nodes = 5, n_covariates = 2, family = "gaussian")
+grps_temp_dep_cooccur <- plotMRF_hm(grps_temp_dep_model, main = "Temperature (incl. depth)")
 
 # MPAs and depth ----------------------------------------------------------
 
-grps_mpa_dep_model <- run_mod(species_mat = grps_mpa_dep, n_covs = 2, family = "gaussian")
-plotMRF_hm(grps_mpa_dep_model$mod, main = "Groupers and MPAs (incl. depth) - association coefficients")
+grps_mpa_dep_model <- MRFcov(data = grps_mpa_dep, n_nodes = 5, n_covariates = 2, family = "gaussian")
+grps_mpa_dep_cooccur <- plotMRF_hm(grps_mpa_dep_model, main = "MPAs (incl. depth)")
+
+gridExtra::grid.arrange(grps_temp_dep_cooccur, grps_mpa_dep_cooccur, nrow = 1, top = "Groupers association coefficients")
 
 ```
 
-## Networks
+And also while accounting for spatial autocorrelation
+```{r, message='hide', warning='hide'}
+
+# Temperature and depth ---------------------------------------------------
+
+grps_temp_dep_model_spt <- MRFcov_spatial(data = grps_temp_dep, n_nodes = 5, n_covariates = 2, 
+                                          family = "gaussian", coords = coords_all)
+grps_temp_dep_cooccur_spt <- plotMRF_hm(grps_temp_dep_model_spt, main = "Temperature (incl. depth)")
+
+# MPAs and depth ----------------------------------------------------------
+
+grps_mpa_dep_model_spt <- MRFcov_spatial(data = grps_mpa_dep, n_nodes = 5, n_covariates = 2, 
+                                         family = "gaussian", coords = coords_all)
+grps_mpa_dep_cooccur_spt <- plotMRF_hm(grps_mpa_dep_model_spt, main = "MPAs (incl. depth)")
+
+gridExtra::grid.arrange(grps_temp_dep_cooccur_spt, grps_mpa_dep_cooccur_spt, nrow = 1, top = "Groupers association coefficients (with spatial)")
+
+```
+
+There are a lot less associations when we account for spatial autocorrelation. Also the association coefficient of the species in the MPA model is relatively lower when accounting for spatial autocorrelation. The relationship between *Epinephelus costae* and *Epinephelus marginatus* seem to be strongly negative in all cases.  
+
+Now the same association coefficients are calculated for each of the covariates levels
 
 ```{r}
 # Temperature -------------------------------------------------------------
-# without depth
 grps_temp_cats <- categorise_cov(species = grps_temp_dep, covariate = "tmean_reg")
-grps_temp_cat_nested <- nested_data(categorised_data = grps_temp_cats)
-grps_temp_cat_model <- get_model(data = grps_temp, ncov = 1)
-grps_temp_nested_mod <- nested_models(nested_df = grps_temp_cat_nested, ncov = 1)
-grps_temp_nested_plot <- grps_temp_nested_mod %>% mutate(plot = map(model, get_graph))
-grps_temp_graph <- plot_multi_graphs(nested_df = grps_temp_nested_plot, n_graphs = 3)
+grps_temp_cat_nested <- nested_data(categorised_data = grps_temp_cats, ncov = 1)
+grps_temp_cat_model <- get_model(data = grps_temp_dep, ncov = 2, coords = coords_all)
+grps_temp_nested_mod <- nested_models(nested_df = grps_temp_cat_nested, ncov = 2, coords = coords_all)
+# grps_temp_nested_plot <- grps_temp_nested_mod %>% mutate(plot = map(model, get_graph))
+# grps_temp_graph <- plot_multi_graphs(nested_df = grps_temp_nested_plot, n_graphs = 3)
 
-# Connectance 
-(grps_temp_connect <- tibble(connectance = unlist(grps_temp_nested_mod$connectance)) %>% 
-    add_column(network = factor(c("low", "medium", "high"))) %>% 
-    select(network, connectance))
+# # Connectance 
+# (grps_temp_connect <- tibble(connectance = unlist(grps_temp_nested_mod$connectance)) %>% 
+#     add_column(network = factor(c("low", "medium", "high"))) %>% 
+#     select(network, connectance))
 
 # MPAs --------------------------------------------------------------------
-# without depth
-grps_mpa_cat_nested <- nested_data(categorised_data = as.data.frame(grps_mpa))
-grps_mpa_cat_model <- get_model(data = grps_mpa, ncov = 2)
-grps_mpa_nested_mod <- nested_models(nested_df = grps_mpa_cat_nested)
-grps_mpa_nested_plot <- grps_mpa_nested_mod %>% mutate(plot = map(model, get_graph))
-grps_mpa_graph <- plot_multi_graphs(nested_df = grps_mpa_nested_plot, n_graphs = 2)
+grps_mpa_cat_nested <- nested_data(categorised_data = as.data.frame(grps_mpa_dep), ncov = 2)
+grps_mpa_cat_model <- get_model(data = grps_mpa_dep, ncov = 2)
+grps_mpa_nested_mod <- nested_models(nested_df = grps_mpa_cat_nested, ncov = 2)
+# grps_mpa_nested_plot <- grps_mpa_nested_mod %>% mutate(plot = map(model, get_graph))
+# grps_mpa_graph <- plot_multi_graphs(nested_df = grps_mpa_nested_plot, n_graphs = 2)
 
-# Connectance 
-(grps_mpa_connect <- tibble(connectance = unlist(grps_mpa_nested_mod$connectance)) %>% 
-  add_column(network = factor(c("outside MPA", "inside MPA"))) %>% 
-  select(network, connectance))
+# # Connectance 
+# (grps_mpa_connect <- tibble(connectance = unlist(grps_mpa_nested_mod$connectance)) %>% 
+#   add_column(network = factor(c("outside MPA", "inside MPA"))) %>% 
+#   select(network, connectance))
 
 ```
 
-## Stationarity
+Now take a look at the results for temperature:
+```{r}
+low_temp_grps_coefs <- sapply(X = grps_temp_nested_mod$model[[1]]$key_coefs, FUN = mean_coef)
+med_temp_grps_coefs <- sapply(X = grps_temp_nested_mod$model[[2]]$key_coefs, FUN = mean_coef)
+high_temp_grps_coefs <- sapply(X = grps_temp_nested_mod$model[[3]]$key_coefs, FUN = mean_coef)
+
+temp_df <- data.frame(low_temp = low_temp_grps_coefs[1:5],
+                      medium_temp = med_temp_grps_coefs[1:5],
+                      high_temp = high_temp_grps_coefs[1:5])
+
+
+formattable(temp_df, align = c("l","c", "c", "c"), list(
+  `low_temp` = col_formatter,
+  `medium_temp` = col_formatter,
+  `high_temp` = col_formatter,
+  
+))
+
+```
+
+
+
+And the results for MPAs:
+```{r}
+notmpa_grps_coefs <- sapply(X = grps_mpa_nested_mod$model[[1]]$key_coefs, FUN = mean_coef)
+ismpa_grps_coefs <- sapply(X = grps_mpa_nested_mod$model[[2]]$key_coefs, FUN = mean_coef)
+
+mpa_df <- data.frame(not_mpa = notmpa_grps_coefs[1:5],
+                      is_mpa = ismpa_grps_coefs[1:5])
+
+
+formattable(mpa_df, align = c("l","c", "c"), list(
+  `not_mpa` = col_formatter,
+  `is_mpa` = col_formatter
+))
+
+```
+
+The mean associations of *Epinephelus marginatus* and *Serranus cabrilla* are positive inside and outside marine protected areas. For *Mycteroperca rubra* the mean association is negative both in and out of reserves and there is a slight change in the value compared to all other species.
+
+
+<!-- ## Stationarity -->
 
 ```{r}
 # Relative importance
@@ -188,10 +253,10 @@ formattable(grps_spp_meancoef, align = c("l","c"), list(
 
 ```
 
-Most grouper species are affected mainly by other species occurrence rather than covariates (temperature, MPAs and depth).  
-_Mycteroperca rubra_ shows a different pattern whereas temperature and MPAs are stronger factors than biotic interactions.  
+<!-- Most grouper species are affected mainly by other species occurrence rather than covariates (temperature, MPAs and depth).   -->
+<!-- _Mycteroperca rubra_ shows a different pattern whereas temperature and MPAs are stronger factors than biotic interactions.   -->
 
-# Seabreams
+<!-- # Seabreams -->
 ```{r warning=FALSE, fig.align='center'}
 
 ## Create matrices --------------------------------------------------------
@@ -290,7 +355,7 @@ formattable(dip_spp_meancoef, align = c("l","c"), list(
 
 ```
 
-Seabream species are not greatly affected by other species accept _Diplodus cervinus_, which seem to show a different pattern with temperature and depth effects.
+<!-- Seabream species are not greatly affected by other species accept _Diplodus cervinus_, which seem to show a different pattern with temperature and depth effects. -->
 
 
 # Herbivores in western basin
