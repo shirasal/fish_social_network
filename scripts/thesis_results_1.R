@@ -87,4 +87,27 @@ groupers_mod$indirect_coefs$mpa
 groupers_mod_nocov <- MRFcov(data = groupers_mat, n_nodes = length(groupers), n_covariates = 3, family = "gaussian")
 groupersHM_nocov <- plotMRF_hm(groupers_mod_nocov, main = "without covariates")
 
+# Compare relationships between species with and without covariates:
 gridExtra::grid.arrange(groupersHM_cov, groupersHM_nocov, nrow = 1, top = "Groupers co-occurrence")
+
+# Create species matrix to run the model on, this time for diplodus
+# This matrix should include all species from the taxa I'm interested in
+# and the covariates I'd like to include in the model (these are pre-determined in FUNC 1)
+seabream_mat <- create_spp_mat(dataset = med_clean, taxa = diplodus, covariate = c("temp", "depth", "mpa"))
+seabream_mat %>% View()
+
+# Run MRF model with covariates
+seabream_mod <- MRFcov(data = seabream_mat, n_nodes = length(diplodus), n_covariates = 3, family = "gaussian")
+seabreamHM_cov <- plotMRF_hm(seabream_mod, main = "with covariates")
+
+seabream_mod$indirect_coefs$temp
+seabream_mod$indirect_coefs$depth
+seabream_mod$indirect_coefs$mpa
+
+seabream_mod_nocov <- MRFcov(data = seabream_mat, n_nodes = length(diplodus), n_covariates = 3, family = "gaussian")
+seabreamHM_nocov <- plotMRF_hm(seabream_mod_nocov, main = "without covariates")
+
+# Compare relationships between species with and without covariates:
+gridExtra::grid.arrange(seabreamHM_cov, seabreamHM_nocov, nrow = 1, top = "Seabream co-occurrence")
+
+
