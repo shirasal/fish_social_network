@@ -19,7 +19,7 @@ col_formatter <- formatter("span",
                            style = x ~ style(color =
                                                ifelse(x > 0, pos_col, ifelse(x < 0, neg_col, "black"))))
 
-# Create variables --------------------------------------------------------
+# Create TAXA vectors -----------------------------------------------------
 
 groupers <- c("Epinephelus.costae", "Epinephelus.marginatus",
               "Mycteroperca.rubra", "Serranus.cabrilla", "Serranus.scriba")
@@ -27,6 +27,11 @@ diplodus <- c("Diplodus.annularis", "Diplodus.puntazzo", "Diplodus.sargus",
               "Diplodus.vulgaris", "Diplodus.cervinus")
 herbivores <- c("Siganus.rivulatus", "Siganus.luridus", "Sarpa.salpa",
                 "Scarus.ghobban", "Sparisoma.cretense")
+
+# Create ENV/ANTHRO vectors -----------------------------------------------
+
+env_vector <- c("temp", "depth") # TODO add:, country, sal, prod -- these have been removed atm. They have many NAs and I'd like to dix that first
+anthro_vector <- c("mpa")
 
 # Add medata --------------------------------------------------------------
 
@@ -50,7 +55,7 @@ med_clean %>% colnames
 # Func 1: Create species matrix for a specific taxa with all environmental variables
 create_spp_mat <- function(dataset, taxa, covariate){
   dataset %>%
-    group_by(lat, lon, site, trans, species, temp, mpa, depth) %>% # TODO add:, country, sal, prod -- these have been removed atm. They have many NAs and I'd like to 
+    group_by(lat, lon, site, trans, species, env_vector, anthro_vector) %>%
     summarise(n = sum(sp.n)) %>% 
     spread(species, n, fill = 0) %>% 
     sample_n(size = 1) %>% 
@@ -58,21 +63,48 @@ create_spp_mat <- function(dataset, taxa, covariate){
     na.omit() %>% 
     mutate(loc = paste(site, trans)) %>% 
     column_to_rownames("loc") %>%
-    select(all_of(taxa), all_of(covariate)) #TODO add:, country, sal, prod --- see above comment
+    select(all_of(taxa), all_of(covariate))
 }
 
 #*** *** ***#
 
 # Func 2: Count the number of associations per species in taxa
 assoc_count <- function(taxa){
-  sapply(taxa$key_coefs, FUN = count) %>% 
+  sapply(taxa$key_coefs, FUN = count) %>% # returns a list
     unlist() %>%
     as_tibble(rownames = "species") %>% 
-    mutate(species = str_sub(string = species, end = -3)) %>% 
-    select(species, associations = value)
+    mutate(species = str_sub(string = species, end = -3)) %>% # the count function returns species names with a suffix, this line removes the suffix
+    select(species, associations = value) # rename variables
 }
 
 #*** *** ***#
+
+# Func 3: Count the number of associations per species in taxa, by covariate type
+covar_count <- function(taxa){
+  env_effect <- sapply(taxa$key_coefs, FUN = function(x) x %>% filter(Variable %in% env_vector) %>%
+                         count()) %>% 
+    unlist() %>%
+    as_tibble(rownames = "species") %>% 
+    mutate(species = str_sub(string = species, end = -3)) %>%
+    select(species, env_assoc = value)
+  
+  anthro_effect <- sapply(taxa$key_coefs, FUN = function(x) x %>% filter(Variable %in% env_vector) %>%
+                            count()) %>% 
+    unlist() %>%
+    as_tibble(rownames = "species") %>% 
+    mutate(species = str_sub(string = species, end = -3)) %>%
+    select(species, anthro_assoc = value)
+  
+  biotic_effect <- sapply(taxa$key_coefs, FUN = function(x) x %>% filter(Variable %in% env_vector) %>%
+                            count()) %>% 
+    unlist() %>%
+    as_tibble(rownames = "species") %>% 
+    mutate(species = str_sub(string = species, end = -3)) %>%
+    select(species, biotic_assoc = value)
+  
+  env_effect %>% left_join(anthro_effect, by = "species") %>% left_join(biotic_effect, by = "species")
+}
+
 
 # Create species matrix for each taxa -------------------------------------
 
@@ -155,14 +187,25 @@ gridExtra::grid.arrange(herbHM_cov, herbHM_nocov, nrow = 1, top = "Herbivores co
 
 # Table 1. Relative importance per species --------------------------------
 # How many associations a species has? -> for each species, count coefficients != 0
-# How many of these associations are a result of env./mpa? -> for each coef, determine biotic/abiotic
 
 grps_assoc <- assoc_count(grps_mod)
+dip_assoc <- assoc_count(dip_mod)
+herb_assoc <- assoc_count(herb_mod)
 
-grps_mod$key_coefs$Epinephelus.costae %>% select(Rel_importance) %>% colSums()
+all_assoc <- rbind(grps_assoc, dip_assoc, herb_assoc)
+formattable(all_assoc)
 
-  if_else(.$Variable == mpa | depth | temp, mutate(abiotic = count(n)),
-                                                  mutate(biotic = count(n)))
+# How many of these associations are a result of env./mpa? -> for each coef, determine biotic/abiotic
+grps_cov_assoc <- covar_count(grps_mod)
+dip_cov_assoc <- covar_count(dip_mod)
+herb_cov_assoc <- covar_count(herb_mod)
+
+all_cov_assoc <- rbind(grps_cov_assoc, dip_cov_assoc, herb_cov_assoc) %>% 
+  select(Species = species,
+         Environmental = env_assoc,
+         Anthropogenic = anthro_assoc,
+         Biotic = biotic_assoc)
+formattable(all_cov_assoc)
 
 # Figure 2. Relative importance per taxa ----------------------------------
 # Bar graph summarising Table 1 per a whole taxonomic group
