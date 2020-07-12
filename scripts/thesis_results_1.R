@@ -88,22 +88,37 @@ covar_count <- function(taxa){
     mutate(species = str_sub(string = species, end = -3)) %>%
     select(species, env_assoc = value)
   
-  anthro_effect <- sapply(taxa$key_coefs, FUN = function(x) x %>% filter(Variable %in% env_vector) %>%
+  anthro_effect <- sapply(taxa$key_coefs, FUN = function(x) x %>% filter(Variable %in% anthro_vector) %>%
                             count()) %>% 
     unlist() %>%
     as_tibble(rownames = "species") %>% 
     mutate(species = str_sub(string = species, end = -3)) %>%
     select(species, anthro_assoc = value)
   
-  biotic_effect <- sapply(taxa$key_coefs, FUN = function(x) x %>% filter(Variable %in% env_vector) %>%
-                            count()) %>% 
+  biotic_effect <- sapply(taxa$key_coefs, FUN = function(x) x %>%
+                            filter(!(Variable %in% env_vector | Variable %in% anthro_vector | str_detect(string = Variable, pattern = "_"))) %>%
+                            count()) %>%
     unlist() %>%
     as_tibble(rownames = "species") %>% 
     mutate(species = str_sub(string = species, end = -3)) %>%
     select(species, biotic_assoc = value)
   
-  env_effect %>% left_join(anthro_effect, by = "species") %>% left_join(biotic_effect, by = "species")
+  inter_effect <- sapply(taxa$key_coefs, FUN = function(x) x %>%
+                           filter(str_detect(string = Variable, pattern = "_")) %>%
+                           count()) %>%
+    unlist() %>%
+    as_tibble(rownames = "species") %>% 
+    mutate(species = str_sub(string = species, end = -3)) %>%
+    select(species, inter_assoc = value)
+  
+  env_effect %>%
+    left_join(anthro_effect, by = "species") %>%
+    left_join(biotic_effect, by = "species") %>%
+    left_join(inter_effect, by = "species")
 }
+
+#*** *** ***#
+
 
 
 # Create species matrix for each taxa -------------------------------------
@@ -204,9 +219,12 @@ all_cov_assoc <- rbind(grps_cov_assoc, dip_cov_assoc, herb_cov_assoc) %>%
   select(Species = species,
          Environmental = env_assoc,
          Anthropogenic = anthro_assoc,
-         Biotic = biotic_assoc)
+         Biotic = biotic_assoc,
+         Interaction = inter_assoc)
 formattable(all_cov_assoc)
 
 # Figure 2. Relative importance per taxa ----------------------------------
-# Bar graph summarising Table 1 per a whole taxonomic group
+# Bar graph summarising Table 1 per a whole taxonomic group --- BY REL IMP VALUE!!
+
+
 
