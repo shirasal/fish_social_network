@@ -63,60 +63,83 @@ create_spp_mat <- function(dataset, taxa, covariate){
 
 #*** *** ***#
 
-
+# Func 2: Count the number of associations per species in taxa
+assoc_count <- function(taxa){
+  sapply(taxa$key_coefs, FUN = count) %>% 
+    unlist() %>%
+    as_tibble(rownames = "species") %>% 
+    mutate(species = str_sub(string = species, end = -3)) %>% 
+    select(species, associations = value)
+}
 
 #*** *** ***#
 
-
-# Running Script ----------------------------------------------------------
+# Create species matrix for each taxa -------------------------------------
 
 # Create species matrix to run the model on (using FUNC 1)
 # This matrix should include all species from the taxa I'm interested in
 # and the covariates I'd like to include in the model (these are pre-determined in FUNC 1)
-groupers_mat <- create_spp_mat(dataset = med_clean, taxa = groupers, covariate = c("temp", "depth", "mpa"))
-groupers_mat %>% View()
 
-# Run MRF model with covariates
-groupers_mod <- MRFcov(data = groupers_mat, n_nodes = length(groupers), n_covariates = 3, family = "gaussian")
-groupersHM_cov <- plotMRF_hm(groupers_mod, main = "with covariates")
+## GROUPERS
+grps_mat <- create_spp_mat(dataset = med_clean, taxa = groupers, covariate = c("temp", "depth", "mpa"))
+grps_mat %>% View()
 
-groupers_mod$indirect_coefs$temp
-groupers_mod$indirect_coefs$depth
-groupers_mod$indirect_coefs$mpa
+## SEABREAM (Diplodus species)
+dip_mat <- create_spp_mat(dataset = med_clean, taxa = diplodus, covariate = c("temp", "depth", "mpa"))
+dip_mat %>% View()
 
-groupers_mod_nocov <- MRFcov(data = groupers_mat, n_nodes = length(groupers), n_covariates = 3, family = "gaussian")
-groupersHM_nocov <- plotMRF_hm(groupers_mod_nocov, main = "without covariates")
-
-# Compare relationships between species with and without covariates:
-gridExtra::grid.arrange(groupersHM_cov, groupersHM_nocov, nrow = 1, top = "Groupers co-occurrence")
-
-# Create species matrix to run the model on, this time for diplodus
-# This matrix should include all species from the taxa I'm interested in
-# and the covariates I'd like to include in the model (these are pre-determined in FUNC 1)
-seabream_mat <- create_spp_mat(dataset = med_clean, taxa = diplodus, covariate = c("temp", "depth", "mpa"))
-seabream_mat %>% View()
-
-# Run MRF model with covariates
-seabream_mod <- MRFcov(data = seabream_mat, n_nodes = length(diplodus), n_covariates = 3, family = "gaussian")
-seabreamHM_cov <- plotMRF_hm(seabream_mod, main = "with covariates")
-
-seabream_mod$indirect_coefs$temp
-seabream_mod$indirect_coefs$depth
-seabream_mod$indirect_coefs$mpa
-
-seabream_mod_nocov <- MRFcov(data = seabream_mat, n_nodes = length(diplodus), n_covariates = 3, family = "gaussian")
-seabreamHM_nocov <- plotMRF_hm(seabream_mod_nocov, main = "without covariates")
-
-# Compare relationships between species with and without covariates:
-gridExtra::grid.arrange(seabreamHM_cov, seabreamHM_nocov, nrow = 1, top = "Seabream co-occurrence")
-
-# Create species matrix to run the model on, this time for herbivores
-# This matrix should include all species from the taxa I'm interested in
-# and the covariates I'd like to include in the model (these are pre-determined in FUNC 1)
+## HERBIVORES
 herb_mat <- create_spp_mat(dataset = med_clean, taxa = herbivores, covariate = c("temp", "depth", "mpa"))
 herb_mat %>% View()
 
-# Run MRF model with covariates
+
+############## List of figures (dead line 15/7 ####################################
+
+# Table 1: relative importance for each species:
+# how many associations and how many of them are an effect of covariate?
+# 
+# Figure 1: Co-occurrence with/without covariates
+# 
+# Figure 2: Relative importance aggregation per species: env, spp, interaction (spp*cov)-stationarity
+# try diffetrent combinations (env*spp, mpa*spp, cov*spp)
+# for each taxa (3 bar graphs)
+#
+# Write all results and think of a take home message.
+# Is species response the same for varying covariates?
+
+##################################################################################
+
+# Figure 1. Co-occurrence of species with and without covariates ----------
+
+# GROUPERS
+grps_mod <- MRFcov(data = grps_mat, n_nodes = length(groupers), n_covariates = 3, family = "gaussian")
+grpsHM_cov <- plotMRF_hm(grps_mod, main = "with covariates")
+
+grps_mod$indirect_coefs$temp
+grps_mod$indirect_coefs$depth
+grps_mod$indirect_coefs$mpa
+
+grps_mod_nocov <- MRFcov(data = grps_mat, n_nodes = length(groupers), n_covariates = 3, family = "gaussian")
+grpsHM_nocov <- plotMRF_hm(grps_mod_nocov, main = "without covariates")
+
+gridExtra::grid.arrange(grpsHM_cov, grpsHM_nocov, nrow = 1, top = "Groupers co-occurrence")
+
+
+# SEABREAM
+dip_mod <- MRFcov(data = dip_mat, n_nodes = length(diplodus), n_covariates = 3, family = "gaussian")
+dipHM_cov <- plotMRF_hm(dip_mod, main = "with covariates")
+
+dip_mod$indirect_coefs$temp
+dip_mod$indirect_coefs$depth
+dip_mod$indirect_coefs$mpa
+
+dip_mod_nocov <- MRFcov(data = dip_mat, n_nodes = length(diplodus), n_covariates = 3, family = "gaussian")
+dipHM_nocov <- plotMRF_hm(dip_mod_nocov, main = "without covariates")
+
+gridExtra::grid.arrange(dipHM_cov, dipHM_nocov, nrow = 1, top = "Seabream co-occurrence")
+
+
+# HERBIVORES
 herb_mod <- MRFcov(data = herb_mat, n_nodes = length(herbivores), n_covariates = 3, family = "gaussian")
 herbHM_cov <- plotMRF_hm(herb_mod, main = "with covariates")
 
@@ -127,6 +150,20 @@ herb_mod$indirect_coefs$mpa
 herb_mod_nocov <- MRFcov(data = herb_mat, n_nodes = length(herbivores), n_covariates = 3, family = "gaussian")
 herbHM_nocov <- plotMRF_hm(herb_mod_nocov, main = "without covariates")
 
-# Compare relationships between species with and without covariates:
 gridExtra::grid.arrange(herbHM_cov, herbHM_nocov, nrow = 1, top = "Herbivores co-occurrence")
+
+
+# Table 1. Relative importance per species --------------------------------
+# How many associations a species has? -> for each species, count coefficients != 0
+# How many of these associations are a result of env./mpa? -> for each coef, determine biotic/abiotic
+
+grps_assoc <- assoc_count(grps_mod)
+
+grps_mod$key_coefs$Epinephelus.costae %>% select(Rel_importance) %>% colSums()
+
+  if_else(.$Variable == mpa | depth | temp, mutate(abiotic = count(n)),
+                                                  mutate(biotic = count(n)))
+
+# Figure 2. Relative importance per taxa ----------------------------------
+# Bar graph summarising Table 1 per a whole taxonomic group
 
