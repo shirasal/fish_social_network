@@ -29,5 +29,5 @@ herbivores <- c("Siganus.rivulatus", "Siganus.luridus", "Sarpa.salpa",
 
 # Create ENV/ANTHRO vectors -----------------------------------------------
 
-env_vector <- c("temp", "depth") # TODO add:, country, sal, prod -- these have been removed atm. They have many NAs and I'd like to dix that first
+env_vector <- c("country", "temp", "depth", "sal", "prod") # TODO complete 'sal' NAs
 anthro_vector <- c("mpa")
