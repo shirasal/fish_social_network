@@ -261,7 +261,6 @@ all_cov_assoc <- list(groupers = grps_cov_assoc,
                       herbivores = herb_cov_assoc)
 
 # Figure 2. Relative importance per taxa ----------------------------------
-# Bar graph summarising Table 1 per a whole taxonomic group --- BY REL IMP VALUE!!
 
 grps_relimp <- rel_imp_sum(grps_mod)
 dip_relimp <- rel_imp_sum(dip_mod)
@@ -270,4 +269,16 @@ herb_relimp <- rel_imp_sum(herb_mod)
 all_relimp <- list(groupers = grps_relimp,
                    seabream = dip_relimp,
                    herbivores = herb_relimp)
+
+# Table of mean relative importance of covariates per taxa:
+relimp_table <- sapply(X = all_relimp, FUN = function(x) x[,-1] %>% colMeans())
+
+# Figure 2:
+all_relimp %>% bind_rows(.id = "taxa") %>% pivot_longer(3:6) %>% # Create a tibble of all taxa
+  rename(taxa = taxa, species = species, covariate = name, rel_imp = value) %>%
+  mutate(covariate = str_remove(string = covariate, pattern = "_rel_imp")) %>% 
+  ggplot() +
+  aes(x = covariate, y = rel_imp, fill = taxa)+
+  stat_summary(geom = "bar", fun = mean, position = "dodge")+
+  stat_summary(geom = "errorbar", fun.data = mean_se, position = "dodge")
 
