@@ -1,77 +1,33 @@
-
-# Load packages -----------------------------------------------------------
+# Packages ----------------------------------------------------------------
 
 library(parallel)
 library(formattable)
 library(igraph)
-library(tidygraph)
-library(ggraph)
+# library(tidygraph)
+# library(ggraph)
 library(magrittr)
 library(tidyverse)
 library(MRFcov)
-library(LaplacesDemon)
+# library(LaplacesDemon)
+library(usethis)
 
-# parallel::detectCores() # in case I'd like to speed up MRFcov by spreading processing over >1 core
+# Graphical agents
+neg_col <- '#3399CC'
+pos_col <- '#FF3333'
+col_formatter <- formatter("span",
+                           style = x ~ style(color =
+                                               ifelse(x > 0, pos_col, ifelse(x < 0, neg_col, "black"))))
 
-# Create variables --------------------------------------------------------
+# Create TAXA vectors -----------------------------------------------------
 
-# Basins
-west <- list("France", "Italy", "Spain")
-east <- list("Croatia", "Greece", "Israel", "Malta", "Turkey")
-all_med <- list("France", "Italy", "Spain", "Croatia", "Greece", "Israel", "Malta", "Turkey")
-
-# Groups
 groupers <- c("Epinephelus.costae", "Epinephelus.marginatus",
               "Mycteroperca.rubra", "Serranus.cabrilla", "Serranus.scriba")
 diplodus <- c("Diplodus.annularis", "Diplodus.puntazzo", "Diplodus.sargus",
-             "Diplodus.vulgaris", "Diplodus.cervinus")
+              "Diplodus.vulgaris", "Diplodus.cervinus")
 herbivores <- c("Siganus.rivulatus", "Siganus.luridus", "Sarpa.salpa",
-               "Scarus.ghobban", "Sparisoma.cretense")
+                "Scarus.ghobban", "Sparisoma.cretense")
 
-# Add medata --------------------------------------------------------------
+# Create ENV/ANTHRO vectors -----------------------------------------------
 
-med_raw <- read_rds("data/medata.Rds") %>%
-  filter(data.origin != "azz_asi") %>% # presence-absence
-  mutate(tmean_reg = scale(tmean),
-         depth_reg = scale(depth),
-         # log_n = log10(sp.n),
-         mpa = if_else(enforcement <= 1, FALSE, TRUE))
-
-
-# Create coordinate dfs ---------------------------------------------------
-
-coords_all <- med_raw %>%
-  filter(country %in% all_med) %>% 
-  group_by(lat, lon, site, trans, species, tmean_reg, mpa, depth_reg) %>%
-  summarise(n = sum(sp.n)) %>% 
-  spread(species, n, fill = 0) %>% 
-  sample_n(size = 1) %>% 
-  ungroup() %>% 
-  na.omit() %>% 
-  mutate(loc = paste(site, trans)) %>% 
-  column_to_rownames("loc") %>% 
-  select(lat, lon)
-
-coords_w <- med_raw %>%
-  filter(country %in% west) %>% 
-  group_by(lat, lon, site, trans, species, tmean_reg, mpa, depth_reg) %>%
-  summarise(n = sum(sp.n)) %>% 
-  spread(species, n, fill = 0) %>% 
-  sample_n(size = 1) %>% 
-  ungroup() %>% 
-  na.omit() %>% 
-  mutate(loc = paste(site, trans)) %>% 
-  column_to_rownames("loc") %>% 
-  select(lat, lon)
-
-coords_e <- med_raw %>%
-  filter(country %in% east) %>% 
-  group_by(lat, lon, site, trans, species, tmean_reg, mpa, depth_reg) %>%
-  summarise(n = sum(sp.n)) %>% 
-  spread(species, n, fill = 0) %>% 
-  sample_n(size = 1) %>% 
-  ungroup() %>% 
-  na.omit() %>% 
-  mutate(loc = paste(site, trans)) %>% 
-  column_to_rownames("loc") %>% 
-  select(lat, lon)
+env_vector <- c("temp", "depth") # TODO add:, country, sal, prod -- these have been removed atm. They have many NAs and I'd like to dix that first
+anthro_vector <- c("mpa")
