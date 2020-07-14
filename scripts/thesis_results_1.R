@@ -10,7 +10,7 @@ med_raw %<>% filter(!(site %in% c("assecret2210191mlsc_a", "assecret2210191mlsc_
 med_clean <- med_raw %>%
   filter(data.origin != "azz_asi") %>% # presence-absence
   mutate(mpa = if_else(enforcement <= 1, FALSE, TRUE),
-         country = as.factor(country),
+         country = as.numeric(as.factor(country)),
          temp = scale(tmean),
          depth = scale(depth),
          # enforce = as.factor(enforcement),
@@ -20,6 +20,7 @@ med_clean <- med_raw %>%
   
 
 med_clean %>% colnames
+med_clean %>% glimpse()
 
 # Functions ---------------------------------------------------------------
 
@@ -136,76 +137,48 @@ rel_imp_sum <- function(taxa){
 # and the covariates I'd like to include in the model (these are pre-determined in FUNC 1)
 
 ## GROUPERS
-grps_mat <- create_spp_mat(dataset = med_clean, taxa = groupers, covariate = c("temp", "depth", "mpa"))
-grps_mat %>% View()
+grps_mat <- create_spp_mat(dataset = med_clean, taxa = groupers, covariate = c("country", "mpa", "temp", "depth", "sal", "prod"))
+# grps_mat %>% View()
 
 ## SEABREAM (Diplodus species)
-dip_mat <- create_spp_mat(dataset = med_clean, taxa = diplodus, covariate = c("temp", "depth", "mpa"))
-dip_mat %>% View()
+dip_mat <- create_spp_mat(dataset = med_clean, taxa = diplodus, covariate = c("country", "mpa", "temp", "depth", "sal", "prod"))
+# dip_mat %>% View()
 
 ## HERBIVORES
-herb_mat <- create_spp_mat(dataset = med_clean, taxa = herbivores, covariate = c("temp", "depth", "mpa"))
-herb_mat %>% View()
+herb_mat <- create_spp_mat(dataset = med_clean, taxa = herbivores, covariate = c("country", "mpa", "temp", "depth", "sal", "prod"))
+# herb_mat %>% View()
 
-
-############## List of figures (dead line 15/7 ####################################
-
-# Table 1: relative importance for each species:
-# how many associations and how many of them are an effect of covariate?
-# 
-# Figure 1: Co-occurrence with/without covariates
-# 
-# Figure 2: Relative importance aggregation per species: env, spp, interaction (spp*cov)-stationarity
-# try diffetrent combinations (env*spp, mpa*spp, cov*spp)
-# for each taxa (3 bar graphs)
-#
-# Write all results and think of a take home message.
-# Is species response the same for varying covariates?
-
-##################################################################################
 
 # Figure 1. Co-occurrence of species with and without covariates ----------
 
 # GROUPERS
-grps_mod <- MRFcov(data = grps_mat, n_nodes = length(groupers), n_covariates = 3, family = "gaussian")
+grps_mod <- MRFcov(data = grps_mat, n_nodes = length(groupers), n_covariates = 6, family = "gaussian")
 grpsHM_cov <- plotMRF_hm(grps_mod, main = "with covariates")
 
-grps_mod$indirect_coefs$temp
-grps_mod$indirect_coefs$depth
-grps_mod$indirect_coefs$mpa
-
-grps_mod_nocov <- MRFcov(data = grps_mat, n_nodes = length(groupers), n_covariates = 3, family = "gaussian")
+grps_mod_nocov <- MRFcov(data = grps_mat, n_nodes = length(groupers), n_covariates = 6, family = "gaussian")
 grpsHM_nocov <- plotMRF_hm(grps_mod_nocov, main = "without covariates")
 
-gridExtra::grid.arrange(grpsHM_cov, grpsHM_nocov, nrow = 1, top = "Groupers co-occurrence")
+# gridExtra::grid.arrange(grpsHM_cov, grpsHM_nocov, nrow = 1, top = "Groupers co-occurrence")
 
 
 # SEABREAM
-dip_mod <- MRFcov(data = dip_mat, n_nodes = length(diplodus), n_covariates = 3, family = "gaussian")
+dip_mod <- MRFcov(data = dip_mat, n_nodes = length(diplodus), n_covariates = 6, family = "gaussian")
 dipHM_cov <- plotMRF_hm(dip_mod, main = "with covariates")
 
-dip_mod$indirect_coefs$temp
-dip_mod$indirect_coefs$depth
-dip_mod$indirect_coefs$mpa
-
-dip_mod_nocov <- MRFcov(data = dip_mat, n_nodes = length(diplodus), n_covariates = 3, family = "gaussian")
+dip_mod_nocov <- MRFcov(data = dip_mat, n_nodes = length(diplodus), n_covariates = 6, family = "gaussian")
 dipHM_nocov <- plotMRF_hm(dip_mod_nocov, main = "without covariates")
 
-gridExtra::grid.arrange(dipHM_cov, dipHM_nocov, nrow = 1, top = "Seabream co-occurrence")
+# gridExtra::grid.arrange(dipHM_cov, dipHM_nocov, nrow = 1, top = "Seabream co-occurrence")
 
 
 # HERBIVORES
-herb_mod <- MRFcov(data = herb_mat, n_nodes = length(herbivores), n_covariates = 3, family = "gaussian")
+herb_mod <- MRFcov(data = herb_mat, n_nodes = length(herbivores), n_covariates = 6, family = "gaussian")
 herbHM_cov <- plotMRF_hm(herb_mod, main = "with covariates")
 
-herb_mod$indirect_coefs$temp
-herb_mod$indirect_coefs$depth
-herb_mod$indirect_coefs$mpa
-
-herb_mod_nocov <- MRFcov(data = herb_mat, n_nodes = length(herbivores), n_covariates = 3, family = "gaussian")
+herb_mod_nocov <- MRFcov(data = herb_mat, n_nodes = length(herbivores), n_covariates = 6, family = "gaussian")
 herbHM_nocov <- plotMRF_hm(herb_mod_nocov, main = "without covariates")
 
-gridExtra::grid.arrange(herbHM_cov, herbHM_nocov, nrow = 1, top = "Herbivores co-occurrence")
+# gridExtra::grid.arrange(herbHM_cov, herbHM_nocov, nrow = 1, top = "Herbivores co-occurrence")
 
 
 # Table 1. Relative importance per species --------------------------------
