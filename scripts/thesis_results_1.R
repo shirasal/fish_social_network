@@ -45,9 +45,8 @@ create_spp_mat <- function(dataset, taxa, covariate){
 assoc_count <- function(taxa){
   sapply(taxa$key_coefs, FUN = count) %>% # returns a list
     unlist() %>%
-    as_tibble(rownames = "species") %>% 
-    mutate(species = str_sub(string = species, end = -3)) %>% # the count function returns species names with a suffix, this line removes the suffix
-    select(species, associations = value) # rename variables
+    enframe(name = "species", value = "associations") %>% 
+    mutate(species = str_sub(string = species, end = -3)) # the count function returns species names with a suffix, this line removes the suffix
 }
 
 #*** *** ***#
@@ -57,32 +56,28 @@ covar_count <- function(taxa){
   env_effect <- sapply(taxa$key_coefs, FUN = function(x) x %>% filter(Variable %in% env_vector) %>%
                          count()) %>% 
     unlist() %>%
-    as_tibble(rownames = "species") %>% 
-    mutate(species = str_sub(string = species, end = -3)) %>%
-    select(species, env_assoc = value)
+    enframe(name = "species", value = "env_assoc") %>% 
+    mutate(species = str_sub(string = species, end = -3))
   
   anthro_effect <- sapply(taxa$key_coefs, FUN = function(x) x %>% filter(Variable %in% anthro_vector) %>%
                             count()) %>% 
     unlist() %>%
-    as_tibble(rownames = "species") %>% 
-    mutate(species = str_sub(string = species, end = -3)) %>%
-    select(species, anthro_assoc = value)
+    enframe(name = "species", value = "anthro_assoc") %>% 
+    mutate(species = str_sub(string = species, end = -3))
   
   biotic_effect <- sapply(taxa$key_coefs, FUN = function(x) x %>%
                             filter(!(Variable %in% env_vector | Variable %in% anthro_vector | str_detect(string = Variable, pattern = "_"))) %>%
                             count()) %>%
     unlist() %>%
-    as_tibble(rownames = "species") %>% 
-    mutate(species = str_sub(string = species, end = -3)) %>%
-    select(species, biotic_assoc = value)
+    enframe(name = "species", value = "biotic_assoc") %>% 
+    mutate(species = str_sub(string = species, end = -3))
   
   inter_effect <- sapply(taxa$key_coefs, FUN = function(x) x %>%
                            filter(str_detect(string = Variable, pattern = "_")) %>%
                            count()) %>%
     unlist() %>%
-    as_tibble(rownames = "species") %>% 
-    mutate(species = str_sub(string = species, end = -3)) %>%
-    select(species, inter_assoc = value)
+    enframe(name = "species", value = "inter_assoc") %>% 
+    mutate(species = str_sub(string = species, end = -3))
   
   env_effect %>%
     left_join(anthro_effect, by = "species") %>%
@@ -187,7 +182,6 @@ herbHM_nocov <- plotMRF_hm(herb_mod_nocov, main = "without covariates")
 grps_assoc <- assoc_count(grps_mod)
 dip_assoc <- assoc_count(dip_mod)
 herb_assoc <- assoc_count(herb_mod)
-# TODO Calling `as_tibble()` on a vector is discouraged, because the behavior is likely to change in the future. Use `tibble::enframe(name = NULL)` instead.
 
 all_assoc <- list(groupers = grps_assoc,
                   seabream = dip_assoc,
