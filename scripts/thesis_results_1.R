@@ -1,37 +1,5 @@
 
-# Packages ----------------------------------------------------------------
-
-library(parallel)
-library(formattable)
-library(igraph)
-# library(tidygraph)
-# library(ggraph)
-library(magrittr)
-library(tidyverse)
-library(MRFcov)
-# library(LaplacesDemon)
-library(usethis)
-
-# Graphical agents
-neg_col <- '#3399CC'
-pos_col <- '#FF3333'
-col_formatter <- formatter("span",
-                           style = x ~ style(color =
-                                               ifelse(x > 0, pos_col, ifelse(x < 0, neg_col, "black"))))
-
-# Create TAXA vectors -----------------------------------------------------
-
-groupers <- c("Epinephelus.costae", "Epinephelus.marginatus",
-              "Mycteroperca.rubra", "Serranus.cabrilla", "Serranus.scriba")
-diplodus <- c("Diplodus.annularis", "Diplodus.puntazzo", "Diplodus.sargus",
-              "Diplodus.vulgaris", "Diplodus.cervinus")
-herbivores <- c("Siganus.rivulatus", "Siganus.luridus", "Sarpa.salpa",
-                "Scarus.ghobban", "Sparisoma.cretense")
-
-# Create ENV/ANTHRO vectors -----------------------------------------------
-
-env_vector <- c("temp", "depth") # TODO add:, country, sal, prod -- these have been removed atm. They have many NAs and I'd like to dix that first
-anthro_vector <- c("mpa")
+source("scripts/pckgs_preps.R")
 
 # Add medata --------------------------------------------------------------
 
@@ -57,16 +25,17 @@ med_clean %>% colnames
 
 # Func 1: Create species matrix for a specific taxa with all environmental variables
 create_spp_mat <- function(dataset, taxa, covariate){
-  dataset %>%
-    group_by(lat, lon, site, trans, species, temp, depth, mpa) %>% # TODO add other covs
-    summarise(n = sum(sp.n)) %>% 
-    spread(species, n, fill = 0) %>% 
-    sample_n(size = 1) %>% 
+  cols <- c(c("lat", "lon", "site", "trans", "species"), env_vector, anthro_vector)
+  dataset %>% 
+    group_by_at(.vars = cols) %>% # group for summarise
+    summarise(n = sum(sp.n)) %>% # sum sp.n for each grouped variable
+    spread(species, n, fill = 0) %>% # convert to species matrix
     ungroup() %>% 
-    na.omit() %>% 
-    mutate(loc = paste(site, trans)) %>% 
-    column_to_rownames("loc") %>%
-    select(all_of(taxa), all_of(covariate))
+    na.omit() %>% # remove NAs; make sure this part it minimised in the raw data
+    mutate(loc = paste(site, trans)) %>% # Create a variable of the location, which shpuld be unique
+    group_by(loc) %>% 
+    column_to_rownames("loc") %>% # create row names by location
+    select(all_of(taxa), all_of(covariate)) # keep the species and covariates columns
 }
 
 #*** *** ***#
