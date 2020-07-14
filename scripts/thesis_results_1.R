@@ -36,6 +36,9 @@ anthro_vector <- c("mpa")
 # Add medata --------------------------------------------------------------
 
 med_raw <- read_rds("data/medata.Rds")
+# TODO fix me
+med_raw %<>% filter(!(site %in% c("assecret2210191mlsc_a", "assecret2210191mlsc_b", "assecret2210191mlsc_c")))
+
 med_clean <- med_raw %>%
   filter(data.origin != "azz_asi") %>% # presence-absence
   mutate(mpa = if_else(enforcement <= 1, FALSE, TRUE),
@@ -55,7 +58,7 @@ med_clean %>% colnames
 # Func 1: Create species matrix for a specific taxa with all environmental variables
 create_spp_mat <- function(dataset, taxa, covariate){
   dataset %>%
-    group_by(lat, lon, site, trans, species, env_vector, anthro_vector) %>%
+    group_by(lat, lon, site, trans, species, temp, depth, mpa) %>% # TODO add other covs
     summarise(n = sum(sp.n)) %>% 
     spread(species, n, fill = 0) %>% 
     sample_n(size = 1) %>% 
@@ -119,6 +122,42 @@ covar_count <- function(taxa){
 
 #*** *** ***#
 
+# Func 4: Summarise the relative importance of each type of covariate for each species
+rel_imp_sum <- function(taxa){
+  env_relimp <- sapply(taxa$key_coefs, FUN = function(x) x %>%  # Take the taxa model and apply the following:
+                         filter(Variable %in% env_vector) %>%  # Filter by relevant covariates
+                         summarise(n = sum(Rel_importance))) %>% # Summarise Rel_importance column
+    unlist() %>% # Take out of the list
+    enframe(name = "species", value = "env_rel_imp") %>%  # Rearrange
+    mutate(species = str_sub(string = species, end = -3)) # Fix species names
+  
+  anthro_relimp <- sapply(taxa$key_coefs, FUN = function(x) x %>% 
+                            filter(Variable %in% anthro_vector) %>%
+                            summarise(n = sum(Rel_importance))) %>% 
+    unlist() %>%
+    enframe(name = "species", value = "anthro_rel_imp") %>% 
+    mutate(species = str_sub(string = species, end = -3))
+  
+  biotic_relimp <- sapply(taxa$key_coefs, FUN = function(x) x %>% 
+                            filter(!(Variable %in% env_vector | Variable %in% anthro_vector | str_detect(string = Variable, pattern = "_"))) %>%
+                            summarise(n = sum(Rel_importance))) %>% 
+    unlist() %>%
+    enframe(name = "species", value = "biotic_rel_imp") %>% 
+    mutate(species = str_sub(string = species, end = -3))
+  
+  inter_relimp <- sapply(taxa$key_coefs, FUN = function(x) x %>% 
+                           filter(str_detect(string = Variable, pattern = "_")) %>%
+                           summarise(n = sum(Rel_importance))) %>% 
+    unlist() %>%
+    enframe(name = "species", value = "inter_rel_imp") %>% 
+    mutate(species = str_sub(string = species, end = -3))
+  
+  
+  env_relimp %>%
+    left_join(anthro_relimp, by = "species") %>%
+    left_join(biotic_relimp, by = "species") %>%
+    left_join(inter_relimp, by = "species")
+}
 
 
 # Create species matrix for each taxa -------------------------------------
@@ -206,25 +245,29 @@ gridExtra::grid.arrange(herbHM_cov, herbHM_nocov, nrow = 1, top = "Herbivores co
 grps_assoc <- assoc_count(grps_mod)
 dip_assoc <- assoc_count(dip_mod)
 herb_assoc <- assoc_count(herb_mod)
+# TODO Calling `as_tibble()` on a vector is discouraged, because the behavior is likely to change in the future. Use `tibble::enframe(name = NULL)` instead.
 
-all_assoc <- rbind(grps_assoc, dip_assoc, herb_assoc)
-formattable(all_assoc)
+all_assoc <- list(groupers = grps_assoc,
+                  seabream = dip_assoc,
+                  herbivores = herb_assoc)
 
 # How many of these associations are a result of env./mpa? -> for each coef, determine biotic/abiotic
 grps_cov_assoc <- covar_count(grps_mod)
 dip_cov_assoc <- covar_count(dip_mod)
 herb_cov_assoc <- covar_count(herb_mod)
 
-all_cov_assoc <- rbind(grps_cov_assoc, dip_cov_assoc, herb_cov_assoc) %>% 
-  select(Species = species,
-         Environmental = env_assoc,
-         Anthropogenic = anthro_assoc,
-         Biotic = biotic_assoc,
-         Interaction = inter_assoc)
-formattable(all_cov_assoc)
+all_cov_assoc <- list(groupers = grps_cov_assoc,
+                      seabrean = dip_cov_assoc,
+                      herbivores = herb_cov_assoc)
 
 # Figure 2. Relative importance per taxa ----------------------------------
 # Bar graph summarising Table 1 per a whole taxonomic group --- BY REL IMP VALUE!!
 
+grps_relimp <- rel_imp_sum(grps_mod)
+dip_relimp <- rel_imp_sum(dip_mod)
+herb_relimp <- rel_imp_sum(herb_mod)
 
+all_relimp <- list(groupers = grps_relimp,
+                   seabream = dip_relimp,
+                   herbivores = herb_relimp)
 
