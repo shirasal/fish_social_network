@@ -5,3 +5,10 @@ new_grps_temp_dep %>% as.data.frame() %>%
 
 # Fix for listed columns in a dataframe
 as.data.frame(lapply(med_raw,unlist))
+
+# Check if any infinite values in object:
+grps_mat %>% 
+  select_if(.predicate = is.numeric) %>% 
+  as.matrix() %>% 
+  is.finite() %>%
+  any()
