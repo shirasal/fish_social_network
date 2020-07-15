@@ -80,11 +80,15 @@ gridExtra::grid.arrange(dipHM_cov, dipHM_nocov, nrow = 1, top = "Seabream co-occ
 gridExtra::grid.arrange(herbHM_cov, herbHM_nocov, nrow = 1, top = "Herbivores co-occurrence")
 ```
 
+Groupers species seem to not be affected by environmental or anthropogenic factors. Seabreams show different pattern when considering abiotic factor. There is a strong positive correlation between *Diplodus sargus* and *Diplodus annularis*, which is uneffected by covariates. Nevertheless, the relationship between *Diplodus vulgaris* and three other species changes when introducing abiotic factors. Herbivorous species are not affected greatly by covariates, but the strength of association is weaker when accounting for them.
+
 ## Number of associations
 
 ```{r}
 all_assoc
 ```
+
+<!--Change to include only biotic associations-->
 
 ## Relative importance of covariates
 
@@ -92,6 +96,21 @@ all_assoc
 ```{r}
 all_relimp
 ```
+
+**Groupers**  
+
+- *Epinephelus costae* is mainly affected by biotic factors.
+- *Serranus cabrilla* is affected almost exlusively by environmental factors.
+
+**Seabreams**  
+
+- *Diplodus vulgaris* is mostly affected by environmental variables.
+- *Diplodus cervinus* is affected only by environmental variables.
+
+**Herbivores**  
+*Siganus rivulatus* and *Sarpa salpa* are highly effected by environmental variables. They may have a simialr response to environmental variations.
+
+### Per taxa
 
 ```{r}
 all_relimp %>% bind_rows(.id = "taxa") %>%
