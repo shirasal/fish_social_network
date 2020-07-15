@@ -63,14 +63,6 @@ I'm using the MRF-based model from `MRFcov` package (Clark _et al._ [^1]) to det
 
 -->
 
-<!-- Connectance (Delams _et al._ [^2]) is a measure of comparison between networks. Essentially, it describes the level of connectedness of species in the network as a proportion the potential associations in the network: -->
-
-<!--     C0 = [total # of edges] / [total # of nodes^2 (total possible connections)] -->
-
-<!-- L = number of edges (associations)   -->
-<!-- S = number of nodes (species)   -->
-<!-- M = S^2   -->
-<!-- connectance (C0) = L/M   -->
 # Analyses
 
 ## Compare association coefficients
@@ -80,17 +72,48 @@ Association coefficients describe the relationship between species. Looking at t
 ```{r}
 # Groupers
 gridExtra::grid.arrange(grpsHM_cov, grpsHM_nocov, nrow = 1, top = "Groupers co-occurrence")
-```
 
-```{r}
 # Seabreams
 gridExtra::grid.arrange(dipHM_cov, dipHM_nocov, nrow = 1, top = "Seabream co-occurrence")
-```
 
-```{r}
 # Herbivores
 gridExtra::grid.arrange(herbHM_cov, herbHM_nocov, nrow = 1, top = "Herbivores co-occurrence")
 ```
+
+## Number of associations
+
+```{r}
+all_assoc
+```
+
+## Relative importance of covariates
+
+### Per species
+```{r}
+all_relimp
+```
+
+```{r}
+all_relimp %>% bind_rows(.id = "taxa") %>%
+  pivot_longer(3:6) %>% # Create a tibble of all taxa
+  rename(taxa = taxa, species = species, covariate = name, rel_imp = value) %>%
+  mutate(covariate = str_remove(string = covariate, pattern = "_rel_imp")) %>% 
+  ggplot() +
+  aes(x = covariate, y = rel_imp, fill = taxa)+
+  stat_summary(geom = "bar", fun = mean, position = "dodge")+
+  stat_summary(geom = "errorbar", fun.data = mean_se, position = "dodge")
+```
+
+There's a large variance between species in the taxa so maybe this isn't the right way to look at it.
+
+<!-- Connectance (Delams _et al._ [^2]) is a measure of comparison between networks. Essentially, it describes the level of connectedness of species in the network as a proportion the potential associations in the network: -->
+
+<!--     C0 = [total # of edges] / [total # of nodes^2 (total possible connections)] -->
+
+<!-- L = number of edges (associations)   -->
+<!-- S = number of nodes (species)   -->
+<!-- M = S^2   -->
+<!-- connectance (C0) = L/M   -->
 
 ___
 
