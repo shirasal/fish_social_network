@@ -153,7 +153,7 @@ grpsHM_cov <- plotMRF_hm(grps_mod, main = "with covariates")
 grps_mod_nocov <- MRFcov(data = grps_mat, n_nodes = length(groupers), n_covariates = 6, family = "gaussian")
 grpsHM_nocov <- plotMRF_hm(grps_mod_nocov, main = "without covariates")
 
-# gridExtra::grid.arrange(grpsHM_cov, grpsHM_nocov, nrow = 1, top = "Groupers co-occurrence")
+gridExtra::grid.arrange(grpsHM_cov, grpsHM_nocov, nrow = 1, top = "Groupers co-occurrence")
 
 
 # SEABREAM
@@ -163,7 +163,7 @@ dipHM_cov <- plotMRF_hm(dip_mod, main = "with covariates")
 dip_mod_nocov <- MRFcov(data = dip_mat, n_nodes = length(diplodus), n_covariates = 6, family = "gaussian")
 dipHM_nocov <- plotMRF_hm(dip_mod_nocov, main = "without covariates")
 
-# gridExtra::grid.arrange(dipHM_cov, dipHM_nocov, nrow = 1, top = "Seabream co-occurrence")
+gridExtra::grid.arrange(dipHM_cov, dipHM_nocov, nrow = 1, top = "Seabream co-occurrence")
 
 
 # HERBIVORES
@@ -173,7 +173,7 @@ herbHM_cov <- plotMRF_hm(herb_mod, main = "with covariates")
 herb_mod_nocov <- MRFcov(data = herb_mat, n_nodes = length(herbivores), n_covariates = 6, family = "gaussian")
 herbHM_nocov <- plotMRF_hm(herb_mod_nocov, main = "without covariates")
 
-# gridExtra::grid.arrange(herbHM_cov, herbHM_nocov, nrow = 1, top = "Herbivores co-occurrence")
+gridExtra::grid.arrange(herbHM_cov, herbHM_nocov, nrow = 1, top = "Herbivores co-occurrence")
 
 
 # Table 1. Relative importance per species --------------------------------
@@ -218,3 +218,12 @@ all_relimp %>% bind_rows(.id = "taxa") %>% pivot_longer(3:6) %>% # Create a tibb
   stat_summary(geom = "bar", fun = mean, position = "dodge")+
   stat_summary(geom = "errorbar", fun.data = mean_se, position = "dodge")
 
+################## New goals
+# Check correelations (temp-sal/temp-invasive)
+# Biomass of invasive species as covariate
+# cov_assoc: interactions of temp*spp and mpa*spp
+# Rel_imp bar graph for each species (graph for each taxa) after breaking up the interactions (temp*spp and mpa*spp)
+# percentage of non-stationarity (co-occurrence changes within mpa for example)
+# Which other graphs I'd like to have
+# Salinity- fix
+# Depth - mean
