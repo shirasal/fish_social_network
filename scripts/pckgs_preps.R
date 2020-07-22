@@ -35,8 +35,6 @@ anthro_vector <- c("mpa")
 # Add medata --------------------------------------------------------------
 
 med_raw <- read_rds("data/medata.Rds")
-# TODO fix me
-med_raw %<>% filter(!(site %in% c("assecret2210191mlsc_a", "assecret2210191mlsc_b", "assecret2210191mlsc_c")))
 
 med_clean <- med_raw %>%
   filter(data.origin != "azz_asi") %>% # presence-absence
@@ -44,10 +42,11 @@ med_clean <- med_raw %>%
          country = as.numeric(as.factor(country)),
          temp = scale(tmean),
          depth = scale(depth),
-         # enforce = as.factor(enforcement),
          sal = scale(sal_mean),
          prod = scale(pp_mean)) %>%
   select(site, lon, lat, trans, species, sp.n, country, mpa, temp, depth, sal, prod)
+
+# TODO add covariates: invasive species count/biomass (spatial), MPA age, MPA size
 
 # Create species matrix for each taxa -------------------------------------
 
