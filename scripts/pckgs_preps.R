@@ -36,6 +36,11 @@ anthro_vector <- c("mpa")
 
 med_raw <- read_rds("data/medata.Rds")
 
+# med_raw[which(med_raw$site == "assecret2210191mlsc_a"),]$depth %<>% mean()
+# med_raw[which(med_raw$site == "assecret2210191mlsc_b"),]$depth %<>% mean()
+# med_raw[which(med_raw$site == "assecret2210191mlsc_c"),]$depth %<>% mean()
+# write_rds(med_raw, "data/medata.Rds")
+
 med_clean <- med_raw %>%
   filter(data.origin != "azz_asi") %>% # presence-absence
   mutate(mpa = if_else(enforcement <= 1, FALSE, TRUE),
