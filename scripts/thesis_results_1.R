@@ -1,9 +1,27 @@
+
+source("scripts/packages.R")
+load("data/all_objects.RData")
 source("scripts/functions.R")
-source("scripts/pckgs_preps.R")
-  
 
 med_clean %>% colnames
 med_clean %>% glimpse()
+
+
+# Check auto-correlations -------------------------------------------------
+
+# Temperature - Salinity
+
+med_clean %>% ggplot() + 
+  aes(x = temp, y = sal) + 
+  geom_point()
+
+# Salinity NAs
+med_raw %>% dplyr::filter(!complete.cases(sal_mean))
+med_raw %>% dplyr::filter(!complete.cases(sal_mean)) %>% group_by(data.origin) %>% summarise(n = n())
+med_raw %>% dplyr::filter(!complete.cases(sal_mean) & data.origin == "Belmaker") %>% distinct(site)
+med_raw %>% dplyr::filter(!complete.cases(sal_mean) & data.origin == "Sala - PEW") %>% distinct(site)
+
+# Temperature - Invasive species
 
 
 # Figure 1. Co-occurrence of species with and without covariates ----------
@@ -81,11 +99,8 @@ all_relimp %>% bind_rows(.id = "taxa") %>% pivot_longer(3:6) %>% # Create a tibb
   stat_summary(geom = "errorbar", fun.data = mean_se, position = "dodge")
 
 ################## New goals
-# Check correelations (temp-sal/temp-invasive) - WED
-# Biomass of invasive species as covariate - Find ref WED
+
 # cov_assoc: interactions of temp*spp and mpa*spp
 # Rel_imp bar graph for each species (graph for each taxa) after breaking up the interactions (temp*spp and mpa*spp)
 # percentage of non-stationarity (co-occurrence changes within mpa for example)
 # Which other graphs I'd like to have - WED
-# Salinity- fix - WED
-# Depth - mean - WED
