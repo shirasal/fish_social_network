@@ -49,3 +49,20 @@ med_clean <- med_raw %>%
          prod = scale(pp_mean)) %>%
   select(site, lon, lat, trans, species, sp.n, country, mpa, temp, depth, sal, prod)
 
+# Create species matrix for each taxa -------------------------------------
+
+# Create species matrix to run the model on (using FUNC 1)
+# This matrix should include all species from the taxa I'm interested in
+# and the covariates I'd like to include in the model (these are pre-determined in FUNC 1)
+
+## GROUPERS
+grps_mat <- create_spp_mat(dataset = med_clean, taxa = groupers, covariate = c("country", "mpa", "temp", "depth", "sal", "prod"))
+# grps_mat %>% View()
+
+## SEABREAM (Diplodus species)
+dip_mat <- create_spp_mat(dataset = med_clean, taxa = diplodus, covariate = c("country", "mpa", "temp", "depth", "sal", "prod"))
+# dip_mat %>% View()
+
+## HERBIVORES
+herb_mat <- create_spp_mat(dataset = med_clean, taxa = herbivores, covariate = c("country", "mpa", "temp", "depth", "sal", "prod"))
+# herb_mat %>% View()
