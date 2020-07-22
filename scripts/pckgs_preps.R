@@ -1,15 +1,3 @@
-# Packages ----------------------------------------------------------------
-
-library(parallel)
-library(formattable)
-library(igraph)
-# library(tidygraph)
-# library(ggraph)
-library(magrittr)
-library(tidyverse)
-library(MRFcov)
-# library(LaplacesDemon)
-library(usethis)
 
 # Graphical agents
 neg_col <- '#3399CC'
@@ -18,7 +6,8 @@ col_formatter <- formatter("span",
                            style = x ~ style(color =
                                                ifelse(x > 0, pos_col, ifelse(x < 0, neg_col, "black"))))
 
-# Create TAXA vectors -----------------------------------------------------
+
+# Taxa vectors ------------------------------------------------------------
 
 groupers <- c("Epinephelus.costae", "Epinephelus.marginatus",
               "Mycteroperca.rubra", "Serranus.cabrilla", "Serranus.scriba")
@@ -27,7 +16,8 @@ diplodus <- c("Diplodus.annularis", "Diplodus.puntazzo", "Diplodus.sargus",
 herbivores <- c("Siganus.rivulatus", "Siganus.luridus", "Sarpa.salpa",
                 "Scarus.ghobban", "Sparisoma.cretense")
 
-# Create ENV/ANTHRO vectors -----------------------------------------------
+
+# Env/Anthro vectors ------------------------------------------------------
 
 env_vector <- c("country", "temp", "depth", "sal", "prod") # TODO complete 'sal' NAs
 anthro_vector <- c("mpa")
@@ -35,11 +25,6 @@ anthro_vector <- c("mpa")
 # Add medata --------------------------------------------------------------
 
 med_raw <- read_rds("data/medata.Rds")
-
-# med_raw[which(med_raw$site == "assecret2210191mlsc_a"),]$depth %<>% mean()
-# med_raw[which(med_raw$site == "assecret2210191mlsc_b"),]$depth %<>% mean()
-# med_raw[which(med_raw$site == "assecret2210191mlsc_c"),]$depth %<>% mean()
-# write_rds(med_raw, "data/medata.Rds")
 
 med_clean <- med_raw %>%
   filter(data.origin != "azz_asi") %>% # presence-absence
@@ -61,12 +46,9 @@ med_clean <- med_raw %>%
 
 ## GROUPERS
 grps_mat <- create_spp_mat(dataset = med_clean, taxa = groupers, covariate = c("country", "mpa", "temp", "depth", "sal", "prod"))
-# grps_mat %>% View()
 
 ## SEABREAM (Diplodus species)
 dip_mat <- create_spp_mat(dataset = med_clean, taxa = diplodus, covariate = c("country", "mpa", "temp", "depth", "sal", "prod"))
-# dip_mat %>% View()
 
 ## HERBIVORES
 herb_mat <- create_spp_mat(dataset = med_clean, taxa = herbivores, covariate = c("country", "mpa", "temp", "depth", "sal", "prod"))
-# herb_mat %>% View()
