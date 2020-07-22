@@ -1,147 +1,9 @@
-
+source("scripts/functions.R")
 source("scripts/pckgs_preps.R")
-
-# Add medata --------------------------------------------------------------
-
-med_raw <- read_rds("data/medata.Rds")
-# TODO fix me
-med_raw %<>% filter(!(site %in% c("assecret2210191mlsc_a", "assecret2210191mlsc_b", "assecret2210191mlsc_c")))
-
-med_clean <- med_raw %>%
-  filter(data.origin != "azz_asi") %>% # presence-absence
-  mutate(mpa = if_else(enforcement <= 1, FALSE, TRUE),
-         country = as.numeric(as.factor(country)),
-         temp = scale(tmean),
-         depth = scale(depth),
-         # enforce = as.factor(enforcement),
-         sal = scale(sal_mean),
-         prod = scale(pp_mean)) %>%
-  select(site, lon, lat, trans, species, sp.n, country, mpa, temp, depth, sal, prod)
   
 
 med_clean %>% colnames
 med_clean %>% glimpse()
-
-# Functions ---------------------------------------------------------------
-
-# Func 1: Create species matrix for a specific taxa with all environmental variables
-create_spp_mat <- function(dataset, taxa, covariate){
-  cols <- c(c("lat", "lon", "site", "trans", "species"), env_vector, anthro_vector)
-  dataset %>% 
-    group_by_at(.vars = cols) %>% # group for summarise
-    summarise(n = sum(sp.n)) %>% # sum sp.n for each grouped variable
-    spread(species, n, fill = 0) %>% # convert to species matrix
-    ungroup() %>% 
-    na.omit() %>% # remove NAs; make sure this part it minimised in the raw data
-    mutate(loc = paste(site, trans)) %>% # Create a variable of the location, which shpuld be unique
-    group_by(loc) %>% 
-    column_to_rownames("loc") %>% # create row names by location
-    select(all_of(taxa), all_of(covariate)) # keep the species and covariates columns
-}
-
-#*** *** ***#
-
-# Func 2: Count the number of associations per species in taxa
-assoc_count <- function(taxa){
-  sapply(taxa$key_coefs, FUN = count) %>% # returns a list
-    unlist() %>%
-    enframe(name = "species", value = "associations") %>% 
-    mutate(species = str_sub(string = species, end = -3)) # the count function returns species names with a suffix, this line removes the suffix
-}
-
-#*** *** ***#
-
-# Func 3: Count the number of associations per species in taxa, by covariate type
-covar_count <- function(taxa){
-  env_effect <- sapply(taxa$key_coefs, FUN = function(x) x %>% filter(Variable %in% env_vector) %>%
-                         count()) %>% 
-    unlist() %>%
-    enframe(name = "species", value = "env_assoc") %>% 
-    mutate(species = str_sub(string = species, end = -3))
-  
-  anthro_effect <- sapply(taxa$key_coefs, FUN = function(x) x %>% filter(Variable %in% anthro_vector) %>%
-                            count()) %>% 
-    unlist() %>%
-    enframe(name = "species", value = "anthro_assoc") %>% 
-    mutate(species = str_sub(string = species, end = -3))
-  
-  biotic_effect <- sapply(taxa$key_coefs, FUN = function(x) x %>%
-                            filter(!(Variable %in% env_vector | Variable %in% anthro_vector | str_detect(string = Variable, pattern = "_"))) %>%
-                            count()) %>%
-    unlist() %>%
-    enframe(name = "species", value = "biotic_assoc") %>% 
-    mutate(species = str_sub(string = species, end = -3))
-  
-  inter_effect <- sapply(taxa$key_coefs, FUN = function(x) x %>%
-                           filter(str_detect(string = Variable, pattern = "_")) %>%
-                           count()) %>%
-    unlist() %>%
-    enframe(name = "species", value = "inter_assoc") %>% 
-    mutate(species = str_sub(string = species, end = -3))
-  
-  env_effect %>%
-    left_join(anthro_effect, by = "species") %>%
-    left_join(biotic_effect, by = "species") %>%
-    left_join(inter_effect, by = "species")
-}
-
-#*** *** ***#
-
-# Func 4: Summarise the relative importance of each type of covariate for each species
-rel_imp_sum <- function(taxa){
-  env_relimp <- sapply(taxa$key_coefs, FUN = function(x) x %>%  # Take the taxa model and apply the following:
-                         filter(Variable %in% env_vector) %>%  # Filter by relevant covariates
-                         summarise(n = sum(Rel_importance))) %>% # Summarise Rel_importance column
-    unlist() %>% # Take out of the list
-    enframe(name = "species", value = "env_rel_imp") %>%  # Rearrange
-    mutate(species = str_sub(string = species, end = -3)) # Fix species names
-  
-  anthro_relimp <- sapply(taxa$key_coefs, FUN = function(x) x %>% 
-                            filter(Variable %in% anthro_vector) %>%
-                            summarise(n = sum(Rel_importance))) %>% 
-    unlist() %>%
-    enframe(name = "species", value = "anthro_rel_imp") %>% 
-    mutate(species = str_sub(string = species, end = -3))
-  
-  biotic_relimp <- sapply(taxa$key_coefs, FUN = function(x) x %>% 
-                            filter(!(Variable %in% env_vector | Variable %in% anthro_vector | str_detect(string = Variable, pattern = "_"))) %>%
-                            summarise(n = sum(Rel_importance))) %>% 
-    unlist() %>%
-    enframe(name = "species", value = "biotic_rel_imp") %>% 
-    mutate(species = str_sub(string = species, end = -3))
-  
-  inter_relimp <- sapply(taxa$key_coefs, FUN = function(x) x %>% 
-                           filter(str_detect(string = Variable, pattern = "_")) %>%
-                           summarise(n = sum(Rel_importance))) %>% 
-    unlist() %>%
-    enframe(name = "species", value = "inter_rel_imp") %>% 
-    mutate(species = str_sub(string = species, end = -3))
-  
-  
-  env_relimp %>%
-    left_join(anthro_relimp, by = "species") %>%
-    left_join(biotic_relimp, by = "species") %>%
-    left_join(inter_relimp, by = "species")
-}
-
-
-# Create species matrix for each taxa -------------------------------------
-
-# Create species matrix to run the model on (using FUNC 1)
-# This matrix should include all species from the taxa I'm interested in
-# and the covariates I'd like to include in the model (these are pre-determined in FUNC 1)
-
-## GROUPERS
-grps_mat <- create_spp_mat(dataset = med_clean, taxa = groupers, covariate = c("country", "mpa", "temp", "depth", "sal", "prod"))
-# grps_mat %>% View()
-
-## SEABREAM (Diplodus species)
-dip_mat <- create_spp_mat(dataset = med_clean, taxa = diplodus, covariate = c("country", "mpa", "temp", "depth", "sal", "prod"))
-# dip_mat %>% View()
-
-## HERBIVORES
-herb_mat <- create_spp_mat(dataset = med_clean, taxa = herbivores, covariate = c("country", "mpa", "temp", "depth", "sal", "prod"))
-# herb_mat %>% View()
 
 
 # Figure 1. Co-occurrence of species with and without covariates ----------
@@ -219,11 +81,11 @@ all_relimp %>% bind_rows(.id = "taxa") %>% pivot_longer(3:6) %>% # Create a tibb
   stat_summary(geom = "errorbar", fun.data = mean_se, position = "dodge")
 
 ################## New goals
-# Check correelations (temp-sal/temp-invasive)
-# Biomass of invasive species as covariate
+# Check correelations (temp-sal/temp-invasive) - WED
+# Biomass of invasive species as covariate - Find ref WED
 # cov_assoc: interactions of temp*spp and mpa*spp
 # Rel_imp bar graph for each species (graph for each taxa) after breaking up the interactions (temp*spp and mpa*spp)
 # percentage of non-stationarity (co-occurrence changes within mpa for example)
-# Which other graphs I'd like to have
-# Salinity- fix
-# Depth - mean
+# Which other graphs I'd like to have - WED
+# Salinity- fix - WED
+# Depth - mean - WED
