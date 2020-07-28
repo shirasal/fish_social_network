@@ -90,7 +90,7 @@ all_relimp <- list(groupers = grps_relimp,
 relimp_table <- sapply(X = all_relimp, FUN = function(x) x[,-1] %>% colMeans())
 
 # Figure 2:
-all_relimp %>% bind_rows(.id = "taxa") %>% pivot_longer(3:6) %>% # Create a tibble of all taxa
+all_relimp %>% bind_rows(.id = "taxa") %>% pivot_longer(3:length(.)) %>% # Create a tibble of all taxa
   rename(taxa = taxa, species = species, covariate = name, rel_imp = value) %>%
   mutate(covariate = str_remove(string = covariate, pattern = "_rel_imp")) %>% 
   ggplot() +
@@ -98,9 +98,10 @@ all_relimp %>% bind_rows(.id = "taxa") %>% pivot_longer(3:6) %>% # Create a tibb
   stat_summary(geom = "bar", fun = mean, position = "dodge")+
   stat_summary(geom = "errorbar", fun.data = mean_se, position = "dodge")
 
+# Does the anthro/biotic/env include also interactions? If so - need to separate them.
+
 ################## New goals
 
 # cov_assoc: interactions of temp*spp and mpa*spp
-# Rel_imp bar graph for each species (graph for each taxa) after breaking up the interactions (temp*spp and mpa*spp)
-# percentage of non-stationarity (co-occurrence changes within mpa for example)
+# ]percentage of non-stationarity (co-occurrence changes within mpa for example)
 # Which other graphs I'd like to have - WED
