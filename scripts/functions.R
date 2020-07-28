@@ -47,17 +47,29 @@ covar_count <- function(taxa){
     enframe(name = "species", value = "biotic_assoc") %>% 
     mutate(species = str_sub(string = species, end = -3))
   
-  inter_effect <- sapply(taxa$key_coefs, FUN = function(x) x %>%
-                           filter(str_detect(string = Variable, pattern = "_")) %>%
-                           count()) %>%
+  env_bio_effect <- sapply(taxa$key_coefs, FUN = function(x) x %>% 
+                             filter(str_detect(string = Variable, pattern = "sal_") | 
+                                      str_detect(string = Variable, pattern = "temp_") |
+                                      str_detect(string = Variable, pattern = "country_") |
+                                      str_detect(string = Variable, pattern = "prod_") |
+                                      str_detect(string = Variable, pattern = "depth_")) %>% 
+                             summarise(n = sum(Rel_importance))) %>% 
     unlist() %>%
-    enframe(name = "species", value = "inter_assoc") %>% 
+    enframe(name = "species", value = "env_bio_assoc") %>% 
+    mutate(species = str_sub(string = species, end = -3))
+  
+  anthro_bio_effect <- sapply(taxa$key_coefs, FUN = function(x) x %>% 
+                                filter(str_detect(string = Variable, pattern = "mpa_")) %>% 
+                                summarise(n = sum(Rel_importance))) %>% 
+    unlist() %>%
+    enframe(name = "species", value = "mpa_bio_assoc") %>% 
     mutate(species = str_sub(string = species, end = -3))
   
   env_effect %>%
     left_join(anthro_effect, by = "species") %>%
     left_join(biotic_effect, by = "species") %>%
-    left_join(inter_effect, by = "species")
+    left_join(env_bio_effect, by = "species") %>%
+    left_join(anthro_bio_effect, by = "species")
 }
 
 #-----------------------------------------------------------------------------------------------
@@ -85,18 +97,29 @@ rel_imp_sum <- function(taxa){
     enframe(name = "species", value = "biotic_rel_imp") %>% 
     mutate(species = str_sub(string = species, end = -3))
   
-  inter_relimp <- sapply(taxa$key_coefs, FUN = function(x) x %>% 
-                           filter(str_detect(string = Variable, pattern = "_")) %>%
-                           summarise(n = sum(Rel_importance))) %>% 
+  env_bio_relimp <- sapply(taxa$key_coefs, FUN = function(x) x %>% 
+           filter(str_detect(string = Variable, pattern = "sal_") | 
+                    str_detect(string = Variable, pattern = "temp_") |
+                    str_detect(string = Variable, pattern = "country_") |
+                    str_detect(string = Variable, pattern = "prod_") |
+                    str_detect(string = Variable, pattern = "depth_")) %>% 
+           summarise(n = sum(Rel_importance))) %>% 
     unlist() %>%
-    enframe(name = "species", value = "inter_rel_imp") %>% 
+    enframe(name = "species", value = "env_bio_rel_imp") %>% 
     mutate(species = str_sub(string = species, end = -3))
   
+  anthro_bio_relimp <- sapply(taxa$key_coefs, FUN = function(x) x %>% 
+           filter(str_detect(string = Variable, pattern = "mpa_")) %>% 
+           summarise(n = sum(Rel_importance))) %>% 
+    unlist() %>%
+    enframe(name = "species", value = "mpa_bio_rel_imp") %>% 
+    mutate(species = str_sub(string = species, end = -3))
   
   env_relimp %>%
     left_join(anthro_relimp, by = "species") %>%
     left_join(biotic_relimp, by = "species") %>%
-    left_join(inter_relimp, by = "species")
+    left_join(env_bio_relimp, by = "species") %>%
+    left_join(anthro_bio_relimp, by = "species")
 }
 
 
