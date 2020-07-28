@@ -100,8 +100,3 @@ all_relimp %>% bind_rows(.id = "taxa") %>% pivot_longer(3:length(.)) %>% # Creat
 
 # Does the anthro/biotic/env include also interactions? If so - need to separate them.
 
-################## New goals
-
-# cov_assoc: interactions of temp*spp and mpa*spp
-# ]percentage of non-stationarity (co-occurrence changes within mpa for example)
-# Which other graphs I'd like to have - WED
