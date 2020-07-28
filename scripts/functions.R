@@ -48,19 +48,15 @@ covar_count <- function(taxa){
     mutate(species = str_sub(string = species, end = -3))
   
   env_bio_effect <- sapply(taxa$key_coefs, FUN = function(x) x %>% 
-                             filter(str_detect(string = Variable, pattern = "sal_") | 
-                                      str_detect(string = Variable, pattern = "temp_") |
-                                      str_detect(string = Variable, pattern = "country_") |
-                                      str_detect(string = Variable, pattern = "prod_") |
-                                      str_detect(string = Variable, pattern = "depth_")) %>% 
-                             summarise(n = sum(Rel_importance))) %>% 
+                             filter(str_detect(string = Variable, pattern = "temp_")) %>% 
+                             count()) %>% 
     unlist() %>%
     enframe(name = "species", value = "env_bio_assoc") %>% 
     mutate(species = str_sub(string = species, end = -3))
   
   anthro_bio_effect <- sapply(taxa$key_coefs, FUN = function(x) x %>% 
                                 filter(str_detect(string = Variable, pattern = "mpa_")) %>% 
-                                summarise(n = sum(Rel_importance))) %>% 
+                                count()) %>% 
     unlist() %>%
     enframe(name = "species", value = "mpa_bio_assoc") %>% 
     mutate(species = str_sub(string = species, end = -3))
@@ -98,11 +94,7 @@ rel_imp_sum <- function(taxa){
     mutate(species = str_sub(string = species, end = -3))
   
   env_bio_relimp <- sapply(taxa$key_coefs, FUN = function(x) x %>% 
-           filter(str_detect(string = Variable, pattern = "sal_") | 
-                    str_detect(string = Variable, pattern = "temp_") |
-                    str_detect(string = Variable, pattern = "country_") |
-                    str_detect(string = Variable, pattern = "prod_") |
-                    str_detect(string = Variable, pattern = "depth_")) %>% 
+           filter(str_detect(string = Variable, pattern = "temp_")) %>% 
            summarise(n = sum(Rel_importance))) %>% 
     unlist() %>%
     enframe(name = "species", value = "env_bio_rel_imp") %>% 
