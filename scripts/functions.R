@@ -114,4 +114,67 @@ rel_imp_sum <- function(taxa){
     left_join(anthro_bio_relimp, by = "species")
 }
 
+# ------------------------------------------------------------------------------------
+
+# Func 5: Count the all POSITIVE/NEGATIVE association coefficients, per taxa
+
+direction_assoc <- function(taxa){
+  env_effect <- lapply(dip_mod$key_coefs, FUN = function(x) x %>%
+                         filter(Variable %in% env_vector) %>%
+                         group_by(Standardised_coef > 0) %>% 
+                         summarise(env_coefs = sum(Standardised_coef)) %>% 
+                         transmute(direction = `Standardised_coef > 0`, env_coefficient = env_coefs) %>%
+                         mutate(direction = case_when(.$direction == TRUE ~ "pos",
+                                                      .$direction == FALSE ~ "neg",
+                                                      TRUE ~ as.character(.$direction)))) %>% 
+    bind_rows(.id = "id")
+  
+  anthro_effect <- lapply(dip_mod$key_coefs, FUN = function(x) x %>%
+                            filter(Variable %in% anthro_vector) %>%
+                            group_by(Standardised_coef > 0) %>% 
+                            summarise(env_coefs = sum(Standardised_coef)) %>% 
+                            transmute(direction = `Standardised_coef > 0`, anthro_coefficient = env_coefs) %>%
+                            mutate(direction = case_when(.$direction == TRUE ~ "pos",
+                                                         .$direction == FALSE ~ "neg",
+                                                         TRUE ~ as.character(.$direction)))) %>% 
+    bind_rows(.id = "id")
+  
+  biotic_effect <- lapply(dip_mod$key_coefs, FUN = function(x) x %>%
+                            filter(!(Variable %in% env_vector | Variable %in% anthro_vector | str_detect(string = Variable, pattern = "_"))) %>%
+                            group_by(Standardised_coef > 0) %>% 
+                            summarise(env_coefs = sum(Standardised_coef)) %>% 
+                            transmute(direction = `Standardised_coef > 0`, bio_coefficient = env_coefs) %>%
+                            mutate(direction = case_when(.$direction == TRUE ~ "pos",
+                                                         .$direction == FALSE ~ "neg",
+                                                         TRUE ~ as.character(.$direction)))) %>% 
+    bind_rows(.id = "id")
+  
+  env_bio_effect <- lapply(dip_mod$key_coefs, FUN = function(x) x %>%
+                             filter(str_detect(string = Variable, pattern = "temp_")) %>%
+                             group_by(Standardised_coef > 0) %>% 
+                             summarise(env_coefs = sum(Standardised_coef)) %>%
+                             transmute(direction = `Standardised_coef > 0`, int_env_coefficient = env_coefs) %>%
+                             mutate(direction = case_when(.$direction == TRUE ~ "pos",
+                                                          .$direction == FALSE ~ "neg",
+                                                          TRUE ~ as.character(.$direction)))) %>%
+    bind_rows(.id = "id")
+  
+  anthro_bio_effect <- lapply(dip_mod$key_coefs, FUN = function(x) x %>%
+                                filter(str_detect(string = Variable, pattern = "mpa_")) %>%
+                                group_by(Standardised_coef > 0) %>% 
+                                summarise(env_coefs = sum(Standardised_coef)) %>%
+                                transmute(direction = `Standardised_coef > 0`, int_anth_coefficient = env_coefs) %>%
+                                mutate(direction = case_when(.$direction == TRUE ~ "pos",
+                                                             .$direction == FALSE ~ "neg",
+                                                             TRUE ~ as.character(.$direction)))) %>%
+    bind_rows(.id = "id")
+  
+  
+  env_effect %>%
+    left_join(anthro_effect, by = c("id", "direction")) %>%
+    left_join(biotic_effect, by = c("id", "direction")) %>% 
+    left_join(env_bio_effect, by = c("id", "direction")) %>%
+    left_join(anthro_bio_effect, by = c("id", "direction")) %>% 
+    arrange(direction)
+}
 
