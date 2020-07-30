@@ -5,26 +5,19 @@ source("R/functions.R")
 source("R/run_models.R")
 library(wesanderson)
 
-med_clean %>% colnames
+med_clean %<>% select(-sal) # removing salinity to avoid data loss because of NAs until completed.
 med_clean %>% glimpse()
-
 
 # Check auto-correlations -------------------------------------------------
 
-# Temperature - Salinity
-
-med_clean %>% ggplot() + 
-  aes(x = temp, y = sal) + 
-  geom_point()
-
-# Salinity NAs
-med_raw %>% dplyr::filter(!complete.cases(sal_mean))
-med_raw %>% dplyr::filter(!complete.cases(sal_mean)) %>% group_by(data.origin) %>% summarise(n = n())
-med_raw %>% dplyr::filter(!complete.cases(sal_mean) & data.origin == "Belmaker") %>% distinct(site)
-med_raw %>% dplyr::filter(!complete.cases(sal_mean) & data.origin == "Sala - PEW") %>% distinct(site)
+# # Temperature - Salinity
+# 
+# med_clean %>% ggplot() + 
+#   aes(x = temp, y = sal) + 
+#   geom_point()
 
 # Temperature - Invasive species
-
+# TODO add column of native(T/F) to data
 
 # Figure 1. Co-occurrence of species with and without covariates ----------
 # Compare between co-occurrence with and without covariates:
@@ -65,7 +58,7 @@ all_cov_assoc <- list(groupers = grps_cov_assoc,
                       herbivores = herb_cov_assoc)
 
 # Figure 2. Relative importance per taxa ----------------------------------
-
+# How much is does a predictor affect the data
 grps_relimp <- rel_imp_sum(grps_mod)
 dip_relimp <- rel_imp_sum(dip_mod)
 herb_relimp <- rel_imp_sum(herb_mod)
@@ -77,7 +70,7 @@ all_relimp <- list(groupers = grps_relimp,
 # Table of mean relative importance of covariates per taxa:
 relimp_table <- sapply(X = all_relimp, FUN = function(x) x[,-1] %>% colMeans())
 
-# Figure 2:
+# Figure: how much are predictors important for all fish?
 all_relimp %>% bind_rows(.id = "taxa") %>% pivot_longer(3:length(.)) %>% # Create a tibble of all taxa
   rename(taxa = taxa, species = species, covariate = name, rel_imp = value) %>%
   mutate(covariate = str_remove(string = covariate, pattern = "_rel_imp")) %>% 
@@ -85,7 +78,7 @@ all_relimp %>% bind_rows(.id = "taxa") %>% pivot_longer(3:length(.)) %>% # Creat
   aes(x = covariate, y = rel_imp, fill = taxa)+
   stat_summary(geom = "bar", fun = mean, position = "dodge") +
   stat_summary(geom = "errorbar", fun.data = mean_se, position = "dodge")
-
+## A different look (facetted)
 all_relimp %>% bind_rows(.id = "taxa") %>% pivot_longer(3:length(.)) %>% # Create a tibble of all taxa
   rename(taxa = taxa, species = species, covariate = name, rel_imp = value) %>%
   mutate(covariate = str_remove(string = covariate, pattern = "_rel_imp")) %>% 
@@ -117,7 +110,7 @@ dip_rel_imp_bp <- all_relimp %>% bind_rows(.id = "taxa") %>% pivot_longer(3:leng
   aes(x = covariate, y = rel_imp, fill = species) +
   stat_summary(geom = "bar", fun = mean, position = "stack", alpha = 0.7) + 
   theme_classic() + 
-  scale_fill_manual(values = wes_palette(n = 5, name = "FantasticFox"))
+  scale_fill_manual(values = wes_palette(n = 5, name = "FantasticFox1"))
 
 # Herbivores
 herb_rel_imp_bp <- all_relimp %>% bind_rows(.id = "taxa") %>% pivot_longer(3:length(.)) %>%
@@ -128,7 +121,7 @@ herb_rel_imp_bp <- all_relimp %>% bind_rows(.id = "taxa") %>% pivot_longer(3:len
   aes(x = covariate, y = rel_imp, fill = species) +
   stat_summary(geom = "bar", fun = mean, position = "stack", alpha = 0.7) + 
   theme_classic() + 
-  scale_fill_manual(values = wes_palette(n = 5, name = "Rushmore"))
+  scale_fill_manual(values = wes_palette(n = 5, name = "Rushmore1"))
 
 gridExtra::grid.arrange(grps_rel_imp_bp, dip_rel_imp_bp, herb_rel_imp_bp)
 
@@ -168,7 +161,7 @@ all_relimp %>% bind_rows(.id = "taxa") %>% pivot_longer(3:length(.)) %>%
 
 # Fig. 3: Associations per MPA --------------------------------------------
 
-### How to plot this? How to relate between covariate coefficient and the covariate values? For example: what is the value I'm looking for when I want to see what happens in 25 degrees?
+# Working on that in 'run_models.R'
 
 ############################################################################
 
