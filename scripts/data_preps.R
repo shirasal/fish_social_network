@@ -16,6 +16,19 @@ diplodus <- c("Diplodus.annularis", "Diplodus.puntazzo", "Diplodus.sargus",
 herbivores <- c("Siganus.rivulatus", "Siganus.luridus", "Sarpa.salpa",
                 "Scarus.ghobban", "Sparisoma.cretense")
 
+# Vector of all species that were observed over 10 times in the whole dataset
+all_spps_over10 <- med_clean %>% 
+  group_by_at(.vars = c("lat", "lon", "site", "trans", "species")) %>% # group for summarise
+  summarise(n = sum(sp.n)) %>% # sum sp.n for each grouped variable
+  spread(species, n, fill = 0) %>%  # convert to species matrix
+  ungroup() %>% 
+  select(5:127) %>% 
+  colSums() %>% 
+  as.matrix() %>% 
+  as.data.frame() %>% 
+  rownames_to_column() %>% 
+  filter(V1 > 10) %>%
+  select(rowname) %>% as.list() %>% as.array()
 
 # Env/Anthro vectors ------------------------------------------------------
 
