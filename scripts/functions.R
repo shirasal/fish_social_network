@@ -1,3 +1,4 @@
+source("R/packages.R")
 
 # Func 1: Create species matrix for a specific taxa with all environmental variables
 create_spp_mat <- function(dataset, taxa, covariate){
