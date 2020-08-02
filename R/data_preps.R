@@ -19,7 +19,7 @@ herbivores <- c("Siganus.rivulatus", "Siganus.luridus", "Sarpa.salpa",
 
 # Env/Anthro vectors ------------------------------------------------------
 
-env_vector <- c("country", "temp", "depth", "sal", "prod") # TODO complete 'sal' NAs
+env_vector <- c("country", "temp", "depth", "prod") # Salinity (sal) removed to avoid data loss (NAs)
 anthro_vector <- c("mpa")
 
 # Add medata --------------------------------------------------------------
@@ -34,9 +34,9 @@ med_clean <- med_raw %>%
          depth = scale(depth),
          sal = scale(sal_mean),
          prod = scale(pp_mean)) %>%
-  select(site, lon, lat, trans, species, sp.n, country, mpa, temp, depth, sal, prod)
+  select(site, lon, lat, trans, species, sp.n, country, mpa, temp, depth, prod)
 
-# TODO add covariates: invasive species count/biomass (spatial), MPA age, MPA size
+# TODO add covariates: invasive species count/biomass (spatial), MPA age, MPA size; salinity after completing NAs
 
 # Create species matrix for each taxa -------------------------------------
 
@@ -45,10 +45,12 @@ med_clean <- med_raw %>%
 # and the covariates I'd like to include in the model (these are pre-determined in FUNC 1)
 
 ## GROUPERS
-grps_mat <- create_spp_mat(dataset = med_clean, taxa = groupers, covariate = c("country", "mpa", "temp", "depth", "sal", "prod"))
+grps_mat <- create_spp_mat(dataset = med_clean, taxa = groupers, covariate = c("country", "mpa", "temp", "depth", "prod"))
 
 ## SEABREAM (Diplodus species)
-dip_mat <- create_spp_mat(dataset = med_clean, taxa = diplodus, covariate = c("country", "mpa", "temp", "depth", "sal", "prod"))
+dip_mat <- create_spp_mat(dataset = med_clean, taxa = diplodus, covariate = c("country", "mpa", "temp", "depth", "prod"))
 
 ## HERBIVORES
-herb_mat <- create_spp_mat(dataset = med_clean, taxa = herbivores, covariate = c("country", "mpa", "temp", "depth", "sal", "prod"))
+herb_mat <- create_spp_mat(dataset = med_clean, taxa = herbivores, covariate = c("country", "mpa", "temp", "depth", "prod"))
+
+save.image(file = "data/all_objects.RData")

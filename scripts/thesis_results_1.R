@@ -5,9 +5,6 @@ source("R/functions.R")
 source("R/run_models.R")
 library(wesanderson)
 
-med_clean %<>% select(-sal) # removing salinity to avoid data loss because of NAs until completed.
-med_clean %>% glimpse()
-
 # Check auto-correlations -------------------------------------------------
 
 # # Temperature - Salinity
