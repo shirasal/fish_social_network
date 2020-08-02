@@ -12,7 +12,6 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-source("scripts/pckgs_preps.R")
 source("scripts/thesis_results_1.R")
 
 ```
@@ -80,7 +79,12 @@ gridExtra::grid.arrange(dipHM_cov, dipHM_nocov, nrow = 1, top = "Seabream co-occ
 gridExtra::grid.arrange(herbHM_cov, herbHM_nocov, nrow = 1, top = "Herbivores co-occurrence")
 ```
 
-Groupers species seem to not be affected by environmental or anthropogenic factors. Seabreams show different pattern when considering abiotic factor. There is a strong positive correlation between *Diplodus sargus* and *Diplodus annularis*, which is uneffected by covariates. Nevertheless, the relationship between *Diplodus vulgaris* and three other species changes when introducing abiotic factors. Herbivorous species are not affected greatly by covariates, but the strength of association is weaker when accounting for them.
+All species exhibit non-stationarity. When covariates are introduced (left graph in all three panels), species associations change. In the groupers taxa it is extremely evident as most associations are completely gone and the only one that's left (*Epinephelus marginatus* and *Epinephelus costae*) seem to be weaker. All negative associations that were found when no covariates were introduced, are minimised to zero.
+The associations of seabreams are also highly affected by the introduction of covariates: all associations that exist when not accounting for covariates are minimised to zero, while others strengthen. The coefficients are also minimised.
+The herbivorous species exhibit the most subtle variance: though most associations are minimised to zero when accounting for covariates, on species pair (*Scarus ghobban* and *Siganus luridus*) still show a strong negative association. This is a particulary interesting results because both are limited to the eastern basin of the Mediterranean, both are exotic species and the association here is negative (as oppose to other taxa).
+Overall we can see clearly that biotic co-occurrence patterns change when accounting for environmental and anthropogenic covariates.
+
+<!--See if I can do the same with models with and without anthropogenic-->
 
 ## Number of associations
 
