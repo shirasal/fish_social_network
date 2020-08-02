@@ -21,17 +21,17 @@ library(wesanderson)
 # GROUPERS
 grpsHM_cov <- plotMRF_hm(grps_mod, main = "with covariates")
 grpsHM_nocov <- plotMRF_hm(grps_mod_nocov, main = "without covariates")
-gridExtra::grid.arrange(grpsHM_cov, grpsHM_nocov, nrow = 1, top = "Groupers co-occurrence")
+# gridExtra::grid.arrange(grpsHM_cov, grpsHM_nocov, nrow = 1, top = "Groupers co-occurrence")
 
 # SEABREAM
 dipHM_cov <- plotMRF_hm(dip_mod, main = "with covariates")
 dipHM_nocov <- plotMRF_hm(dip_mod_nocov, main = "without covariates")
-gridExtra::grid.arrange(dipHM_cov, dipHM_nocov, nrow = 1, top = "Seabream co-occurrence")
+# gridExtra::grid.arrange(dipHM_cov, dipHM_nocov, nrow = 1, top = "Seabream co-occurrence")
 
 # HERBIVORES
 herbHM_cov <- plotMRF_hm(herb_mod, main = "with covariates")
 herbHM_nocov <- plotMRF_hm(herb_mod_nocov, main = "without covariates")
-gridExtra::grid.arrange(herbHM_cov, herbHM_nocov, nrow = 1, top = "Herbivores co-occurrence")
+# gridExtra::grid.arrange(herbHM_cov, herbHM_nocov, nrow = 1, top = "Herbivores co-occurrence")
 
 
 # Table 1. Relative importance per species --------------------------------
@@ -120,7 +120,7 @@ herb_rel_imp_bp <- all_relimp %>% bind_rows(.id = "taxa") %>% pivot_longer(3:len
   theme_classic() + 
   scale_fill_manual(values = wes_palette(n = 5, name = "Rushmore1"))
 
-gridExtra::grid.arrange(grps_rel_imp_bp, dip_rel_imp_bp, herb_rel_imp_bp)
+# gridExtra::grid.arrange(grps_rel_imp_bp, dip_rel_imp_bp, herb_rel_imp_bp)
 
 # Exchange covaraite with species (species as x and cov as fill)
 all_relimp %>% bind_rows(.id = "taxa") %>% pivot_longer(3:length(.)) %>%
