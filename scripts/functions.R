@@ -95,15 +95,15 @@ rel_imp_sum <- function(taxa){
     mutate(species = str_sub(string = species, end = -3))
   
   env_bio_relimp <- sapply(taxa$key_coefs, FUN = function(x) x %>% 
-           filter(str_detect(string = Variable, pattern = "temp_")) %>% 
-           summarise(n = sum(Rel_importance))) %>% 
+                             filter(str_detect(string = Variable, pattern = "temp_")) %>% 
+                             summarise(n = sum(Rel_importance))) %>% 
     unlist() %>%
     enframe(name = "species", value = "env_bio_rel_imp") %>% 
     mutate(species = str_sub(string = species, end = -3))
   
   anthro_bio_relimp <- sapply(taxa$key_coefs, FUN = function(x) x %>% 
-           filter(str_detect(string = Variable, pattern = "mpa_")) %>% 
-           summarise(n = sum(Rel_importance))) %>% 
+                                filter(str_detect(string = Variable, pattern = "mpa_")) %>% 
+                                summarise(n = sum(Rel_importance))) %>% 
     unlist() %>%
     enframe(name = "species", value = "mpa_bio_rel_imp") %>% 
     mutate(species = str_sub(string = species, end = -3))
@@ -179,3 +179,9 @@ direction_assoc <- function(taxa){
     arrange(direction)
 }
 
+
+# inverse logit -----------------------------------------------------------
+
+invlogit <- function (x){
+  1/(1 + exp(-x))
+}
