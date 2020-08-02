@@ -24,5 +24,5 @@ grps_mod
 grps_mod$graph # Only association parameters of species
 grps_mod$intercepts
 grps_mod$direct_coefs # association parameters of species and covariates
-grps_mod$direct_coefs[1,] %>% View
+# grps_mod$direct_coefs[1,] %>% View
 
