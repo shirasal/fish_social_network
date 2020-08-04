@@ -64,21 +64,6 @@ I'm using the MRF-based model from `MRFcov` package (Clark _et al._ [^1]) to det
 
 -->
 
-### Take a look at the model's predictions for the data
-
-**temperature**  
-```{r}
-gridExtra::grid.arrange(ec_plot, em_plot, mr_plot, ss_plot, sc_plot, nrow = 2)
-gridExtra::grid.arrange(da_plot, dp_plot, ds_plot, dv_plot, dc_plot, nrow = 2)
-gridExtra::grid.arrange(sr_plot, sl_plot, sas_plot, sg_plot, spc_plot, nrow = 2)
-```
-
-**MPAs**  
-```{r}
-gridExtra::grid.arrange(ec_boxplot, em_boxplot, mr_boxplot, ss_boxplot, sc_boxplot, nrow = 2)
-gridExtra::grid.arrange(da_boxplot, dp_boxplot, ds_boxplot, dv_boxplot, dc_boxplot, nrow = 2)
-gridExtra::grid.arrange(sr_boxplot, sl_boxplot, sas_boxplot, sg_boxplot, spc_boxplot, nrow = 2)
-```
 
 # Analyses
 
@@ -102,15 +87,6 @@ The associations of seabreams are also highly affected by the introduction of co
 The herbivorous species exhibit the most subtle variance: though most associations are minimised to zero when accounting for covariates, on species pair (*Scarus ghobban* and *Siganus luridus*) still show a strong negative association. This is a particulary interesting results because both are limited to the eastern basin of the Mediterranean, both are exotic species and the association here is negative (as oppose to other taxa).
 Overall we can see clearly that biotic co-occurrence patterns change when accounting for environmental and anthropogenic covariates.
 
-<!--See if I can do the same with models with and without anthropogenic-->
-
-## Number of associations
-
-```{r}
-all_assoc
-```
-
-<!--Change to include only biotic associations-->
 
 ## Nonstationarity
 
@@ -145,6 +121,24 @@ all_relimp %>% bind_rows(.id = "taxa") %>% pivot_longer(3:length(.)) %>% # Creat
   theme(legend.position = "none")
 ```
 Groupers exhibit stationarity.
+
+
+
+<!-- ##  -->
+
+<!-- **temperature**   -->
+<!-- ```{r} -->
+<!-- gridExtra::grid.arrange(ec_plot, em_plot, mr_plot, ss_plot, sc_plot, nrow = 2) -->
+<!-- gridExtra::grid.arrange(da_plot, dp_plot, ds_plot, dv_plot, dc_plot, nrow = 2) -->
+<!-- gridExtra::grid.arrange(sr_plot, sl_plot, sas_plot, sg_plot, spc_plot, nrow = 2) -->
+<!-- ``` -->
+
+<!-- **MPAs**   -->
+<!-- ```{r} -->
+<!-- gridExtra::grid.arrange(ec_boxplot, em_boxplot, mr_boxplot, ss_boxplot, sc_boxplot, nrow = 2) -->
+<!-- gridExtra::grid.arrange(da_boxplot, dp_boxplot, ds_boxplot, dv_boxplot, dc_boxplot, nrow = 2) -->
+<!-- gridExtra::grid.arrange(sr_boxplot, sl_boxplot, sas_boxplot, sg_boxplot, spc_boxplot, nrow = 2) -->
+<!-- ``` -->
 
 
 
