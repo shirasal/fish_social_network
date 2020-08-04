@@ -33,55 +33,46 @@ dip_cov_assoc <- covar_count(dip_mod)
 herb_cov_assoc <- covar_count(herb_mod)
 
 all_cov_assoc <- list(groupers = grps_cov_assoc,
-                      seabrean = dip_cov_assoc,
+                      seabream = dip_cov_assoc,
                       herbivores = herb_cov_assoc)
 
-# Rel_imp figures for species:
-# Groupers
-grps_rel_imp_bp <- all_relimp %>% bind_rows(.id = "taxa") %>% pivot_longer(3:length(.)) %>%
-  rename(taxa = taxa, species = species, covariate = name, rel_imp = value) %>%
-  mutate(covariate = str_remove(string = covariate, pattern = "_rel_imp")) %>% 
-  filter(taxa == "groupers") %>% 
+covariates_effect <- all_cov_assoc %>%
+  bind_rows(.id = "taxa") %>%
+  pivot_longer(3:length(.)) %>%
+  rename(taxa = taxa, species = species, covariate = name, cov_assoc = value) %>%
+  mutate(covariate = str_remove(string = covariate, pattern = "_assoc")) %>%
+  left_join(all_relimp %>% bind_rows(.id = "taxa") %>% pivot_longer(3:length(.)) %>%
+              rename(taxa = taxa, species = species, covariate = name, rel_imp = value) %>%
+              mutate(covariate = str_remove(string = covariate, pattern = "_rel_imp")))
+
+# Rel_imp figures for species per taxa:
+covariates_effect %>% 
   ggplot() +
   aes(x = covariate, y = rel_imp, fill = species) +
-  stat_summary(geom = "bar", fun = mean, position = "stack", alpha = 0.7) + 
-  theme_classic() + 
-  scale_fill_manual(values = wes_palette(n = 5, name = "Moonrise3"))
+  stat_summary(geom = "bar", fun = mean, position = "stack", alpha = 0.7) +
+  facet_wrap(~taxa, nrow = 1)
 
-# Diplodus
-dip_rel_imp_bp <- all_relimp %>% bind_rows(.id = "taxa") %>% pivot_longer(3:length(.)) %>%
-  rename(taxa = taxa, species = species, covariate = name, rel_imp = value) %>%
-  mutate(covariate = str_remove(string = covariate, pattern = "_rel_imp")) %>% 
-  filter(taxa == "seabream") %>% 
+# Rel_imp * (1/cov_assoc) figure for species per taxa:
+covariates_effect %>% 
   ggplot() +
-  aes(x = covariate, y = rel_imp, fill = species) +
-  stat_summary(geom = "bar", fun = mean, position = "stack", alpha = 0.7) + 
-  theme_classic() + 
-  scale_fill_manual(values = wes_palette(n = 5, name = "FantasticFox1"))
-
-# Herbivores
-herb_rel_imp_bp <- all_relimp %>% bind_rows(.id = "taxa") %>% pivot_longer(3:length(.)) %>%
-  rename(taxa = taxa, species = species, covariate = name, rel_imp = value) %>%
-  mutate(covariate = str_remove(string = covariate, pattern = "_rel_imp")) %>% 
-  filter(taxa == "herbivores") %>% 
-  ggplot() +
-  aes(x = covariate, y = rel_imp, fill = species) +
-  stat_summary(geom = "bar", fun = mean, position = "stack", alpha = 0.7) + 
-  theme_classic() + 
-  scale_fill_manual(values = wes_palette(n = 5, name = "Rushmore1"))
-
-# gridExtra::grid.arrange(grps_rel_imp_bp, dip_rel_imp_bp, herb_rel_imp_bp)
+  aes(x = covariate, y = rel_imp*(1/(cov_assoc)), fill = species) +
+  stat_summary(geom = "bar", fun = mean, position = "stack", alpha = 0.7) +
+  facet_wrap(~taxa, nrow = 1)
 
 # Exchange covaraite with species (species as x and cov as fill)
-all_relimp %>% bind_rows(.id = "taxa") %>% pivot_longer(3:length(.)) %>%
-  rename(taxa = taxa, species = species, covariate = name, rel_imp = value) %>%
-  mutate(covariate = str_remove(string = covariate, pattern = "_rel_imp")) %>% 
-  filter(taxa == "groupers") %>% 
+covariates_effect %>% 
   ggplot() +
   aes(x = species, y = rel_imp, fill = covariate) +
-  stat_summary(geom = "bar", fun = mean, position = "stack", alpha = 0.7) + 
-  theme_classic() + 
+  stat_summary(geom = "bar", fun = mean, position = "stack", alpha = 0.7) +
   scale_fill_manual(values = wes_palette(n = 5, name = "Zissou1"))
+
+covariates_effect %>% 
+  filter(taxa == "seabream") %>% 
+  ggplot() +
+  aes(x = species, y = rel_imp*cov_assoc, fill = covariate) +
+  stat_summary(geom = "bar", fun = mean, position = "stack", alpha = 0.7) +
+  scale_fill_manual(values = wes_palette(n = 5, name = "Zissou1")) +
+  labs("")
 
 all_relimp %>% bind_rows(.id = "taxa") %>% pivot_longer(3:length(.)) %>%
   rename(taxa = taxa, species = species, covariate = name, rel_imp = value) %>%
@@ -103,15 +94,5 @@ all_relimp %>% bind_rows(.id = "taxa") %>% pivot_longer(3:length(.)) %>%
   theme_classic() + 
   scale_fill_manual(values = wes_palette(n = 5, name = "Zissou1"))
 
-# rel_imp*effect_size for a better index of the importance (when summing up)
 
 
-# Fig. 3: Associations per MPA --------------------------------------------
-
-# Working on that in 'run_models.R'
-
-############################################################################
-
-grps_dir_assoc <- direction_assoc(taxa = grps_mod)
-dip_dir_assoc <- direction_assoc(taxa = dip_mod)
-herb_dir_assoc <- direction_assoc(taxa = herb_mod)
