@@ -1,3 +1,5 @@
+source("R/run_models.R")
+
 # Figure 2. Relative importance per taxa ----------------------------------
 # How much is does a predictor affect the data
 grps_relimp <- rel_imp_sum(grps_mod)
