@@ -48,10 +48,8 @@ sc_plot <- grps_predict %>%
   geom_point()
   # stat_smooth(aes(x = tmean, y = Serranus.cabrilla), method = "lm", formula = y ~ x)
 
-gridExtra::grid.arrange(ec_plot, em_plot, mr_plot, ss_plot, sc_plot, nrow = 2)
 
-
-# All on one plot ---------------------------------------------------------
+# All in one plot ---------------------------------------------------------
 
 # grps_predict %>% 
 #   ggplot() +
@@ -109,8 +107,6 @@ dc_plot <- dip_predict %>%
   geom_point()
   # stat_smooth(aes(x = tmean, y = Diplodus.cervinus), method = "lm", formula = y ~ x)
 
-gridExtra::grid.arrange(da_plot, dp_plot, ds_plot, dv_plot, dc_plot, nrow = 2)
-
 
 # Herbivores --------------------------------------------------------------
 
@@ -153,7 +149,6 @@ spc_plot <- herb_predict %>%
   geom_point()
   # stat_smooth(aes(x = tmean, y = Sparisoma.cretense), method = "lm", formula = y ~ x)
 
-gridExtra::grid.arrange(sr_plot, sl_plot, sas_plot, sg_plot, spc_plot, nrow = 2)
 
 # ----------------------------------MPA-------------------------- #
 
@@ -168,45 +163,107 @@ grps_mpa_predict <- MRFcov::predict_MRF(data = grps_mat, MRF_mod = grps_mod) %>%
   rownames_to_column("site") %>%
   mutate(loc = stringr::str_replace(string = .$site, " ", "_")) %>% 
   select(loc, 2:6) %>% 
-  left_join(locs_mpas, by = "loc") %>% 
-  group_by(mpa) %>% 
+  left_join(locs_mpas, by = "loc")
   
 
-grps_mpa_predict %>% 
-  ggplot() +
-  aes(x = mpa) +
-  geom_bar()
-
 # Plot probability of occurrence of species as a function of mpa:
-ec_barplot <- grps_mpa_predict %>% 
+ec_boxplot <- grps_mpa_predict %>% 
   ggplot() +
-  aes(y = Epinephelus.costae) +
-  geom_bar()
+  aes(x = mpa, y = Epinephelus.costae) +
+  geom_boxplot()
 
-em_barplot <- grps_mpa_predict %>% 
+em_boxplot <- grps_mpa_predict %>% 
   ggplot() +
   aes(x = mpa, y = Epinephelus.marginatus) +
-  geom_bar()
-  # stat_smooth(aes(x = mpa, y = Epinephelus.marginatus), method = "lm", formula = y ~ x)
+  geom_boxplot()
 
-mr_barplot <- grps_mpa_predict %>% 
+mr_boxplot <- grps_mpa_predict %>% 
   ggplot() +
   aes(x = mpa, y = Mycteroperca.rubra) +
-  geom_bar()
-  # stat_smooth(aes(x = mpa, y = Mycteroperca.rubra), method = "lm", formula = y ~ x)
+  geom_boxplot()
 
-ss_barplot <- grps_mpa_predict %>% 
+ss_boxplot <- grps_mpa_predict %>% 
   ggplot() +
   aes(x = mpa, y = Serranus.scriba) +
-  geom_bar()
-  # stat_smooth(aes(x = mpa, y = Serranus.scriba), method = "lm", formula = y ~ x)
+  geom_boxplot()
 
-sc_barplot <- grps_mpa_predict %>% 
+sc_boxplot <- grps_mpa_predict %>% 
   ggplot() +
   aes(x = mpa, y = Serranus.cabrilla) +
-  geom_bar()
-  # stat_smooth(aes(x = mpa, y = Serranus.cabrilla), method = "lm", formula = y ~ x)
-
-gridExtra::grid.arrange(ec_barplot, em_barplot, mr_barplot, ss_barplot, sc_barplot, nrow = 2)
+  geom_boxplot()
 
 
+
+# Seabream ----------------------------------------------------------------
+
+dip_mpa_predict <- MRFcov::predict_MRF(data = dip_mat, MRF_mod = dip_mod) %>%
+  invlogit() %>% 
+  as.data.frame() %>% 
+  rownames_to_column("site") %>%
+  mutate(loc = stringr::str_replace(string = .$site, " ", "_")) %>% 
+  select(loc, 2:6) %>% 
+  left_join(locs_mpas, by = "loc")
+
+
+# Plot probability of occurrence of species as a function of mpa:
+da_boxplot <- dip_mpa_predict %>% 
+  ggplot() +
+  aes(x = mpa, y = Diplodus.annularis) +
+  geom_boxplot()
+
+dc_boxplot <- dip_mpa_predict %>% 
+  ggplot() +
+  aes(x = mpa, y = Diplodus.cervinus) +
+  geom_boxplot()
+
+dp_boxplot <- dip_mpa_predict %>% 
+  ggplot() +
+  aes(x = mpa, y = Diplodus.puntazzo) +
+  geom_boxplot()
+
+ds_boxplot <- dip_mpa_predict %>% 
+  ggplot() +
+  aes(x = mpa, y = Diplodus.sargus) +
+  geom_boxplot()
+
+dv_boxplot <- dip_mpa_predict %>% 
+  ggplot() +
+  aes(x = mpa, y = Diplodus.vulgaris) +
+  geom_boxplot()
+
+# Herbivores --------------------------------------------------------------
+
+herb_mpa_predict <- MRFcov::predict_MRF(data = herb_mat, MRF_mod = herb_mod) %>%
+  invlogit() %>% 
+  as.data.frame() %>% 
+  rownames_to_column("site") %>%
+  mutate(loc = stringr::str_replace(string = .$site, " ", "_")) %>% 
+  select(loc, 2:6) %>% 
+  left_join(locs_mpas, by = "loc")
+
+
+# Plot probability of occurrence of species as a function of mpa:
+sr_boxplot <- herb_mpa_predict %>% 
+  ggplot() +
+  aes(x = mpa, y = Siganus.rivulatus) +
+  geom_boxplot()
+
+sl_boxplot <- herb_mpa_predict %>% 
+  ggplot() +
+  aes(x = mpa, y = Siganus.luridus) +
+  geom_boxplot()
+
+sas_boxplot <- herb_mpa_predict %>% 
+  ggplot() +
+  aes(x = mpa, y = Sarpa.salpa) +
+  geom_boxplot()
+
+sg_boxplot <- herb_mpa_predict %>% 
+  ggplot() +
+  aes(x = mpa, y = Scarus.ghobban) +
+  geom_boxplot()
+
+spc_boxplot <- herb_mpa_predict %>% 
+  ggplot() +
+  aes(x = mpa, y = Sparisoma.cretense) +
+  geom_boxplot()

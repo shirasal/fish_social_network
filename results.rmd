@@ -13,7 +13,9 @@ output:
 
 ```{r setup, include=FALSE}
 source("scripts/thesis_results_1.R")
-
+# source("R/run_models.R")
+# source("R/rel_imp.R)
+# source("R/predict_models.R")
 ```
 
 # Objectives  
@@ -62,6 +64,22 @@ I'm using the MRF-based model from `MRFcov` package (Clark _et al._ [^1]) to det
 
 -->
 
+### Take a look at the model's predictions for the data
+
+**temperature**  
+```{r}
+gridExtra::grid.arrange(ec_plot, em_plot, mr_plot, ss_plot, sc_plot, nrow = 2)
+gridExtra::grid.arrange(da_plot, dp_plot, ds_plot, dv_plot, dc_plot, nrow = 2)
+gridExtra::grid.arrange(sr_plot, sl_plot, sas_plot, sg_plot, spc_plot, nrow = 2)
+```
+
+**MPAs**  
+```{r}
+gridExtra::grid.arrange(ec_boxplot, em_boxplot, mr_boxplot, ss_boxplot, sc_boxplot, nrow = 2)
+gridExtra::grid.arrange(da_boxplot, dp_boxplot, ds_boxplot, dv_boxplot, dc_boxplot, nrow = 2)
+gridExtra::grid.arrange(sr_boxplot, sl_boxplot, sas_boxplot, sg_boxplot, spc_boxplot, nrow = 2)
+```
+
 # Analyses
 
 ## Compare association coefficients
@@ -94,40 +112,42 @@ all_assoc
 
 <!--Change to include only biotic associations-->
 
-## Relative importance of covariates
+## Nonstationarity
 
-### Per species
-```{r}
-all_relimp
-```
+How important is non-stationarity in fish networks in the Mediterranean?
 
-**Groupers**  
-
-- *Epinephelus costae* is mainly affected by biotic factors.
-- *Serranus cabrilla* is affected almost exlusively by environmental factors.
-
-**Seabreams**  
-
-- *Diplodus vulgaris* is mostly affected by environmental variables.
-- *Diplodus cervinus* is affected only by environmental variables.
-
-**Herbivores**  
-*Siganus rivulatus* and *Sarpa salpa* are highly effected by environmental variables. They may have a simialr response to environmental variations.
-
-### Per taxa
+### For all three taxa
 
 ```{r}
-all_relimp %>% bind_rows(.id = "taxa") %>%
-  pivot_longer(3:6) %>% # Create a tibble of all taxa
+all_relimp %>% bind_rows(.id = "taxa") %>% pivot_longer(3:length(.)) %>% # Create a tibble of all taxa
   rename(taxa = taxa, species = species, covariate = name, rel_imp = value) %>%
   mutate(covariate = str_remove(string = covariate, pattern = "_rel_imp")) %>% 
   ggplot() +
   aes(x = covariate, y = rel_imp, fill = taxa)+
-  stat_summary(geom = "bar", fun = mean, position = "dodge")+
-  stat_summary(geom = "errorbar", fun.data = mean_se, position = "dodge")
+  stat_summary(geom = "bar", fun = mean, position = "dodge") +
+  stat_summary(geom = "errorbar", fun.data = mean_se, position = "dodge") +
+  scale_fill_manual(values = wesanderson::wes_palette(n = 3, name = "Darjeeling2")) +
+  labs(title = "Relative importance of factors in the model", subtitle = "All three taxa mean")
 ```
 
-There's a large variance between species in the taxa so maybe this isn't the right way to look at it.
+The interaction between temperature/mpa and biotic factors (what points out non-stationarity) is relatively low, which indicates a rather small non-stationarity. Nevertheless, the variance over the mean is very high, so let's have a closer look into the means over the species in each taxa:
+```{r}
+all_relimp %>% bind_rows(.id = "taxa") %>% pivot_longer(3:length(.)) %>% # Create a tibble of all taxa
+  rename(taxa = taxa, species = species, covariate = name, rel_imp = value) %>%
+  mutate(covariate = str_remove(string = covariate, pattern = "_rel_imp")) %>% 
+  ggplot() +
+  aes(x = covariate, y = rel_imp, fill = taxa)+
+  stat_summary(geom = "bar", fun = mean, position = "dodge") +
+  stat_summary(geom = "errorbar", fun.data = mean_se, position = "dodge") +
+  facet_wrap(~taxa, nrow = 1) +
+  scale_fill_manual(values = wesanderson::wes_palette(n = 3, name = "Darjeeling2")) +
+  labs(title = "Relative importance of factors in the model", subtitle = "Mean for each taxa") +
+  theme(legend.position = "none")
+```
+Groupers exhibit stationarity.
+
+
+
 
 <!-- Connectance (Delams _et al._ [^2]) is a measure of comparison between networks. Essentially, it describes the level of connectedness of species in the network as a proportion the potential associations in the network: -->
 
