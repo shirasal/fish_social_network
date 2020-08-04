@@ -26,3 +26,20 @@ grps_mod$intercepts
 grps_mod$direct_coefs # association parameters of species and covariates
 # grps_mod$direct_coefs[1,] %>% View
 
+
+# Figure 1. Co-occurrence of species with and without covariates ----------
+# Compare between co-occurrence with and without covariates:
+# GROUPERS
+grpsHM_cov <- plotMRF_hm(grps_mod, main = "with covariates")
+grpsHM_nocov <- plotMRF_hm(grps_mod_nocov, main = "without covariates")
+# gridExtra::grid.arrange(grpsHM_cov, grpsHM_nocov, nrow = 1, top = "Groupers co-occurrence")
+
+# SEABREAM
+dipHM_cov <- plotMRF_hm(dip_mod, main = "with covariates")
+dipHM_nocov <- plotMRF_hm(dip_mod_nocov, main = "without covariates")
+# gridExtra::grid.arrange(dipHM_cov, dipHM_nocov, nrow = 1, top = "Seabream co-occurrence")
+
+# HERBIVORES
+herbHM_cov <- plotMRF_hm(herb_mod, main = "with covariates")
+herbHM_nocov <- plotMRF_hm(herb_mod_nocov, main = "without covariates")
+# gridExtra::grid.arrange(herbHM_cov, herbHM_nocov, nrow = 1, top = "Herbivores co-occurrence")
