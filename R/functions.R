@@ -119,7 +119,7 @@ rel_imp_sum <- function(taxa){
 # Func 5: Count the all POSITIVE/NEGATIVE association coefficients, per taxa
 
 direction_assoc <- function(taxa){
-  env_effect <- lapply(dip_mod$key_coefs, FUN = function(x) x %>%
+  env_effect <- lapply(taxa$key_coefs, FUN = function(x) x %>%
                          filter(Variable %in% env_vector) %>%
                          group_by(Standardised_coef > 0) %>% 
                          summarise(env_coefs = sum(Standardised_coef)) %>% 
@@ -129,7 +129,7 @@ direction_assoc <- function(taxa){
                                                       TRUE ~ as.character(.$direction)))) %>% 
     bind_rows(.id = "id")
   
-  anthro_effect <- lapply(dip_mod$key_coefs, FUN = function(x) x %>%
+  anthro_effect <- lapply(taxa$key_coefs, FUN = function(x) x %>%
                             filter(Variable %in% anthro_vector) %>%
                             group_by(Standardised_coef > 0) %>% 
                             summarise(env_coefs = sum(Standardised_coef)) %>% 
@@ -139,7 +139,7 @@ direction_assoc <- function(taxa){
                                                          TRUE ~ as.character(.$direction)))) %>% 
     bind_rows(.id = "id")
   
-  biotic_effect <- lapply(dip_mod$key_coefs, FUN = function(x) x %>%
+  biotic_effect <- lapply(taxa$key_coefs, FUN = function(x) x %>%
                             filter(!(Variable %in% env_vector | Variable %in% anthro_vector | str_detect(string = Variable, pattern = "_"))) %>%
                             group_by(Standardised_coef > 0) %>% 
                             summarise(env_coefs = sum(Standardised_coef)) %>% 
@@ -149,7 +149,7 @@ direction_assoc <- function(taxa){
                                                          TRUE ~ as.character(.$direction)))) %>% 
     bind_rows(.id = "id")
   
-  env_bio_effect <- lapply(dip_mod$key_coefs, FUN = function(x) x %>%
+  env_bio_effect <- lapply(taxa$key_coefs, FUN = function(x) x %>%
                              filter(str_detect(string = Variable, pattern = "temp_")) %>%
                              group_by(Standardised_coef > 0) %>% 
                              summarise(env_coefs = sum(Standardised_coef)) %>%
@@ -159,7 +159,7 @@ direction_assoc <- function(taxa){
                                                           TRUE ~ as.character(.$direction)))) %>%
     bind_rows(.id = "id")
   
-  anthro_bio_effect <- lapply(dip_mod$key_coefs, FUN = function(x) x %>%
+  anthro_bio_effect <- lapply(taxa$key_coefs, FUN = function(x) x %>%
                                 filter(str_detect(string = Variable, pattern = "mpa_")) %>%
                                 group_by(Standardised_coef > 0) %>% 
                                 summarise(env_coefs = sum(Standardised_coef)) %>%
