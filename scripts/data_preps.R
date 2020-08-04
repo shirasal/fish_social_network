@@ -1,10 +1,10 @@
 
 # Graphical agents
-neg_col <- '#3399CC'
-pos_col <- '#FF3333'
+my_cols <- c(neg = '#3399CC', pos = '#FF3333')
+
 col_formatter <- formatter("span",
                            style = x ~ style(color =
-                                               ifelse(x > 0, pos_col, ifelse(x < 0, neg_col, "black"))))
+                                               ifelse(x > 0, my_cols[["pos"]], ifelse(x < 0, my_cols[["neg"]], "black"))))
 
 
 # Taxa vectors ------------------------------------------------------------

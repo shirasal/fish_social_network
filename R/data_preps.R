@@ -1,10 +1,25 @@
+library(tidyverse)
+
+create_spp_mat <- function(dataset, taxa, covariate){
+  cols <- c(c("lat", "lon", "site", "trans", "species"), env_vector, anthro_vector)
+  dataset %>% 
+    group_by_at(.vars = cols) %>% # group for summarise
+    summarise(n = sum(sp.n)) %>% # sum sp.n for each grouped variable
+    spread(species, n, fill = 0) %>% # convert to species matrix
+    ungroup() %>% 
+    na.omit() %>% # remove NAs; make sure this part it minimised in the raw data
+    mutate(loc = paste(site, trans)) %>% # Create a variable of the location, which shpuld be unique
+    group_by(loc) %>% 
+    column_to_rownames("loc") %>% # create row names by location
+    select(all_of(taxa), all_of(covariate)) # keep the species and covariates columns
+}
 
 # Graphical agents
-neg_col <- '#3399CC'
-pos_col <- '#FF3333'
-col_formatter <- formatter("span",
+my_cols <- c(neg = '#3399CC', pos = '#FF3333')
+
+col_formatter <- formattable::formatter("span",
                            style = x ~ style(color =
-                                               ifelse(x > 0, pos_col, ifelse(x < 0, neg_col, "black"))))
+                                               ifelse(x > 0, my_cols[["pos"]], ifelse(x < 0, my_cols[["neg"]], "black"))))
 
 
 # Taxa vectors ------------------------------------------------------------
@@ -53,4 +68,5 @@ dip_mat <- create_spp_mat(dataset = med_clean, taxa = diplodus, covariate = c("c
 ## HERBIVORES
 herb_mat <- create_spp_mat(dataset = med_clean, taxa = herbivores, covariate = c("country", "mpa", "temp", "depth", "prod"))
 
+rm(create_spp_mat)
 save.image(file = "data/all_objects.RData")
