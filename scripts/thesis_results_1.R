@@ -16,8 +16,8 @@ library(wesanderson)
 # Temperature - Invasive species
 # TODO add column of native(T/F) to data
 
-# Table 1. Relative importance per species --------------------------------
-# How many associations a species has? -> for each species, count coefficients != 0
+
+# Table 1: Number of associations per species -----------------------------
 
 grps_assoc <- assoc_count(grps_mod)
 dip_assoc <- assoc_count(dip_mod)
@@ -35,20 +35,6 @@ herb_cov_assoc <- covar_count(herb_mod)
 all_cov_assoc <- list(groupers = grps_cov_assoc,
                       seabrean = dip_cov_assoc,
                       herbivores = herb_cov_assoc)
-
-# Figure 2. Relative importance per taxa ----------------------------------
-# How much is does a predictor affect the data
-grps_relimp <- rel_imp_sum(grps_mod)
-dip_relimp <- rel_imp_sum(dip_mod)
-herb_relimp <- rel_imp_sum(herb_mod)
-
-all_relimp <- list(groupers = grps_relimp,
-                   seabream = dip_relimp,
-                   herbivores = herb_relimp)
-
-# Table of mean relative importance of covariates per taxa:
-relimp_table <- sapply(X = all_relimp, FUN = function(x) x[,-1] %>% colMeans())
-
 
 # Rel_imp figures for species:
 # Groupers
