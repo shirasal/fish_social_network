@@ -15,7 +15,7 @@ output:
 source("scripts/thesis_results_1.R")
 # source("R/run_models.R")
 # source("R/rel_imp.R)
-# source("R/predict_models.R")
+# source("R/effect_size.R")
 ```
 
 # Objectives  
@@ -121,6 +121,20 @@ all_relimp %>% bind_rows(.id = "taxa") %>% pivot_longer(3:length(.)) %>% # Creat
   theme(legend.position = "none")
 ```
 Groupers exhibit stationarity.
+
+# Effect size
+```{r}
+mean_effect_size %>% 
+  pivot_longer(cols = 3:ncol(.), names_to = "covariate") %>% 
+  ggplot() +
+  aes(x = covariate, y = value, fill = taxa) +
+  geom_abline(aes(intercept = 0, slope = 0), col = "red", linetype = "dashed") +
+  geom_boxplot() +
+  facet_wrap(~taxa, nrow = 1) +
+  scale_fill_manual(values = wesanderson::wes_palette(n = 3, name = "Darjeeling2")) +
+  theme(legend.position = "none")
+
+```
 
 
 
