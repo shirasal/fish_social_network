@@ -16,24 +16,6 @@ library(wesanderson)
 # Temperature - Invasive species
 # TODO add column of native(T/F) to data
 
-# Figure 1. Co-occurrence of species with and without covariates ----------
-# Compare between co-occurrence with and without covariates:
-# GROUPERS
-grpsHM_cov <- plotMRF_hm(grps_mod, main = "with covariates")
-grpsHM_nocov <- plotMRF_hm(grps_mod_nocov, main = "without covariates")
-# gridExtra::grid.arrange(grpsHM_cov, grpsHM_nocov, nrow = 1, top = "Groupers co-occurrence")
-
-# SEABREAM
-dipHM_cov <- plotMRF_hm(dip_mod, main = "with covariates")
-dipHM_nocov <- plotMRF_hm(dip_mod_nocov, main = "without covariates")
-# gridExtra::grid.arrange(dipHM_cov, dipHM_nocov, nrow = 1, top = "Seabream co-occurrence")
-
-# HERBIVORES
-herbHM_cov <- plotMRF_hm(herb_mod, main = "with covariates")
-herbHM_nocov <- plotMRF_hm(herb_mod_nocov, main = "without covariates")
-# gridExtra::grid.arrange(herbHM_cov, herbHM_nocov, nrow = 1, top = "Herbivores co-occurrence")
-
-
 # Table 1. Relative importance per species --------------------------------
 # How many associations a species has? -> for each species, count coefficients != 0
 
@@ -67,24 +49,6 @@ all_relimp <- list(groupers = grps_relimp,
 # Table of mean relative importance of covariates per taxa:
 relimp_table <- sapply(X = all_relimp, FUN = function(x) x[,-1] %>% colMeans())
 
-# Figure: how much are predictors important for all fish?
-all_relimp %>% bind_rows(.id = "taxa") %>% pivot_longer(3:length(.)) %>% # Create a tibble of all taxa
-  rename(taxa = taxa, species = species, covariate = name, rel_imp = value) %>%
-  mutate(covariate = str_remove(string = covariate, pattern = "_rel_imp")) %>% 
-  ggplot() +
-  aes(x = covariate, y = rel_imp, fill = taxa)+
-  stat_summary(geom = "bar", fun = mean, position = "dodge") +
-  stat_summary(geom = "errorbar", fun.data = mean_se, position = "dodge")
-## A different look (facetted)
-all_relimp %>% bind_rows(.id = "taxa") %>% pivot_longer(3:length(.)) %>% # Create a tibble of all taxa
-  rename(taxa = taxa, species = species, covariate = name, rel_imp = value) %>%
-  mutate(covariate = str_remove(string = covariate, pattern = "_rel_imp")) %>% 
-  ggplot() +
-  aes(x = covariate, y = rel_imp, fill = taxa)+
-  stat_summary(geom = "bar", fun = mean, position = "dodge") +
-  stat_summary(geom = "errorbar", fun.data = mean_se, position = "dodge") +
-  facet_wrap(~taxa, nrow = 3) +
-  theme(legend.position = "none")
 
 # Rel_imp figures for species:
 # Groupers
