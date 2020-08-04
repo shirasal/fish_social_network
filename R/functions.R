@@ -17,8 +17,8 @@ create_spp_mat <- function(dataset, taxa, covariate){
 #--------------------------------------------------------------------------------------------
 
 # Func 2: Count the number of associations per species in taxa
-assoc_count <- function(taxa){
-  sapply(taxa$key_coefs, FUN = count) %>% # returns a list
+assoc_count <- function(taxa_mod){
+  sapply(taxa_mod$key_coefs, FUN = count) %>% # returns a list
     unlist() %>%
     enframe(name = "species", value = "associations") %>% 
     mutate(species = str_sub(string = species, end = -3)) # the count function returns species names with a suffix, this line removes the suffix
@@ -27,34 +27,34 @@ assoc_count <- function(taxa){
 #------------------------------------------------------------------------------------------------
 
 # Func 3: Count the number of associations per species in taxa, by covariate type
-covar_count <- function(taxa){
-  env_effect <- sapply(taxa$key_coefs, FUN = function(x) x %>% filter(Variable %in% env_vector) %>%
+covar_count <- function(taxa_mod){
+  env_effect <- sapply(taxa_mod$key_coefs, FUN = function(x) x %>% filter(Variable %in% env_vector) %>%
                          count()) %>% 
     unlist() %>%
     enframe(name = "species", value = "env_assoc") %>% 
     mutate(species = str_sub(string = species, end = -3))
   
-  anthro_effect <- sapply(taxa$key_coefs, FUN = function(x) x %>% filter(Variable %in% anthro_vector) %>%
+  anthro_effect <- sapply(taxa_mod$key_coefs, FUN = function(x) x %>% filter(Variable %in% anthro_vector) %>%
                             count()) %>% 
     unlist() %>%
     enframe(name = "species", value = "anthro_assoc") %>% 
     mutate(species = str_sub(string = species, end = -3))
   
-  biotic_effect <- sapply(taxa$key_coefs, FUN = function(x) x %>%
+  biotic_effect <- sapply(taxa_mod$key_coefs, FUN = function(x) x %>%
                             filter(!(Variable %in% env_vector | Variable %in% anthro_vector | str_detect(string = Variable, pattern = "_"))) %>%
                             count()) %>%
     unlist() %>%
     enframe(name = "species", value = "biotic_assoc") %>% 
     mutate(species = str_sub(string = species, end = -3))
   
-  env_bio_effect <- sapply(taxa$key_coefs, FUN = function(x) x %>% 
+  env_bio_effect <- sapply(taxa_mod$key_coefs, FUN = function(x) x %>% 
                              filter(str_detect(string = Variable, pattern = "temp_")) %>% 
                              count()) %>% 
     unlist() %>%
     enframe(name = "species", value = "env_bio_assoc") %>% 
     mutate(species = str_sub(string = species, end = -3))
   
-  anthro_bio_effect <- sapply(taxa$key_coefs, FUN = function(x) x %>% 
+  anthro_bio_effect <- sapply(taxa_mod$key_coefs, FUN = function(x) x %>% 
                                 filter(str_detect(string = Variable, pattern = "mpa_")) %>% 
                                 count()) %>% 
     unlist() %>%
@@ -71,36 +71,36 @@ covar_count <- function(taxa){
 #-----------------------------------------------------------------------------------------------
 
 # Func 4: Summarise the relative importance of each type of covariate for each species
-rel_imp_sum <- function(taxa){
-  env_relimp <- sapply(taxa$key_coefs, FUN = function(x) x %>%  # Take the taxa model and apply the following:
+rel_imp_sum <- function(taxa_mod){
+  env_relimp <- sapply(taxa_mod$key_coefs, FUN = function(x) x %>%  # Take the taxa model and apply the following:
                          filter(Variable %in% env_vector) %>%  # Filter by relevant covariates
                          summarise(n = sum(Rel_importance))) %>% # Summarise Rel_importance column
     unlist() %>% # Take out of the list
     enframe(name = "species", value = "env_rel_imp") %>%  # Rearrange
     mutate(species = str_sub(string = species, end = -3)) # Fix species names
   
-  anthro_relimp <- sapply(taxa$key_coefs, FUN = function(x) x %>% 
+  anthro_relimp <- sapply(taxa_mod$key_coefs, FUN = function(x) x %>% 
                             filter(Variable %in% anthro_vector) %>%
                             summarise(n = sum(Rel_importance))) %>% 
     unlist() %>%
     enframe(name = "species", value = "anthro_rel_imp") %>% 
     mutate(species = str_sub(string = species, end = -3))
   
-  biotic_relimp <- sapply(taxa$key_coefs, FUN = function(x) x %>% 
+  biotic_relimp <- sapply(taxa_mod$key_coefs, FUN = function(x) x %>% 
                             filter(!(Variable %in% env_vector | Variable %in% anthro_vector | str_detect(string = Variable, pattern = "_"))) %>%
                             summarise(n = sum(Rel_importance))) %>% 
     unlist() %>%
     enframe(name = "species", value = "biotic_rel_imp") %>% 
     mutate(species = str_sub(string = species, end = -3))
   
-  env_bio_relimp <- sapply(taxa$key_coefs, FUN = function(x) x %>% 
+  env_bio_relimp <- sapply(taxa_mod$key_coefs, FUN = function(x) x %>% 
            filter(str_detect(string = Variable, pattern = "temp_")) %>% 
            summarise(n = sum(Rel_importance))) %>% 
     unlist() %>%
     enframe(name = "species", value = "env_bio_rel_imp") %>% 
     mutate(species = str_sub(string = species, end = -3))
   
-  anthro_bio_relimp <- sapply(taxa$key_coefs, FUN = function(x) x %>% 
+  anthro_bio_relimp <- sapply(taxa_mod$key_coefs, FUN = function(x) x %>% 
            filter(str_detect(string = Variable, pattern = "mpa_")) %>% 
            summarise(n = sum(Rel_importance))) %>% 
     unlist() %>%
@@ -118,8 +118,8 @@ rel_imp_sum <- function(taxa){
 
 # Func 5: Count the all POSITIVE/NEGATIVE association coefficients, per taxa
 
-std_coefs <- function(taxa){
-  env_effect <- lapply(taxa$key_coefs, FUN = function(x) x %>%
+std_coefs <- function(taxa_mod){
+  env_effect <- lapply(taxa_mod$key_coefs, FUN = function(x) x %>%
                          filter(Variable %in% env_vector) %>%
                          group_by(Standardised_coef > 0) %>% 
                          summarise(env_coefs = sum(Standardised_coef)) %>% 
@@ -129,7 +129,7 @@ std_coefs <- function(taxa){
                                                       TRUE ~ as.character(.$direction)))) %>% 
     bind_rows(.id = "id")
   
-  anthro_effect <- lapply(taxa$key_coefs, FUN = function(x) x %>%
+  anthro_effect <- lapply(taxa_mod$key_coefs, FUN = function(x) x %>%
                             filter(Variable %in% anthro_vector) %>%
                             group_by(Standardised_coef > 0) %>% 
                             summarise(env_coefs = sum(Standardised_coef)) %>% 
@@ -139,7 +139,7 @@ std_coefs <- function(taxa){
                                                          TRUE ~ as.character(.$direction)))) %>% 
     bind_rows(.id = "id")
   
-  biotic_effect <- lapply(taxa$key_coefs, FUN = function(x) x %>%
+  biotic_effect <- lapply(taxa_mod$key_coefs, FUN = function(x) x %>%
                             filter(!(Variable %in% env_vector | Variable %in% anthro_vector | str_detect(string = Variable, pattern = "_"))) %>%
                             group_by(Standardised_coef > 0) %>% 
                             summarise(env_coefs = sum(Standardised_coef)) %>% 
@@ -149,7 +149,7 @@ std_coefs <- function(taxa){
                                                          TRUE ~ as.character(.$direction)))) %>% 
     bind_rows(.id = "id")
   
-  env_bio_effect <- lapply(taxa$key_coefs, FUN = function(x) x %>%
+  env_bio_effect <- lapply(taxa_mod$key_coefs, FUN = function(x) x %>%
                              filter(str_detect(string = Variable, pattern = "temp_")) %>%
                              group_by(Standardised_coef > 0) %>% 
                              summarise(env_coefs = sum(Standardised_coef)) %>%
@@ -159,7 +159,7 @@ std_coefs <- function(taxa){
                                                           TRUE ~ as.character(.$direction)))) %>%
     bind_rows(.id = "id")
   
-  anthro_bio_effect <- lapply(taxa$key_coefs, FUN = function(x) x %>%
+  anthro_bio_effect <- lapply(taxa_mod$key_coefs, FUN = function(x) x %>%
                                 filter(str_detect(string = Variable, pattern = "mpa_")) %>%
                                 group_by(Standardised_coef > 0) %>% 
                                 summarise(env_coefs = sum(Standardised_coef)) %>%
