@@ -118,7 +118,7 @@ rel_imp_sum <- function(taxa){
 
 # Func 5: Count the all POSITIVE/NEGATIVE association coefficients, per taxa
 
-direction_assoc <- function(taxa){
+std_coefs <- function(taxa){
   env_effect <- lapply(taxa$key_coefs, FUN = function(x) x %>%
                          filter(Variable %in% env_vector) %>%
                          group_by(Standardised_coef > 0) %>% 
