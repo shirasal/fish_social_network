@@ -136,10 +136,12 @@ mean_effect_size %>%
 
 ```
 
+There isn't a prominent effect size in the groupers taxa. Herbivores seem to be affected negatively by anthropogenic factors (MPAs) and seabreams are affected negatively by MPAs and positively by temperature*biotic.
 
 
-<!-- ##  -->
 
+<!-- ## Predictions  -->
+<!-- Not sure how this works: what are the units of prediction? -->
 <!-- **temperature**   -->
 <!-- ```{r} -->
 <!-- gridExtra::grid.arrange(ec_plot, em_plot, mr_plot, ss_plot, sc_plot, nrow = 2) -->
