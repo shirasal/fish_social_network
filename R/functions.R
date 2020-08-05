@@ -1,18 +1,18 @@
 
-# Func 1: Create species matrix for a specific taxa with all environmental variables
-create_spp_mat <- function(dataset, taxa, covariate){
-  cols <- c(c("lat", "lon", "site", "trans", "species"), env_vector, anthro_vector)
-  dataset %>% 
-    group_by_at(.vars = cols) %>% # group for summarise
-    summarise(n = sum(sp.n)) %>% # sum sp.n for each grouped variable
-    spread(species, n, fill = 0) %>% # convert to species matrix
-    ungroup() %>% 
-    na.omit() %>% # remove NAs; make sure this part it minimised in the raw data
-    mutate(loc = paste(site, trans)) %>% # Create a variable of the location, which shpuld be unique
-    group_by(loc) %>% 
-    column_to_rownames("loc") %>% # create row names by location
-    select(all_of(taxa), all_of(covariate)) # keep the species and covariates columns
-}
+# # Func 1: Create species matrix for a specific taxa with all environmental variables
+# create_spp_mat <- function(dataset, taxa, covariate){
+#   cols <- c(c("lat", "lon", "site", "trans", "species"), env_vector, anthro_vector)
+#   dataset %>% 
+#     group_by_at(.vars = cols) %>% # group for summarise
+#     summarise(n = sum(sp.n)) %>% # sum sp.n for each grouped variable
+#     spread(species, n, fill = 0) %>% # convert to species matrix
+#     ungroup() %>% 
+#     na.omit() %>% # remove NAs; make sure this part it minimised in the raw data
+#     mutate(loc = paste(site, trans)) %>% # Create a variable of the location, which shpuld be unique
+#     group_by(loc) %>% 
+#     column_to_rownames("loc") %>% # create row names by location
+#     select(all_of(taxa), all_of(covariate)) # keep the species and covariates columns
+# }
 
 #--------------------------------------------------------------------------------------------
 
