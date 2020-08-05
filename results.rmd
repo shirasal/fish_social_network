@@ -12,10 +12,10 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-source("scripts/thesis_results_1.R")
-# source("R/run_models.R")
-# source("R/rel_imp.R)
-# source("R/effect_size.R")
+# source("scripts/thesis_results_1.R")
+source("R/run_models.R")
+source("R/rel_imp.R")
+source("R/effect_size.R")
 ```
 
 # Objectives  
@@ -28,7 +28,7 @@ source("scripts/thesis_results_1.R")
 1. Temperature effect:
   a. More **positive** associations  
   b. More **negative** associations
-  * CREATE A GRAPH (X = TEMPERATURE; Y = SUM OF ASSOCIATIONS or COUNT OF POSITIVE/NEGATIVE ASSOCIATIONS)  
+  * CREATE A GRAPH (X = TEMPERATURE; Y = SUM OF ASSOCIATIONS or COUNT OF POSITIVE/NEGATIVE ASSOCIATIONS) 
 2. MPA effect:
   a. More species/individuals/biomass can be translated to more associations
   b. In biomass model - more associations
@@ -138,7 +138,21 @@ mean_effect_size %>%
 
 There isn't a prominent effect size in the groupers taxa. Herbivores seem to be affected negatively by anthropogenic factors (MPAs) and seabreams are affected negatively by MPAs and positively by temperature*biotic.
 
+## Networks
 
+### Temperature
+```{r}
+grps_plot
+dip_plot
+herb_plot
+```
+
+### MPA
+```{r}
+grps_mpa_plot
+dip_mpa_plot
+herb_mpa_plot
+```
 
 <!-- ## Predictions  -->
 <!-- Not sure how this works: what are the units of prediction? -->
