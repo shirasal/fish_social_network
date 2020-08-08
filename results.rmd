@@ -18,55 +18,6 @@ source("R/rel_imp.R")
 source("R/effect_size.R")
 ```
 
-# Objectives  
-
-1. To estimate the amount of non-stationarity in interspecific interactions within fish communities across the Mediterranean Sea.  
-2. To estimate the amount of non-stationarity in interspecific interactions within fish communities within and outside MPAs.  
-
-# Predictions:
-
-1. Temperature effect:
-  a. More **positive** associations  
-  b. More **negative** associations
-  * CREATE A GRAPH (X = TEMPERATURE; Y = SUM OF ASSOCIATIONS or COUNT OF POSITIVE/NEGATIVE ASSOCIATIONS) 
-2. MPA effect:
-  a. More species/individuals/biomass can be translated to more associations
-  b. In biomass model - more associations
-  
-# Data
-
-## Species  
-In order to examine the association between species and how this association changes along environmental gradient, I chose three groups of representative fish species (taxa): groupers (Epinephelus species + Serranus species), seabream species and herbivorous species.  
-
-## Covariates  
-
-I included 6 covariates:
-
-* Annual surface temperature (standardised)
-* Mean depth (standardised)
-* MPAs - unprotected (enforcement level 0-1) or protected (2-3)
-* Primary productivity (standardised)
-* Salinity (standardised)
-* Country - to account for spatial autocorrelation (coordinates are rough, so I used country instead)
-
-## Model  
-I'm using the MRF-based model from `MRFcov` package (Clark _et al._ [^1]) to detemine the level and direction of species association in each group.  
-
-<!-- From Roi's comments on proposal: 
-
-- Is there any grounds to hypothesise that in warmer areas the associations will be going a certain direction? (more/less associations, weaker/stringer associations) --- NETWORK LEVEL  
-- How to identify patterns?  
-- Invasive species gradient --- WE CAN MAKE A SORT OF INDEX OF INVASION  
-- What variable is being measured? Strength of associations? Direction of associations? Count of associations?  
-
-**I THINK WE SHOULD USE DIFFERENT VARIABLES FOR DIFFERENT QUESTIONS**  
-
-
--->
-
-
-# Analyses
-
 ## Compare association coefficients
 
 Association coefficients describe the relationship between species. Looking at the mean species correlations (**associations**), we can see a stationary (static) or non-stationary (dynamic) pattern:
