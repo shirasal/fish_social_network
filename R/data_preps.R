@@ -34,22 +34,22 @@ herbivores <- c("Siganus.rivulatus", "Siganus.luridus", "Sarpa.salpa",
 
 # Env/Anthro vectors ------------------------------------------------------
 
-env_vector <- c("country", "temp", "depth", "prod") # Salinity (sal) removed to avoid data loss (NAs)
+env_vector <- c("temp", "depth", "prod") # Salinity (sal) removed to avoid data loss (NAs)
 anthro_vector <- c("mpa")
 
 # Add medata --------------------------------------------------------------
 
-med_raw <- read_rds("data/medata.Rds")
+med_raw <- read_rds("data/medata.Rds") %>% ungroup()
 
 med_clean <- med_raw %>%
   filter(data.origin != "azz_asi") %>% # presence-absence
   mutate(mpa = if_else(enforcement <= 1, FALSE, TRUE),
-         country = as.numeric(as.factor(country)),
          temp = scale(tmean),
          depth = scale(depth),
          sal = scale(sal_mean),
-         prod = scale(pp_mean)) %>%
-  select(site, lon, lat, trans, species, sp.n, country, mpa, temp, depth, prod)
+         prod = scale(pp_mean),
+         sp.n = scale(sp.n)) %>%
+  select(site, lon, lat, trans, species, sp.n, mpa, temp, depth, prod)
 
 # TODO add covariates: invasive species count/biomass (spatial), MPA age, MPA size; salinity after completing NAs
 
@@ -60,13 +60,15 @@ med_clean <- med_raw %>%
 # and the covariates I'd like to include in the model (these are pre-determined in FUNC 1)
 
 ## GROUPERS
-grps_mat <- create_spp_mat(dataset = med_clean, taxa = groupers, covariate = c("country", "mpa", "temp", "depth", "prod"))
+grps_mat <- create_spp_mat(dataset = med_clean,
+                           taxa = groupers,
+                           covariate = c("mpa", "temp", "depth", "prod"))
 
 ## SEABREAM (Diplodus species)
-dip_mat <- create_spp_mat(dataset = med_clean, taxa = diplodus, covariate = c("country", "mpa", "temp", "depth", "prod"))
+dip_mat <- create_spp_mat(dataset = med_clean, taxa = diplodus, covariate = c("mpa", "temp", "depth", "prod"))
 
 ## HERBIVORES
-herb_mat <- create_spp_mat(dataset = med_clean, taxa = herbivores, covariate = c("country", "mpa", "temp", "depth", "prod"))
+herb_mat <- create_spp_mat(dataset = med_clean, taxa = herbivores, covariate = c("mpa", "temp", "depth", "prod"))
 
 rm(create_spp_mat)
 save.image(file = "data/all_objects.RData")
