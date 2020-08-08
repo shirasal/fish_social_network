@@ -31,4 +31,15 @@ In this study, I examined the variation in co-occurrence patterns of fish within
 1.	To estimate the amount of non-stationarity in interspecific interactions within fish communities across the Mediterranean Sea.
 2.	To estimate the amount of non-stationarity in interspecific interactions within fish communities within and outside MPAs.
 
+### Predictions:
+
+1. Temperature effect:
+  a. More **positive** associations  
+  b. More **negative** associations
+  * CREATE A GRAPH (X = TEMPERATURE; Y = SUM OF ASSOCIATIONS or COUNT OF POSITIVE/NEGATIVE ASSOCIATIONS) 
+2. MPA effect:
+  a. More species/individuals/biomass can be translated to more associations
+  b. In biomass model - more associations
+  
+
 <!-- This is the focus? Should I add something about the specific dataset? something we can draw from fish, mediterranean, mpas etc?-->

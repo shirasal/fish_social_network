@@ -25,5 +25,4 @@ Data was analysed using the MRFcov R package (Clark et al. 2018, R Core Team 201
 
 Using co-occurrence networks allows us to explore trends and patterns in the community but is controversial at making inference on the interactions that might have created these patterns (Petereson et al. 2020). Nevertheless, it can be used to examine the shared responses of different species to changes in their environment (Holt et al. 2020).
 
-To avoid overfitting due to large number of predictors (biotic and abiotic), I created subsets of the data for three taxa: groupers, seabreams and herbivores.
-
+To avoid overfitting due to large number of predictors (biotic and abiotic), I created subsets of the data for three taxa: groupers, seabreams and herbivores. I included 6 covariates: Annual surface temperature, mean depth, MPAs - unprotected (enforcement level 0-1) or protected (2-3), primary productivity and salinity.
