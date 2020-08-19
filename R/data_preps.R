@@ -1,4 +1,4 @@
-library(tidyverse)
+# source("R/packages.R")
 
 create_spp_mat <- function(dataset, taxa, covariate){
   cols <- c(c("lat", "lon", "site", "trans", "species"), env_vector, anthro_vector)
@@ -47,8 +47,7 @@ med_clean <- med_raw %>%
          temp = scale(tmean),
          depth = scale(depth),
          sal = scale(sal_mean),
-         prod = scale(pp_mean),
-         sp.n = scale(sp.n)) %>%
+         prod = scale(pp_mean)) %>%
   select(site, lon, lat, trans, species, sp.n, mpa, temp, depth, prod)
 
 # TODO add covariates: invasive species count/biomass (spatial), MPA age, MPA size; salinity after completing NAs
