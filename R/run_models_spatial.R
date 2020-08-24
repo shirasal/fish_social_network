@@ -1,3 +1,8 @@
+source("R/packages.R")
+load("data/all_objects.RData")
+source("R/functions.R")
+# source("R/run_models.R")
+
 med_coords <- med_clean %>% 
   distinct(site, trans, lat, lon) %>% 
   mutate(loc = paste(site, trans)) %>% 
