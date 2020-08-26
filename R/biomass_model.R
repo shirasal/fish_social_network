@@ -1,5 +1,3 @@
-# Need to fill in missing constants
-# the problem is to get a-b for family or genera
 
 med_biomass <- med_raw %>% 
   mutate(mpa = if_else(enforcement <= 1, FALSE, TRUE),
