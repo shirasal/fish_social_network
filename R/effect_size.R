@@ -37,7 +37,7 @@ mean_effect_size %>%
   ggplot() +
   aes(x = covariate, y = value, fill = taxa) +
   geom_abline(aes(intercept = 0, slope = 0), col = "red", linetype = "dashed") +
-  stat_summary(geom = "point", fun = mean) +
+  stat_summary(geom = "point", fun.y = mean) +
   stat_summary(geom = "errorbar", fun.data = mean_se) +
   facet_wrap(~taxa, nrow = 3) +
   # scale_fill_manual(values = wesanderson::wes_palette(n = 3, name = "Darjeeling2")) +
