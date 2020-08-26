@@ -3,9 +3,9 @@
 
 # Extract positive and negative covariate standardised coefficients (effect size) on each taxa:
 
-grps_coefs <- std_coefs(taxa = grps_mod)
-dip_coefs <- std_coefs(taxa = dip_mod)
-herb_coefs <- std_coefs(taxa = herb_mod)
+grps_coefs <- std_coefs(taxa = grps_spat)
+dip_coefs <- std_coefs(taxa = dip_spat)
+herb_coefs <- std_coefs(taxa = herb_spat)
 
 # Calculate the mean effect size (and it's sd) of each covariate
 
@@ -32,16 +32,27 @@ sd_effect_size <- list(groupers = grps_coefs,
   spread(covariate, sd_es, fill = 0)
 
 
-# mean_effect_size %>% 
-#   pivot_longer(cols = 3:ncol(.), names_to = "covariate") %>% 
-#   ggplot() +
-#   aes(x = covariate, y = value, fill = taxa) +
-#   geom_abline(aes(intercept = 0, slope = 0), col = "red", linetype = "dashed") +
-#   stat_summary(geom = "point", fun = mean) +
-#   stat_summary(geom = "errorbar", fun.data = mean_se) +
-#   facet_wrap(~taxa, nrow = 3) +
-#   # scale_fill_manual(values = wesanderson::wes_palette(n = 3, name = "Darjeeling2")) +
-#   theme(legend.position = "none")
-# # No rffect size :(
+mean_effect_size %>%
+  pivot_longer(cols = 3:ncol(.), names_to = "covariate") %>%
+  ggplot() +
+  aes(x = covariate, y = value, fill = taxa) +
+  geom_abline(aes(intercept = 0, slope = 0), col = "red", linetype = "dashed") +
+  stat_summary(geom = "point", fun = mean) +
+  stat_summary(geom = "errorbar", fun.data = mean_se) +
+  facet_wrap(~taxa, nrow = 3) +
+  # scale_fill_manual(values = wesanderson::wes_palette(n = 3, name = "Darjeeling2")) +
+  theme(legend.position = "none")
+
+mean_effect_size %>% 
+  pivot_longer(cols = 3:ncol(.), names_to = "covariate") %>% 
+  ggplot() +
+  aes(x = covariate, y = value, fill = taxa) +
+  geom_abline(aes(intercept = 0, slope = 0), col = "red", linetype = "dashed") +
+  geom_boxplot() +
+  facet_wrap(~taxa, nrow = 1) +
+  scale_fill_manual(values = wesanderson::wes_palette(n = 3, name = "Darjeeling2")) +
+  theme(legend.position = "none")
+
+
 
 
