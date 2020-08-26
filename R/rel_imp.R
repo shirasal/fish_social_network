@@ -20,8 +20,8 @@ all_relimp_p <- all_relimp %>% bind_rows(.id = "taxa") %>% pivot_longer(3:length
   rename(taxa = taxa, species = species, covariate = name, rel_imp = value) %>%
   mutate(covariate = str_remove(string = covariate, pattern = "_rel_imp")) %>% 
   ggplot() +
-  aes(x = covariate, y = rel_imp, fill = taxa)+
-  stat_summary(geom = "bar", fun = mean, position = "dodge") +
+  aes(x = covariate, y = rel_imp, fill = taxa) +
+  stat_summary(geom = "bar", fun.y = mean, position = "dodge") +
   stat_summary(geom = "errorbar", fun.data = mean_se, position = "dodge") +
   scale_fill_manual(values = wesanderson::wes_palette(n = 3, name = "Darjeeling2")) +
   labs(title = "Relative importance of factors in the model", subtitle = "All three taxa mean")
@@ -34,10 +34,10 @@ grps_relimp_p <- grps_relimp %>% pivot_longer(2:length(.)) %>% # Create a tibble
   rename(species = species, covariate = name, rel_imp = value) %>%
   mutate(covariate = str_remove(string = covariate, pattern = "_rel_imp")) %>% 
   ggplot() +
-  aes(x = species, y = rel_imp)+
-  stat_summary(geom = "bar", fun = mean, position = "dodge",  fill = "#eccbae") +
+  aes(x = species, y = rel_imp) +
+  stat_summary(geom = "bar", fun.y = mean, position = "dodge",  fill = "#eccbae") +
   facet_wrap(~covariate, nrow = 3) +
-  labs(title = "Relative importance of factors in the model", subtitle = "Groupers")+
+  labs(title = "Relative importance of factors in the model", subtitle = "Groupers") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1), strip.placement = "outside")
 
 # ggsave("rel_imp_groupers.png", grps_relimp_p, "png", "results/",
@@ -47,10 +47,10 @@ dip_relimp_p <- dip_relimp %>% pivot_longer(2:length(.)) %>% # Create a tibble o
   rename(species = species, covariate = name, rel_imp = value) %>%
   mutate(covariate = str_remove(string = covariate, pattern = "_rel_imp")) %>% 
   ggplot() +
-  aes(x = species, y = rel_imp)+
-  stat_summary(geom = "bar", fun = mean, position = "dodge",  fill = "#d69c4e") +
+  aes(x = species, y = rel_imp) +
+  stat_summary(geom = "bar", fun.y = mean, position = "dodge",  fill = "#d69c4e") +
   facet_wrap(~covariate, nrow = 3) +
-  labs(title = "Relative importance of factors in the model", subtitle = "Seabream")+
+  labs(title = "Relative importance of factors in the model", subtitle = "Seabream") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1), strip.placement = "outside")
 
 # ggsave("rel_imp_diplodus.png", dip_relimp_p, "png", "results/",
@@ -60,10 +60,10 @@ herb_relimp_p <- herb_relimp %>% pivot_longer(2:length(.)) %>% # Create a tibble
   rename(species = species, covariate = name, rel_imp = value) %>%
   mutate(covariate = str_remove(string = covariate, pattern = "_rel_imp")) %>% 
   ggplot() +
-  aes(x = species, y = rel_imp)+
-  stat_summary(geom = "bar", fun = mean, position = "dodge",  fill = "#046c9a") +
+  aes(x = species, y = rel_imp) +
+  stat_summary(geom = "bar", fun.y = mean, position = "dodge",  fill = "#046c9a") +
   facet_wrap(~covariate, nrow = 3) +
-  labs(title = "Relative importance of factors in the model", subtitle = "Herbivores")+
+  labs(title = "Relative importance of factors in the model", subtitle = "Herbivores") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1), strip.placement = "outside")
 
 # ggsave("rel_imp_herbs.png", herb_relimp_p, "png", "results/",
