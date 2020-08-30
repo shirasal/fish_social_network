@@ -153,7 +153,7 @@ std_coefs <- function(taxa_mod){
                              filter(str_detect(string = Variable, pattern = "temp_")) %>%
                              group_by(Standardised_coef > 0) %>% 
                              summarise(env_coefs = sum(Standardised_coef)) %>%
-                             transmute(direction = `Standardised_coef > 0`, int_env_coefficient = env_coefs) %>%
+                             transmute(direction = `Standardised_coef > 0`, bio_env_coefficient = env_coefs) %>%
                              mutate(direction = case_when(.$direction == TRUE ~ "pos",
                                                           .$direction == FALSE ~ "neg",
                                                           TRUE ~ as.character(.$direction)))) %>%
@@ -163,7 +163,7 @@ std_coefs <- function(taxa_mod){
                                 filter(str_detect(string = Variable, pattern = "mpa_")) %>%
                                 group_by(Standardised_coef > 0) %>% 
                                 summarise(env_coefs = sum(Standardised_coef)) %>%
-                                transmute(direction = `Standardised_coef > 0`, int_anth_coefficient = env_coefs) %>%
+                                transmute(direction = `Standardised_coef > 0`, bio_anth_coefficient = env_coefs) %>%
                                 mutate(direction = case_when(.$direction == TRUE ~ "pos",
                                                              .$direction == FALSE ~ "neg",
                                                              TRUE ~ as.character(.$direction)))) %>%

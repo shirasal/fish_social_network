@@ -49,6 +49,7 @@ mean_effect_size %>%
   aes(x = covariate, y = value, fill = taxa) +
   geom_abline(aes(intercept = 0, slope = 0), col = "red", linetype = "dashed") +
   geom_boxplot() +
+  scale_x_discrete(limits = c("anthro", "env", "bio", "bio_anth", "bio_env")) +
   facet_wrap(~taxa, nrow = 1) +
   scale_fill_manual(values = wesanderson::wes_palette(n = 3, name = "Darjeeling2")) +
   theme(legend.position = "none")
