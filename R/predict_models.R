@@ -7,147 +7,89 @@ source("R/run_models.R")
 # Create a dataframe of locations and temperatures
 locs <- med_raw %>% mutate(loc = paste0(site, "_", trans)) %>% select(loc, tmean) %>% unique()
 
+
 # Groupers ----------------------------------------------------------------
 
-grps_predict <- MRFcov::predict_MRF(data = grps_mat, MRF_mod = grps_mod) %>%
-  invlogit() %>% 
+grps_predict <- MRFcov::predict_MRF(data = grps_mat, MRF_mod = grps_spat) %>%
+  `colnames<-`(groupers) %>% 
   as.data.frame() %>% 
   rownames_to_column("site") %>% 
+  pivot_longer(2:length(.),
+               names_to = "species",
+               values_to = "predict_obs") %>% 
   mutate(loc = stringr::str_replace(string = .$site, " ", "_")) %>% 
-  select(loc, 2:6) %>% 
-  left_join(locs, by = "loc")
+  left_join(locs, by = "loc") %>% 
+  mutate(temp = scale(tmean)) %>% 
+  select(loc, tmean, 2:5)
 
 # Plot probability of occurrence of species as a function of temperature:
-ec_plot <- grps_predict %>% 
+grps_predict %>%
+  group_by(loc, tmean, species) %>%
+  summarise(mean_obs = mean(predict_obs), .groups = "keep") %>%
   ggplot() +
-  aes(x = tmean, y = Epinephelus.costae) +
-  geom_point()
-  # stat_smooth(aes(x = tmean, y = Epinephelus.costae), method = "lm", formula = y ~ x)
-
-em_plot <- grps_predict %>% 
-  ggplot() +
-  aes(x = tmean, y = Epinephelus.marginatus) +
-  geom_point()
-  # stat_smooth(aes(x = tmean, y = Epinephelus.marginatus), method = "lm", formula = y ~ x)
-
-mr_plot <- grps_predict %>% 
-  ggplot() +
-  aes(x = tmean, y = Mycteroperca.rubra) +
-  geom_point()
-  # stat_smooth(aes(x = tmean, y = Mycteroperca.rubra), method = "lm", formula = y ~ x)
-
-ss_plot <- grps_predict %>% 
-  ggplot() +
-  aes(x = tmean, y = Serranus.scriba) +
-  geom_point()
-  # stat_smooth(aes(x = tmean, y = Serranus.scriba), method = "lm", formula = y ~ x)
-
-sc_plot <- grps_predict %>% 
-  ggplot() +
-  aes(x = tmean, y = Serranus.cabrilla) +
-  geom_point()
-  # stat_smooth(aes(x = tmean, y = Serranus.cabrilla), method = "lm", formula = y ~ x)
-
-
-# All in one plot ---------------------------------------------------------
-
-# grps_predict %>% 
-#   ggplot() +
-#   geom_point(aes(x = tmean, y = Epinephelus.marginatus), col = "cornflowerblue") +
-#   # stat_smooth(aes(x = tmean, y = Epinephelus.marginatus), method = "lm", formula = y ~ x, col = "cornflowerblue") +
-#   geom_point(aes(x = tmean, y = Epinephelus.costae), col = "cadetblue") +
-#   # stat_smooth(aes(x = tmean, y = Epinephelus.costae), method = "lm", formula = y ~ x, col = "cadetblue") +
-#   geom_point(aes(x = tmean, y = Mycteroperca.rubra), col = "cyan4") +
-#   # stat_smooth(aes(x = tmean, y = Mycteroperca.rubra), method = "lm", formula = y ~ x, col = "cyan4") +
-#   geom_point(aes(x = tmean, y = Serranus.scriba), col = "aquamarine3") +
-#   # stat_smooth(aes(x = tmean, y = Serranus.scriba), method = "lm", formula = y ~ x, col = "aquamarine3") + 
-#   geom_point(aes(x = tmean, y = Serranus.cabrilla), col = "blue4") +
-#   # stat_smooth(aes(x = tmean, y = Serranus.cabrilla), method = "lm", formula = y ~ x, col = "blue4")
-# 
+  aes(x = tmean, y = mean_obs, col = species) +
+  geom_point(cex = 3, alpha = 0.6) +
+  stat_smooth(method = "lm", formula = y ~ x, alpha = 0.3) +
+  scale_color_paletteer_d("ggsci::uniform_startrek") +
+  xlab("Temperature (degC)") +
+  ylab("Predicted observations") +
+  labs(title = "Observation predictions", subtitle = "Groupers")
 
 
 # Seabream ----------------------------------------------------------------
 
-dip_predict <- MRFcov::predict_MRF(data = dip_mat, MRF_mod = dip_mod) %>%
-  invlogit() %>% 
+dip_predict <- MRFcov::predict_MRF(data = dip_mat, MRF_mod = dip_spat) %>%
+  `colnames<-`(diplodus) %>% 
   as.data.frame() %>% 
   rownames_to_column("site") %>% 
+  pivot_longer(2:length(.),
+               names_to = "species",
+               values_to = "predict_obs") %>% 
   mutate(loc = stringr::str_replace(string = .$site, " ", "_")) %>% 
-  select(loc, 2:6) %>% 
-  left_join(locs, by = "loc")
+  left_join(locs, by = "loc") %>% 
+  mutate(temp = scale(tmean)) %>% 
+  select(loc, tmean, 2:5)
 
 # Plot probability of occurrence of species as a function of temperature:
-da_plot <- dip_predict %>% 
+dip_predict %>%
+  group_by(loc, tmean, species) %>%
+  summarise(mean_obs = mean(predict_obs), .groups = "keep") %>%
   ggplot() +
-  aes(x = tmean, y = Diplodus.annularis) +
-  geom_point()
-  # stat_smooth(aes(x = tmean, y = Diplodus.annularis), method = "lm", formula = y ~ x)
-
-dp_plot <- dip_predict %>% 
-  ggplot() +
-  aes(x = tmean, y = Diplodus.puntazzo) +
-  geom_point()
-  # stat_smooth(aes(x = tmean, y = Diplodus.puntazzo), method = "lm", formula = y ~ x)
-
-ds_plot <- dip_predict %>% 
-  ggplot() +
-  aes(x = tmean, y = Diplodus.sargus) +
-  geom_point()
-  # stat_smooth(aes(x = tmean, y = Diplodus.sargus), method = "lm", formula = y ~ x)
-
-dv_plot <- dip_predict %>% 
-  ggplot() +
-  aes(x = tmean, y = Diplodus.vulgaris) +
-  geom_point()
-  # stat_smooth(aes(x = tmean, y = Diplodus.vulgaris), method = "lm", formula = y ~ x)
-
-dc_plot <- dip_predict %>% 
-  ggplot() +
-  aes(x = tmean, y = Diplodus.cervinus) +
-  geom_point()
-  # stat_smooth(aes(x = tmean, y = Diplodus.cervinus), method = "lm", formula = y ~ x)
+  aes(x = tmean, y = mean_obs, col = species) +
+  geom_point(cex = 3, alpha = 0.6) +
+  stat_smooth(method = "lm", formula = y ~ x, alpha = 0.3) +
+  scale_color_paletteer_d("ggsci::uniform_startrek") +
+  xlab("Temperature (degC)") +
+  ylab("Predicted observations") +
+  labs(title = "Observation predictions", subtitle = "Seabreams")
 
 
 # Herbivores --------------------------------------------------------------
 
-herb_predict <- MRFcov::predict_MRF(data = herb_mat, MRF_mod = herb_mod) %>%
-  invlogit() %>% 
+herb_predict <- MRFcov::predict_MRF(data = herb_mat, MRF_mod = herb_spat) %>%
+  `colnames<-`(herbivores) %>% 
   as.data.frame() %>% 
   rownames_to_column("site") %>% 
+  pivot_longer(2:length(.),
+               names_to = "species",
+               values_to = "predict_obs") %>% 
   mutate(loc = stringr::str_replace(string = .$site, " ", "_")) %>% 
-  select(loc, 2:6) %>% 
-  left_join(locs, by = "loc")
+  left_join(locs, by = "loc") %>% 
+  mutate(temp = scale(tmean)) %>% 
+  select(loc, tmean, 2:5)
 
 # Plot probability of occurrence of species as a function of temperature:
-sr_plot <- herb_predict %>% 
+herb_predict %>%
+  group_by(loc, tmean, species) %>%
+  summarise(mean_obs = log(mean(predict_obs)+0.1), .groups = "keep") %>%
   ggplot() +
-  aes(x = tmean, y = Siganus.rivulatus) +
-  geom_point()
-  # stat_smooth(aes(x = tmean, y = Siganus.rivulatus), method = "lm", formula = y ~ x)
-
-sl_plot <- herb_predict %>% 
-  ggplot() +
-  aes(x = tmean, y = Siganus.luridus) +
-  geom_point()
-  # stat_smooth(aes(x = tmean, y = Siganus.luridus), method = "lm", formula = y ~ x)
-
-sas_plot <- herb_predict %>% 
-  ggplot() +
-  aes(x = tmean, y = Sarpa.salpa) +
-  geom_point()
-  # stat_smooth(aes(x = tmean, y = Sarpa.salpa), method = "lm", formula = y ~ x)
-
-sg_plot <- herb_predict %>% 
-  ggplot() +
-  aes(x = tmean, y = Scarus.ghobban) +
-  geom_point()
-  # stat_smooth(aes(x = tmean, y = Scarus.ghobban), method = "lm", formula = y ~ x)
-
-spc_plot <- herb_predict %>% 
-  ggplot() +
-  aes(x = tmean, y = Sparisoma.cretense) +
-  geom_point()
-  # stat_smooth(aes(x = tmean, y = Sparisoma.cretense), method = "lm", formula = y ~ x)
+  aes(x = tmean, y = mean_obs, col = species) +
+  geom_point(cex = 3, alpha = 0.6) +
+  stat_smooth(method = "lm", formula = y ~ x, alpha = 0.3) +
+  scale_color_paletteer_d("ggsci::uniform_startrek") +
+  xlab("Temperature (degC)") +
+  ylab("Predicted observations, log scaled") +
+  labs(title = "Observation predictions", subtitle = "Herbivores")
 
 
 # ----------------------------------MPA-------------------------- #
