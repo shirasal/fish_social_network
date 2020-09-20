@@ -19,7 +19,6 @@ grps_predict <- MRFcov::predict_MRF(data = grps_mat, MRF_mod = grps_spat) %>%
                values_to = "predict_obs") %>% 
   mutate(loc = stringr::str_replace(string = .$site, " ", "_")) %>% 
   left_join(locs, by = "loc") %>% 
-  mutate(temp = scale(tmean)) %>% 
   select(loc, tmean, 2:5)
 
 # Plot probability of occurrence of species as a function of temperature:
@@ -47,7 +46,6 @@ dip_predict <- MRFcov::predict_MRF(data = dip_mat, MRF_mod = dip_spat) %>%
                values_to = "predict_obs") %>% 
   mutate(loc = stringr::str_replace(string = .$site, " ", "_")) %>% 
   left_join(locs, by = "loc") %>% 
-  mutate(temp = scale(tmean)) %>% 
   select(loc, tmean, 2:5)
 
 # Plot probability of occurrence of species as a function of temperature:
@@ -75,7 +73,6 @@ herb_predict <- MRFcov::predict_MRF(data = herb_mat, MRF_mod = herb_spat) %>%
                values_to = "predict_obs") %>% 
   mutate(loc = stringr::str_replace(string = .$site, " ", "_")) %>% 
   left_join(locs, by = "loc") %>% 
-  mutate(temp = scale(tmean)) %>% 
   select(loc, tmean, 2:5)
 
 # Plot probability of occurrence of species as a function of temperature:
@@ -99,113 +96,76 @@ locs_mpas <- med_clean %>% mutate(loc = paste0(site, "_", trans)) %>% select(loc
 
 # Groupers ----------------------------------------------------------------
 
-grps_mpa_predict <- MRFcov::predict_MRF(data = grps_mat, MRF_mod = grps_mod) %>%
-  invlogit() %>% 
+grps_mpa_predict <- MRFcov::predict_MRF(data = grps_mat, MRF_mod = grps_spat) %>%
+  `colnames<-`(groupers) %>% 
   as.data.frame() %>% 
-  rownames_to_column("site") %>%
+  rownames_to_column("site") %>% 
+  pivot_longer(2:length(.),
+               names_to = "species",
+               values_to = "predict_obs") %>% 
   mutate(loc = stringr::str_replace(string = .$site, " ", "_")) %>% 
-  select(loc, 2:6) %>% 
-  left_join(locs_mpas, by = "loc")
-  
+  left_join(locs_mpas, by = "loc") %>% 
+  select(loc, mpa, 2:5)
 
-# Plot probability of occurrence of species as a function of mpa:
-ec_boxplot <- grps_mpa_predict %>% 
-  ggplot() +
-  aes(x = mpa, y = Epinephelus.costae) +
-  geom_boxplot()
 
-em_boxplot <- grps_mpa_predict %>% 
+# Plot probability of occurrence of species as a function of MPA:
+grps_mpa_predict %>%
   ggplot() +
-  aes(x = mpa, y = Epinephelus.marginatus) +
-  geom_boxplot()
-
-mr_boxplot <- grps_mpa_predict %>% 
-  ggplot() +
-  aes(x = mpa, y = Mycteroperca.rubra) +
-  geom_boxplot()
-
-ss_boxplot <- grps_mpa_predict %>% 
-  ggplot() +
-  aes(x = mpa, y = Serranus.scriba) +
-  geom_boxplot()
-
-sc_boxplot <- grps_mpa_predict %>% 
-  ggplot() +
-  aes(x = mpa, y = Serranus.cabrilla) +
-  geom_boxplot()
+  aes(x = mpa, y = log(predict_obs), fill = species) +
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_fill_paletteer_d("ggsci::uniform_startrek") +
+  xlab("In/Out MPA") +
+  ylab("Predicted observations, log scaled") +
+  labs(title = "Observation predictions", subtitle = "Groupers")
 
 
 
 # Seabream ----------------------------------------------------------------
 
-dip_mpa_predict <- MRFcov::predict_MRF(data = dip_mat, MRF_mod = dip_mod) %>%
-  invlogit() %>% 
+dip_mpa_predict <- MRFcov::predict_MRF(data = dip_mat, MRF_mod = dip_spat) %>%
+  `colnames<-`(diplodus) %>% 
   as.data.frame() %>% 
-  rownames_to_column("site") %>%
+  rownames_to_column("site") %>% 
+  pivot_longer(2:length(.),
+               names_to = "species",
+               values_to = "predict_obs") %>% 
   mutate(loc = stringr::str_replace(string = .$site, " ", "_")) %>% 
-  select(loc, 2:6) %>% 
-  left_join(locs_mpas, by = "loc")
+  left_join(locs_mpas, by = "loc") %>% 
+  select(loc, mpa, 2:5)
 
 
-# Plot probability of occurrence of species as a function of mpa:
-da_boxplot <- dip_mpa_predict %>% 
+# Plot probability of occurrence of species as a function of MPA:
+dip_mpa_predict %>%
   ggplot() +
-  aes(x = mpa, y = Diplodus.annularis) +
-  geom_boxplot()
+  aes(x = mpa, y = log(predict_obs), fill = species) +
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_fill_paletteer_d("ggsci::uniform_startrek") +
+  xlab("In/Out MPA") +
+  ylab("Predicted observations, log_scaled") +
+  labs(title = "Observation predictions", subtitle = "Seabreams")
 
-dc_boxplot <- dip_mpa_predict %>% 
-  ggplot() +
-  aes(x = mpa, y = Diplodus.cervinus) +
-  geom_boxplot()
 
-dp_boxplot <- dip_mpa_predict %>% 
-  ggplot() +
-  aes(x = mpa, y = Diplodus.puntazzo) +
-  geom_boxplot()
-
-ds_boxplot <- dip_mpa_predict %>% 
-  ggplot() +
-  aes(x = mpa, y = Diplodus.sargus) +
-  geom_boxplot()
-
-dv_boxplot <- dip_mpa_predict %>% 
-  ggplot() +
-  aes(x = mpa, y = Diplodus.vulgaris) +
-  geom_boxplot()
 
 # Herbivores --------------------------------------------------------------
 
-herb_mpa_predict <- MRFcov::predict_MRF(data = herb_mat, MRF_mod = herb_mod) %>%
-  invlogit() %>% 
+herb_mpa_predict <- MRFcov::predict_MRF(data = herb_mat, MRF_mod = herb_spat) %>%
+  `colnames<-`(herbivores) %>% 
   as.data.frame() %>% 
-  rownames_to_column("site") %>%
+  rownames_to_column("site") %>% 
+  pivot_longer(2:length(.),
+               names_to = "species",
+               values_to = "predict_obs") %>% 
   mutate(loc = stringr::str_replace(string = .$site, " ", "_")) %>% 
-  select(loc, 2:6) %>% 
-  left_join(locs_mpas, by = "loc")
+  left_join(locs_mpas, by = "loc") %>% 
+  select(loc, mpa, 2:5)
 
 
-# Plot probability of occurrence of species as a function of mpa:
-sr_boxplot <- herb_mpa_predict %>% 
+# Plot probability of occurrence of species as a function of MPA:
+herb_mpa_predict %>%
   ggplot() +
-  aes(x = mpa, y = Siganus.rivulatus) +
-  geom_boxplot()
-
-sl_boxplot <- herb_mpa_predict %>% 
-  ggplot() +
-  aes(x = mpa, y = Siganus.luridus) +
-  geom_boxplot()
-
-sas_boxplot <- herb_mpa_predict %>% 
-  ggplot() +
-  aes(x = mpa, y = Sarpa.salpa) +
-  geom_boxplot()
-
-sg_boxplot <- herb_mpa_predict %>% 
-  ggplot() +
-  aes(x = mpa, y = Scarus.ghobban) +
-  geom_boxplot()
-
-spc_boxplot <- herb_mpa_predict %>% 
-  ggplot() +
-  aes(x = mpa, y = Sparisoma.cretense) +
-  geom_boxplot()
+  aes(x = mpa, y = log(predict_obs), fill = species) +
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_fill_paletteer_d("ggsci::uniform_startrek") +
+  xlab("In/Out MPA") +
+  ylab("Predicted observations, log scaled") +
+  labs(title = "Observation predictions", subtitle = "Herbivores")
