@@ -1,5 +1,5 @@
 source("R/run_models.R")
-
+library(paletteer)
 # Run predictions on the model
 
 # ----------------------------------Temperature-------------------------- #
