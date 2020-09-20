@@ -21,7 +21,7 @@ all_relimp_p <- all_relimp %>% bind_rows(.id = "taxa") %>% pivot_longer(3:length
   mutate(covariate = str_remove(string = covariate, pattern = "_rel_imp")) %>% 
   ggplot() +
   aes(x = covariate, y = rel_imp, fill = taxa) +
-  stat_summary(geom = "bar", fun.y = mean, position = "dodge") +
+  stat_summary(geom = "bar", fun = mean, position = "dodge") +
   stat_summary(geom = "errorbar", fun.data = mean_se, position = "dodge") +
   scale_fill_manual(values = wesanderson::wes_palette(n = 3, name = "Darjeeling2")) +
   labs(title = "Relative importance of factors in the model", subtitle = "All three taxa mean")
