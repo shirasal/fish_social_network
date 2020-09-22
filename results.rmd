@@ -13,7 +13,7 @@ output:
 
 ```{r setup, include=FALSE}
 # source("scripts/thesis_results_1.R")
-source("R/run_models.R")
+source("R/run_models_spatial.R")
 source("R/rel_imp.R")
 source("R/effect_size.R")
 ```
