@@ -61,7 +61,7 @@ best.mod
 
 # Herbivores --------------------------------------------------------------
 
-comparison_spatial <- MRFcov::cv_MRF_diag_rep_spatial(data = herb_mat, coords = dip_coords, compare_null = TRUE, family = "poisson", n_nodes = 5, plot = FALSE)
+comparison_spatial <- MRFcov::cv_MRF_diag_rep_spatial(data = herb_mat, coords = herb_coords, compare_null = TRUE, family = "poisson", n_nodes = 5, plot = FALSE)
 
 Spatial.true.prop <- quantile(comparison_spatial$MSE[which(comparison_spatial$model == "Spatial MRF")], 0.5)
 Nonspatial.true.prop <- quantile(comparison_spatial$MSE[which(comparison_spatial$model == "Non-spatial MRF")], 0.5)
