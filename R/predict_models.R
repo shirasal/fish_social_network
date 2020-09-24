@@ -1,4 +1,4 @@
-source("R/run_models.R")
+source("R/run_models_spatial.R")
 library(paletteer)
 # Run predictions on the model
 
@@ -169,3 +169,4 @@ herb_mpa_predict %>%
   xlab("In/Out MPA") +
   ylab("Predicted observations, log scaled") +
   labs(title = "Observation predictions", subtitle = "Herbivores")
+

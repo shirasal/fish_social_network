@@ -1,11 +1,11 @@
 
-grps_fake1 <- med_clean %>%
+grps_allabsent <- med_clean %>%
   group_by_at(.vars = c(c("lat", "lon", "site", "trans", "species"), env_vector, anthro_vector)) %>%
   summarise(n = sum(sp.n)) %>%
   spread(species, n, fill = 0) %>%
   ungroup() %>%
   na.omit() %>%
-  mutate(Epinephelus.marginatus = 1,
+  mutate(Epinephelus.marginatus = 0,
          Mycteroperca.rubra = 0,
          Serranus.scriba = 0,
          Serranus.cabrilla = 0,
