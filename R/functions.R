@@ -14,7 +14,7 @@ create_spp_mat <- function(dataset, taxa, covariate){
     select(all_of(taxa), all_of(covariate)) # keep the species and covariates columns
 }
 
-#--------------------------------------------------------------------------------------------
+##################
 
 # Func 2: Count the number of associations per species in taxa
 assoc_count <- function(taxa_mod){
@@ -24,7 +24,7 @@ assoc_count <- function(taxa_mod){
     mutate(species = str_sub(string = species, end = -3)) # the count function returns species names with a suffix, this line removes the suffix
 }
 
-#------------------------------------------------------------------------------------------------
+##################
 
 # Func 3: Count the number of associations per species in taxa, by covariate type
 covar_count <- function(taxa_mod){
@@ -68,7 +68,7 @@ covar_count <- function(taxa_mod){
     left_join(anthro_bio_effect, by = "species")
 }
 
-#-----------------------------------------------------------------------------------------------
+##################
 
 # Func 4: Summarise the relative importance of each type of covariate for each species
 rel_imp_sum <- function(taxa_mod){
@@ -114,7 +114,7 @@ rel_imp_sum <- function(taxa_mod){
     left_join(anthro_bio_relimp, by = "species")
 }
 
-# ------------------------------------------------------------------------------------
+##################
 
 # Func 5: Count the all POSITIVE/NEGATIVE association coefficients, per taxa
 
@@ -176,5 +176,107 @@ std_coefs <- function(taxa_mod){
     left_join(env_bio_effect, by = c("id", "direction")) %>%
     left_join(anthro_bio_effect, by = c("id", "direction")) %>% 
     arrange(direction)
+}
+
+##################
+
+# Func 6: Create coordinates dataframe for spatial model (accounting for spatial autocorrelation)
+
+create_coords_df <- function(species_mat){
+  med_clean %>% 
+    distinct(site, trans, lat, lon) %>% 
+    mutate(loc = paste(site, trans)) %>% 
+    column_to_rownames("loc") %>% 
+    select(lon, lat) %>% 
+    filter(rownames(.) %in% rownames(species_mat))
+}
+
+##################
+
+
+plot_rel_imp <- function(species_relimp, fill_colour, group_name){
+  species_relimp %>% pivot_longer(2:length(.)) %>% # Create a tibble of all species
+    rename(species = species, covariate = name, rel_imp = value) %>%
+    mutate(covariate = str_remove(string = covariate, pattern = "_rel_imp")) %>% 
+    ggplot() +
+    aes(x = species, y = rel_imp) +
+    stat_summary(geom = "bar", fun = mean, position = "dodge",  fill = fill_colour) +
+    facet_wrap(~covariate, nrow = 3) +
+    labs(title = "Relative importance of factors in the model", subtitle = group_name) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1), strip.placement = "outside")
+}
+
+##################
+
+create_pres_abs_df <- function(species_of_interest, species_group){
+  absent <- med_clean %>%
+    group_by_at(.vars = c(c("lat", "lon", "site", "trans", "species"), env_vector, anthro_vector)) %>%
+    summarise(n = sum(sp.n)) %>%
+    spread(species, n, fill = 0) %>%
+    ungroup() %>%
+    na.omit() %>%
+    mutate(across(species_group[-which(species_group==species_of_interest)]), .fns = 0) %>%
+    mutate(loc = paste(site, trans)) %>%
+    column_to_rownames("loc") %>%
+    select(all_of(species_group), all_of(env_vector), all_of(anthro_vector))
+  present <- med_clean %>%
+    group_by_at(.vars = c(c("lat", "lon", "site", "trans", "species"), env_vector, anthro_vector)) %>%
+    summarise(n = sum(sp.n)) %>%
+    spread(species, n, fill = 0) %>%
+    ungroup() %>%
+    na.omit() %>%
+    mutate(across(species_group[-which(species_group==species_of_interest)]), .fns = 1) %>%
+    mutate(loc = paste(site, trans)) %>%
+    column_to_rownames("loc") %>%
+    select(all_of(species_group), all_of(env_vector), all_of(anthro_vector))
+  return(list(absent = absent, present = present))
+  if (absent == present) 
+    warning("Present and Absent dataframes are equal")
+}
+
+
+model_predictions <- function(list_of_dfs, spp_coords, species_group){
+  abs_mod <- MRFcov::MRFcov_spatial(list_of_dfs$absent, n_nodes = 5, n_covariates = 4, coords = spp_coords, family = "poisson")
+  pres_mod <- MRFcov::MRFcov_spatial(list_of_dfs$present, n_nodes = 5, n_covariates = 4, coords = spp_coords, family = "poisson")
+  abs_pred <- MRFcov::predict_MRF(data = list_of_dfs$absent, MRF_mod = abs_mod) %>%
+    `colnames<-`(species_group) %>% 
+    as.data.frame() %>% 
+    rownames_to_column("site") %>% 
+    pivot_longer(2:length(.),
+                 names_to = "species",
+                 values_to = "pred_abs") %>% 
+    mutate(loc = stringr::str_replace(string = .$site, " ", "_")) %>% 
+    left_join(locs, by = "loc") %>% 
+    select(loc, tmean, 2:5)
+  pres_pred <- MRFcov::predict_MRF(data = list_of_dfs$present, MRF_mod = pres_mod) %>%
+    `colnames<-`(species_group) %>% 
+    as.data.frame() %>% 
+    rownames_to_column("site") %>% 
+    pivot_longer(2:length(.),
+                 names_to = "species",
+                 values_to = "pred_pres") %>% 
+    mutate(loc = stringr::str_replace(string = .$site, " ", "_")) %>% 
+    left_join(locs, by = "loc") %>% 
+    select(loc, tmean, 2:5)
+  
+  abs_pred %>% left_join(pres_pred) %>% 
+    pivot_longer(cols = pred_abs:pred_pres,
+                 names_to = "model",
+                 values_to = "prediction")
+  
+}
+
+plot_predictions <- function(predictions_long_df, species_of_interest){
+  predictions_long_df %>%
+    filter(species == species_of_interest) %>% 
+    ggplot() +
+    aes(x = tmean, y = prediction, color = model) +
+    geom_smooth(method = "lm", formula = y ~ x, cex = 3, alpha = 0.1) +
+    xlab("Temperature (degC)") +
+    ylab("Predicted observations") +
+    labs(title = "Observation predictions",
+         subtitle = stringr::str_replace(species_of_interest, "\\.", "\\ "),
+         colour = 'All other species') +
+    scale_colour_manual(labels = c('Absent','Present'), values = c("#ee3e81", "#6cd4d9"))
 }
 
