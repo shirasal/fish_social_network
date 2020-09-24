@@ -50,6 +50,8 @@ med_clean <- med_raw %>%
          prod = scale(pp_mean)) %>%
   select(site, lon, lat, trans, species, sp.n, mpa, temp, depth, prod)
 
+locs <- med_raw %>% mutate(loc = paste0(site, "_", trans)) %>% select(loc, tmean) %>% unique()
+
 # TODO add covariates: invasive species count/biomass (spatial), MPA age, MPA size; salinity after completing NAs
 
 # Create species matrix for each taxa -------------------------------------
