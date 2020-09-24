@@ -1,4 +1,4 @@
-# source("R/packages.R")
+source("R/packages.R")
 
 create_spp_mat <- function(dataset, taxa, covariate){
   cols <- c(c("lat", "lon", "site", "trans", "species"), env_vector, anthro_vector)
