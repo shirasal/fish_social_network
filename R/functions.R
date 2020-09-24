@@ -193,6 +193,9 @@ create_coords_df <- function(species_mat){
 
 ##################
 
+# Func 7: plot relative importance graph for a specific species group 
+# Arguments examples:
+## species_relimp = grps_relimp, fill_colour = "#eccbae", group_name = "Groupers"
 
 plot_rel_imp <- function(species_relimp, fill_colour, group_name){
   species_relimp %>% pivot_longer(2:length(.)) %>% # Create a tibble of all species
@@ -207,6 +210,10 @@ plot_rel_imp <- function(species_relimp, fill_colour, group_name){
 }
 
 ##################
+
+# Func 8: create a list of dataframes for prediction
+# Arguments examples:
+## species_of_interest = "Epinephelus.costae", species_group = groupers
 
 create_pres_abs_df <- function(species_of_interest, species_group){
   absent <- med_clean %>%
@@ -234,6 +241,11 @@ create_pres_abs_df <- function(species_of_interest, species_group){
     warning("Present and Absent dataframes are equal")
 }
 
+##################
+
+# Func 9: create a list of dataframes for prediction
+# Arguments examples:
+## list_of_dfs = output from FUNC 8, spp_coords = grps_coords, species_group = groupers
 
 model_predictions <- function(list_of_dfs, spp_coords, species_group){
   abs_mod <- MRFcov::MRFcov_spatial(list_of_dfs$absent, n_nodes = 5, n_covariates = 4, coords = spp_coords, family = "poisson")
@@ -265,6 +277,12 @@ model_predictions <- function(list_of_dfs, spp_coords, species_group){
                  values_to = "prediction")
   
 }
+
+##################
+
+# Func 10: plot the predictions
+# Arguments examples:
+## predictions_long_df = output from FUNC 9, species_of_interest = "Epinephelus.costae"
 
 plot_predictions <- function(predictions_long_df, species_of_interest){
   predictions_long_df %>%
