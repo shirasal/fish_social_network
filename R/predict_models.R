@@ -67,7 +67,7 @@ dv_preds <- model_predictions(list_of_dfs = dv_mats, spp_coords = dip_coords, sp
 dv_pred_plot <- plot_predictions(predictions_long_df = dv_preds, species_of_interest = diplodus[4])
 ggsave(dv_pred_plot, filename = "figures/predictions/d_vulgaris_temp.png", device = "png", dpi = 150)
 
-###### Diplodus vulgaris #####
+###### Diplodus cervinus #####
 dc_mats <- create_pres_abs_df(species_of_interest = diplodus[5], species_group = diplodus)
 dc_preds <- model_predictions(list_of_dfs = dc_mats, spp_coords = dip_coords, species_group = diplodus)
 dc_pred_plot <- plot_predictions(predictions_long_df = dc_preds, species_of_interest = diplodus[5])
@@ -76,14 +76,35 @@ ggsave(dc_pred_plot, filename = "figures/predictions/d_cervinus_temp.png", devic
 # Herbivores --------------------------------------------------------------
 
 herb_coords <- create_coords_df(herb_mat)
+herb_spat$key_coefs$Scarus.ghobban <- NULL # this one is problematic
 herb_relimp <- rel_imp_sum(herb_spat)
 plot_rel_imp(species_relimp = herb_relimp, fill_colour = "#145d82", group_name = "Herbivores")
-###
+### All species are of interest
 
-###### Diplodus vulgaris #####
-dc_mats <- create_pres_abs_df(species_of_interest = diplodus[5], species_group = diplodus)
-dc_preds <- model_predictions(list_of_dfs = dc_mats, spp_coords = dip_coords, species_group = diplodus)
-plot_predictions(predictions_long_df = dc_preds, species_of_interest = diplodus[5])
+###### Siganus rivulatus #####
+riv_mats <- create_pres_abs_df(species_of_interest = "Siganus.rivulatus", species_group = herbivores)
+riv_preds <- model_predictions(list_of_dfs = riv_mats, spp_coords = herb_coords, species_group = herbivores)
+riv_pred_plot <- plot_predictions(predictions_long_df = riv_preds, species_of_interest = "Siganus.rivulatus")
+ggsave(riv_pred_plot, filename = "figures/predictions/s_rivulatus_temp.png", device = "png", dpi = 150)
+
+###### Siganus luridus #####
+lurid_mats <- create_pres_abs_df(species_of_interest = "Siganus.luridus", species_group = herbivores)
+lurid_preds <- model_predictions(list_of_dfs = lurid_mats, spp_coords = herb_coords, species_group = herbivores)
+lurid_pred_plot <- plot_predictions(predictions_long_df = lurid_preds, species_of_interest = "Siganus.luridus")
+ggsave(lurid_pred_plot, filename = "figures/predictions/s_luridus_temp.png", device = "png", dpi = 150)
+
+###### Sarpa salpa #####
+salpa_mats <- create_pres_abs_df(species_of_interest = "Sarpa.salpa", species_group = herbivores)
+salpa_preds <- model_predictions(list_of_dfs = salpa_mats, spp_coords = herb_coords, species_group = herbivores)
+salpa_pred_plot <- plot_predictions(predictions_long_df = salpa_preds, species_of_interest = "Sarpa.salpa")
+ggsave(salpa_pred_plot, filename = "figures/predictions/s_salpa_temp.png", device = "png", dpi = 150)
+
+###### Sparisoma cretense #####
+cret_mats <- create_pres_abs_df(species_of_interest = "Sparisoma.cretense", species_group = herbivores)
+cret_preds <- model_predictions(list_of_dfs = cret_mats, spp_coords = herb_coords, species_group = herbivores)
+cret_pred_plot <- plot_predictions(predictions_long_df = cret_preds, species_of_interest = "Sparisoma.cretense")
+ggsave(cret_pred_plot, filename = "figures/predictions/s_cretense_temp.png", device = "png", dpi = 150)
+
 
 # ----------------------------------MPA-------------------------- #
 
