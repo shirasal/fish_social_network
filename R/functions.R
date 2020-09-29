@@ -260,7 +260,7 @@ model_predictions <- function(list_of_dfs, spp_coords, species_group){
                  values_to = "pred_abs") %>% 
     mutate(loc = stringr::str_replace(string = .$site, " ", "_")) %>% 
     left_join(locs, by = "loc") %>% 
-    select(loc, tmean, 2:5)
+    select(loc, tmean, mpa, 2:5)
   pres_pred <- MRFcov::predict_MRF(data = list_of_dfs$present, MRF_mod = pres_mod) %>%
     `colnames<-`(species_group) %>% 
     as.data.frame() %>% 
@@ -270,7 +270,7 @@ model_predictions <- function(list_of_dfs, spp_coords, species_group){
                  values_to = "pred_pres") %>% 
     mutate(loc = stringr::str_replace(string = .$site, " ", "_")) %>% 
     left_join(locs, by = "loc") %>% 
-    select(loc, tmean, 2:5)
+    select(loc, tmean, mpa, 2:5)
   
   abs_pred %>% left_join(pres_pred) %>% 
     pivot_longer(cols = pred_abs:pred_pres,
@@ -299,3 +299,17 @@ plot_predictions <- function(predictions_long_df, species_of_interest){
     scale_colour_manual(labels = c('Absent','Present'), values = c("#ee3e81", "#6cd4d9"))
 }
 
+# or plot for MPA (bar plot)
+plot_bar_predictions <- function(predictions_long_df, species_of_interest){
+  predictions_long_df %>%
+    filter(species == species_of_interest) %>% 
+    ggplot() +
+    aes(x = mpa, y = prediction, fill = model) +
+    stat_summary(geom = "bar", fun = "mean", position = "dodge") +
+    stat_summary(geom = "errorbar", fun.data = "mean_se", position = position_dodge(width = 0.8), width = 0.2) +
+    xlab("MPA") +
+    labs(title = "Observation predictions",
+         subtitle = stringr::str_replace(species_of_interest, "\\.", "\\ "),
+         colour = 'All other species') +
+    scale_colour_manual(labels = c('Absent','Present'), values = c("#ee3e81", "#6cd4d9"))
+}
