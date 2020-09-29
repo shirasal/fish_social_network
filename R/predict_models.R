@@ -43,21 +43,30 @@ dip_relimp <- rel_imp_sum(dip_spat)
 plot_rel_imp(species_relimp = dip_relimp, fill_colour = "#d29a4c", group_name = "Seabreams")
 ### All the species are of interest
 
-###### Epinephelus costae #####
-ec_mats <- create_pres_abs_df(species_of_interest = "Epinephelus.costae", species_group = groupers)
-ec_preds <- model_predictions(list_of_dfs = ec_mats, spp_coords = grps_coords, species_group = groupers)
-plot_predictions(predictions_long_df = ec_preds, species_of_interest = "Epinephelus.costae")
+###### Diplodus annularis #####
+da_mats <- create_pres_abs_df(species_of_interest = diplodus[1], species_group = diplodus)
+da_preds <- model_predictions(list_of_dfs = da_mats, spp_coords = dip_coords, species_group = diplodus)
+plot_predictions(predictions_long_df = da_preds, species_of_interest = diplodus[1])
 
-###### Epinephelus marginatus #####
-em_mats <- create_pres_abs_df(species_of_interest = "Epinephelus.marginatus", species_group = groupers)
-em_preds <- model_predictions(list_of_dfs = em_mats, spp_coords = grps_coords, species_group = groupers)
-plot_predictions(predictions_long_df = em_preds, species_of_interest = "Epinephelus.marginatus")
+###### Diplodus puntazzo #####
+dp_mats <- create_pres_abs_df(species_of_interest = diplodus[2], species_group = diplodus)
+dp_preds <- model_predictions(list_of_dfs = dp_mats, spp_coords = dip_coords, species_group = diplodus)
+plot_predictions(predictions_long_df = dp_preds, species_of_interest = diplodus[2])
 
-###### Epinephelus marginatus #####
-mr_mats <- create_pres_abs_df(species_of_interest = "Mycteroperca.rubra", species_group = groupers)
-mr_preds <- model_predictions(list_of_dfs = mr_mats, spp_coords = grps_coords, species_group = groupers)
-plot_predictions(predictions_long_df = mr_preds, species_of_interest = "Mycteroperca.rubra")
+###### Diplodus sargus #####
+ds_mats <- create_pres_abs_df(species_of_interest = diplodus[3], species_group = diplodus)
+ds_preds <- model_predictions(list_of_dfs = ds_mats, spp_coords = dip_coords, species_group = diplodus)
+plot_predictions(predictions_long_df = ds_preds, species_of_interest = diplodus[3])
 
+###### Diplodus vulgaris #####
+dv_mats <- create_pres_abs_df(species_of_interest = diplodus[4], species_group = diplodus)
+dv_preds <- model_predictions(list_of_dfs = dv_mats, spp_coords = dip_coords, species_group = diplodus)
+plot_predictions(predictions_long_df = dv_preds, species_of_interest = diplodus[4])
+
+###### Diplodus vulgaris #####
+dc_mats <- create_pres_abs_df(species_of_interest = diplodus[5], species_group = diplodus)
+dc_preds <- model_predictions(list_of_dfs = dc_mats, spp_coords = dip_coords, species_group = diplodus)
+plot_predictions(predictions_long_df = dc_preds, species_of_interest = diplodus[5])
 
 # Herbivores --------------------------------------------------------------
 
