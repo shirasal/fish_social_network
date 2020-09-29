@@ -89,7 +89,7 @@ dc_preds <- model_predictions(list_of_dfs = dc_mats, spp_coords = dip_coords, sp
 dc_pred_plot <- plot_predictions(predictions_long_df = dc_preds, species_of_interest = diplodus[5])
 # ggsave(dc_pred_plot, filename = "figures/predictions/d_cervinus_temp.png", device = "png", dpi = 300)
 dc_mpa_plot <- plot_bar_predictions(predictions_long_df = dc_preds, species_of_interest = diplodus[5])
-# ggsave(da_mpa_plot, filename = "figures/predictions/d_cervinus_mpa.png", device = "png", dpi = 300)
+# ggsave(dc_mpa_plot, filename = "figures/predictions/d_cervinus_mpa.png", device = "png", dpi = 300)
 
 # Herbivores --------------------------------------------------------------
 
