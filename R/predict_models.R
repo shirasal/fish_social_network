@@ -5,7 +5,9 @@ source("R/run_models_spatial.R")
 # ----------------------------------Temperature-------------------------- #
 
 # Create a dataframe of locations and temperatures
-locs <- med_raw %>% mutate(loc = paste0(site, "_", trans)) %>% select(loc, tmean) %>% unique()
+locs <- med_raw %>% 
+  mutate(mpa = if_else(enforcement <= 1, FALSE, TRUE), loc = paste0(site, "_", trans)) %>% 
+  select(loc, tmean, mpa) %>% unique()
 
 
 # Groupers ----------------------------------------------------------------
@@ -22,19 +24,25 @@ plot_rel_imp(species_relimp = grps_relimp, fill_colour = "#eccbae", group_name =
 ec_mats <- create_pres_abs_df(species_of_interest = "Epinephelus.costae", species_group = groupers)
 ec_preds <- model_predictions(list_of_dfs = ec_mats, spp_coords = grps_coords, species_group = groupers)
 ec_pred_plot <- plot_predictions(predictions_long_df = ec_preds, species_of_interest = "Epinephelus.costae")
-ggsave(ec_pred_plot, filename = "figures/predictions/e_costae_temp.png", device = "png", dpi = 300)
+# ggsave(ec_pred_plot, filename = "figures/predictions/e_costae_temp.png", device = "png", dpi = 300)
+ec_mpa_plot <- plot_bar_predictions(predictions_long_df = ec_preds, species_of_interest = "Epinephelus.costae")
+# ggsave(ec_mpa_plot, filename = "figures/predictions/e_costae_mpa.png", device = "png", dpi = 300)
 
 ###### Epinephelus marginatus #####
 em_mats <- create_pres_abs_df(species_of_interest = "Epinephelus.marginatus", species_group = groupers)
 em_preds <- model_predictions(list_of_dfs = em_mats, spp_coords = grps_coords, species_group = groupers)
 em_pred_plot <- plot_predictions(predictions_long_df = em_preds, species_of_interest = "Epinephelus.marginatus")
-ggsave(em_pred_plot, filename = "figures/predictions/e_marginatus_temp.png", device = "png", dpi = 300)
+# ggsave(em_pred_plot, filename = "figures/predictions/e_marginatus_temp.png", device = "png", dpi = 300)
+em_mpa_plot <- plot_bar_predictions(predictions_long_df = em_preds, species_of_interest = "Epinephelus.marginatus")
+# ggsave(em_mpa_plot, filename = "figures/predictions/e_marginatus_mpa.png", device = "png", dpi = 300)
 
 ###### Mycteroperca rubra #####
 mr_mats <- create_pres_abs_df(species_of_interest = "Mycteroperca.rubra", species_group = groupers)
 mr_preds <- model_predictions(list_of_dfs = mr_mats, spp_coords = grps_coords, species_group = groupers)
 mr_pred_plot <- plot_predictions(predictions_long_df = mr_preds, species_of_interest = "Mycteroperca.rubra")
-ggsave(mr_pred_plot, filename = "figures/predictions/m_rubra_temp.png", device = "png", dpi = 300)
+# ggsave(mr_pred_plot, filename = "figures/predictions/m_rubra_temp.png", device = "png", dpi = 300)
+em_mpa_plot <- plot_bar_predictions(predictions_long_df = em_preds, species_of_interest = "Epinephelus.marginatus")
+# ggsave(em_mpa_plot, filename = "figures/predictions/e_marginatus_mpa.png", device = "png", dpi = 300)
 
 # Seabream ----------------------------------------------------------------
 
@@ -47,31 +55,41 @@ plot_rel_imp(species_relimp = dip_relimp, fill_colour = "#d29a4c", group_name = 
 da_mats <- create_pres_abs_df(species_of_interest = diplodus[1], species_group = diplodus)
 da_preds <- model_predictions(list_of_dfs = da_mats, spp_coords = dip_coords, species_group = diplodus)
 da_pred_plot <- plot_predictions(predictions_long_df = da_preds, species_of_interest = diplodus[1])
-ggsave(da_pred_plot, filename = "figures/predictions/d_annularis_temp.png", device = "png", dpi = 300)
+# ggsave(da_pred_plot, filename = "figures/predictions/d_annularis_temp.png", device = "png", dpi = 300)
+da_mpa_plot <- plot_bar_predictions(predictions_long_df = da_preds, species_of_interest = diplodus[1])
+# ggsave(da_mpa_plot, filename = "figures/predictions/d_annularis_mpa.png", device = "png", dpi = 300)
 
 ###### Diplodus puntazzo #####
 dp_mats <- create_pres_abs_df(species_of_interest = diplodus[2], species_group = diplodus)
 dp_preds <- model_predictions(list_of_dfs = dp_mats, spp_coords = dip_coords, species_group = diplodus)
 dp_pred_plot <- plot_predictions(predictions_long_df = dp_preds, species_of_interest = diplodus[2])
-ggsave(dp_pred_plot, filename = "figures/predictions/d_puntazzo_temp.png", device = "png", dpi = 300)
+# ggsave(dp_pred_plot, filename = "figures/predictions/d_puntazzo_temp.png", device = "png", dpi = 300)
+dp_mpa_plot <- plot_bar_predictions(predictions_long_df = dp_preds, species_of_interest = diplodus[2])
+# ggsave(dp_mpa_plot, filename = "figures/predictions/d_puntazzo_mpa.png", device = "png", dpi = 300)
 
 ###### Diplodus sargus #####
 ds_mats <- create_pres_abs_df(species_of_interest = diplodus[3], species_group = diplodus)
 ds_preds <- model_predictions(list_of_dfs = ds_mats, spp_coords = dip_coords, species_group = diplodus)
 ds_pred_plot <- plot_predictions(predictions_long_df = ds_preds, species_of_interest = diplodus[3])
-ggsave(ds_pred_plot, filename = "figures/predictions/d_sargus_temp.png", device = "png", dpi = 300)
+# ggsave(ds_pred_plot, filename = "figures/predictions/d_sargus_temp.png", device = "png", dpi = 300)
+ds_mpa_plot <- plot_bar_predictions(predictions_long_df = ds_preds, species_of_interest = diplodus[3])
+# ggsave(ds_mpa_plot, filename = "figures/predictions/d_sargus_mpa.png", device = "png", dpi = 300)
 
 ###### Diplodus vulgaris #####
 dv_mats <- create_pres_abs_df(species_of_interest = diplodus[4], species_group = diplodus)
 dv_preds <- model_predictions(list_of_dfs = dv_mats, spp_coords = dip_coords, species_group = diplodus)
 dv_pred_plot <- plot_predictions(predictions_long_df = dv_preds, species_of_interest = diplodus[4])
-ggsave(dv_pred_plot, filename = "figures/predictions/d_vulgaris_temp.png", device = "png", dpi = 300)
+# ggsave(dv_pred_plot, filename = "figures/predictions/d_vulgaris_temp.png", device = "png", dpi = 300)
+dv_mpa_plot <- plot_bar_predictions(predictions_long_df = dv_preds, species_of_interest = diplodus[4])
+# ggsave(dv_mpa_plot, filename = "figures/predictions/d_vulgaris_mpa.png", device = "png", dpi = 300)
 
 ###### Diplodus cervinus #####
 dc_mats <- create_pres_abs_df(species_of_interest = diplodus[5], species_group = diplodus)
 dc_preds <- model_predictions(list_of_dfs = dc_mats, spp_coords = dip_coords, species_group = diplodus)
 dc_pred_plot <- plot_predictions(predictions_long_df = dc_preds, species_of_interest = diplodus[5])
-ggsave(dc_pred_plot, filename = "figures/predictions/d_cervinus_temp.png", device = "png", dpi = 300)
+# ggsave(dc_pred_plot, filename = "figures/predictions/d_cervinus_temp.png", device = "png", dpi = 300)
+dc_mpa_plot <- plot_bar_predictions(predictions_long_df = dc_preds, species_of_interest = diplodus[5])
+# ggsave(da_mpa_plot, filename = "figures/predictions/d_cervinus_mpa.png", device = "png", dpi = 300)
 
 # Herbivores --------------------------------------------------------------
 
@@ -85,105 +103,30 @@ plot_rel_imp(species_relimp = herb_relimp, fill_colour = "#145d82", group_name =
 riv_mats <- create_pres_abs_df(species_of_interest = "Siganus.rivulatus", species_group = herbivores)
 riv_preds <- model_predictions(list_of_dfs = riv_mats, spp_coords = herb_coords, species_group = herbivores)
 riv_pred_plot <- plot_predictions(predictions_long_df = riv_preds, species_of_interest = "Siganus.rivulatus")
-ggsave(riv_pred_plot, filename = "figures/predictions/s_rivulatus_temp.png", device = "png", dpi = 300)
+# ggsave(riv_pred_plot, filename = "figures/predictions/s_rivulatus_temp.png", device = "png", dpi = 300)
+riv_mpa_plot <- plot_bar_predictions(predictions_long_df = riv_preds, species_of_interest = "Siganus.rivulatus")
+# ggsave(riv_mpa_plot, filename = "figures/predictions/s_rivulatus_mpa.png", device = "png", dpi = 300)
 
 ###### Siganus luridus #####
 lurid_mats <- create_pres_abs_df(species_of_interest = "Siganus.luridus", species_group = herbivores)
 lurid_preds <- model_predictions(list_of_dfs = lurid_mats, spp_coords = herb_coords, species_group = herbivores)
 lurid_pred_plot <- plot_predictions(predictions_long_df = lurid_preds, species_of_interest = "Siganus.luridus")
-ggsave(lurid_pred_plot, filename = "figures/predictions/s_luridus_temp.png", device = "png", dpi = 300)
+# ggsave(lurid_pred_plot, filename = "figures/predictions/s_luridus_temp.png", device = "png", dpi = 300)
+lurid_mpa_plot <- plot_bar_predictions(predictions_long_df = lurid_preds, species_of_interest = "Siganus.luridus")
+# ggsave(lurid_mpa_plot, filename = "figures/predictions/s_luridus_mpa.png", device = "png", dpi = 300)
 
 ###### Sarpa salpa #####
 salpa_mats <- create_pres_abs_df(species_of_interest = "Sarpa.salpa", species_group = herbivores)
 salpa_preds <- model_predictions(list_of_dfs = salpa_mats, spp_coords = herb_coords, species_group = herbivores)
 salpa_pred_plot <- plot_predictions(predictions_long_df = salpa_preds, species_of_interest = "Sarpa.salpa")
-ggsave(salpa_pred_plot, filename = "figures/predictions/s_salpa_temp.png", device = "png", dpi = 300)
+# ggsave(salpa_pred_plot, filename = "figures/predictions/s_salpa_temp.png", device = "png", dpi = 300)
+salpa_mpa_plot <- plot_bar_predictions(predictions_long_df = salpa_preds, species_of_interest = "Sarpa.salpa")
+# ggsave(salpa_mpa_plot, filename = "figures/predictions/s_salpa_mpa.png", device = "png", dpi = 300)
 
 ###### Sparisoma cretense #####
 cret_mats <- create_pres_abs_df(species_of_interest = "Sparisoma.cretense", species_group = herbivores)
 cret_preds <- model_predictions(list_of_dfs = cret_mats, spp_coords = herb_coords, species_group = herbivores)
 cret_pred_plot <- plot_predictions(predictions_long_df = cret_preds, species_of_interest = "Sparisoma.cretense")
-ggsave(cret_pred_plot, filename = "figures/predictions/s_cretense_temp.png", device = "png", dpi = 300)
-
-
-# ----------------------------------MPA-------------------------- #
-
-# # Create a dataframe of locations and MPA
-# locs_mpas <- med_clean %>% mutate(loc = paste0(site, "_", trans)) %>% select(loc, mpa)
-# 
-# # Groupers ----------------------------------------------------------------
-# 
-# grps_mpa_predict <- MRFcov::predict_MRF(data = grps_mat, MRF_mod = grps_spat) %>%
-#   `colnames<-`(groupers) %>% 
-#   as.data.frame() %>% 
-#   rownames_to_column("site") %>% 
-#   pivot_longer(2:length(.),
-#                names_to = "species",
-#                values_to = "predict_obs") %>% 
-#   mutate(loc = stringr::str_replace(string = .$site, " ", "_")) %>% 
-#   left_join(locs_mpas, by = "loc") %>% 
-#   select(loc, mpa, 2:5)
-# 
-# 
-# # Plot probability of occurrence of species as a function of MPA:
-# grps_mpa_predict %>%
-#   ggplot() +
-#   aes(x = mpa, y = log(predict_obs), fill = species) +
-#   geom_bar(stat = "identity", position = "dodge") +
-#   scale_fill_paletteer_d("ggsci::uniform_startrek") +
-#   xlab("In/Out MPA") +
-#   ylab("Predicted observations, log scaled") +
-#   labs(title = "Observation predictions", subtitle = "Groupers")
-# 
-# 
-# 
-# # Seabream ----------------------------------------------------------------
-# 
-# dip_mpa_predict <- MRFcov::predict_MRF(data = dip_mat, MRF_mod = dip_spat) %>%
-#   `colnames<-`(diplodus) %>% 
-#   as.data.frame() %>% 
-#   rownames_to_column("site") %>% 
-#   pivot_longer(2:length(.),
-#                names_to = "species",
-#                values_to = "predict_obs") %>% 
-#   mutate(loc = stringr::str_replace(string = .$site, " ", "_")) %>% 
-#   left_join(locs_mpas, by = "loc") %>% 
-#   select(loc, mpa, 2:5)
-# 
-# 
-# # Plot probability of occurrence of species as a function of MPA:
-# dip_mpa_predict %>%
-#   ggplot() +
-#   aes(x = mpa, y = log(predict_obs), fill = species) +
-#   geom_bar(stat = "identity", position = "dodge") +
-#   scale_fill_paletteer_d("ggsci::uniform_startrek") +
-#   xlab("In/Out MPA") +
-#   ylab("Predicted observations, log_scaled") +
-#   labs(title = "Observation predictions", subtitle = "Seabreams")
-# 
-# 
-# 
-# # Herbivores --------------------------------------------------------------
-# 
-# herb_mpa_predict <- MRFcov::predict_MRF(data = herb_mat, MRF_mod = herb_spat) %>%
-#   `colnames<-`(herbivores) %>% 
-#   as.data.frame() %>% 
-#   rownames_to_column("site") %>% 
-#   pivot_longer(2:length(.),
-#                names_to = "species",
-#                values_to = "predict_obs") %>% 
-#   mutate(loc = stringr::str_replace(string = .$site, " ", "_")) %>% 
-#   left_join(locs_mpas, by = "loc") %>% 
-#   select(loc, mpa, 2:5)
-# 
-# 
-# # Plot probability of occurrence of species as a function of MPA:
-# herb_mpa_predict %>%
-#   ggplot() +
-#   aes(x = mpa, y = log(predict_obs), fill = species) +
-#   geom_bar(stat = "identity", position = "dodge") +
-#   scale_fill_paletteer_d("ggsci::uniform_startrek") +
-#   xlab("In/Out MPA") +
-#   ylab("Predicted observations, log scaled") +
-#   labs(title = "Observation predictions", subtitle = "Herbivores")
-
+# ggsave(cret_pred_plot, filename = "figures/predictions/s_cretense_temp.png", device = "png", dpi = 300)
+cret_mpa_plot <- plot_bar_predictions(predictions_long_df = cret_preds, species_of_interest = "Sparisoma.cretense")
+# ggsave(cret_mpa_plot, filename = "figures/predictions/s_cretense_mpa.png", device = "png", dpi = 300)
