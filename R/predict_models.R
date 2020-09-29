@@ -41,8 +41,8 @@ mr_mats <- create_pres_abs_df(species_of_interest = "Mycteroperca.rubra", specie
 mr_preds <- model_predictions(list_of_dfs = mr_mats, spp_coords = grps_coords, species_group = groupers)
 mr_pred_plot <- plot_predictions(predictions_long_df = mr_preds, species_of_interest = "Mycteroperca.rubra")
 # ggsave(mr_pred_plot, filename = "figures/predictions/m_rubra_temp.png", device = "png", dpi = 300)
-em_mpa_plot <- plot_bar_predictions(predictions_long_df = em_preds, species_of_interest = "Epinephelus.marginatus")
-# ggsave(em_mpa_plot, filename = "figures/predictions/e_marginatus_mpa.png", device = "png", dpi = 300)
+mr_mpa_plot <- plot_bar_predictions(predictions_long_df = mr_preds, species_of_interest = "Mycteroperca.rubra")
+# ggsave(mr_mpa_plot, filename = "figures/predictions/m_rubra_mpa.png", device = "png", dpi = 300)
 
 # Seabream ----------------------------------------------------------------
 
