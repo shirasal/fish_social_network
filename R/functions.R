@@ -181,7 +181,8 @@ std_coefs <- function(taxa_mod){
 ##################
 
 # Func 6: Create coordinates dataframe for spatial model (accounting for spatial autocorrelation)
-
+# Arguments examples:
+## species_mat = grps_mat
 create_coords_df <- function(species_mat){
   med_clean %>% 
     distinct(site, trans, lat, lon) %>% 
@@ -204,7 +205,7 @@ plot_rel_imp <- function(species_relimp, fill_colour, group_name){
     ggplot() +
     aes(x = species, y = rel_imp) +
     stat_summary(geom = "bar", fun = mean, position = "dodge",  fill = fill_colour) +
-    facet_wrap(~covariate, nrow = 3) +
+    facet_wrap(~covariate, nrow = 2) +
     labs(title = "Relative importance of factors in the model", subtitle = group_name) +
     theme(axis.text.x = element_text(angle = 45, hjust = 1), strip.placement = "outside")
 }
