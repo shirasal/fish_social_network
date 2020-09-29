@@ -307,7 +307,7 @@ plot_bar_predictions <- function(predictions_long_df, species_of_interest){
     aes(x = mpa, y = prediction, fill = model) +
     stat_summary(geom = "bar", fun = "mean", position = "dodge") +
     stat_summary(geom = "errorbar", fun.data = "mean_se", position = position_dodge(width = 0.8), width = 0.2) +
-    xlab("MPA") +
+    xlab("MPA") + ylab("Predicted observations") +
     labs(title = "Observation predictions",
          subtitle = stringr::str_replace(species_of_interest, "\\.", "\\ "),
          colour = 'All other species') +
