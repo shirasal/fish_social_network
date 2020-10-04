@@ -35,8 +35,8 @@ grps_relimp_p <- grps_relimp %>% pivot_longer(2:length(.)) %>% # Create a tibble
   mutate(covariate = str_remove(string = covariate, pattern = "_rel_imp")) %>% 
   ggplot() +
   aes(x = species, y = rel_imp) +
-  stat_summary(geom = "bar", fun.y = mean, position = "dodge",  fill = "#eccbae") +
-  facet_wrap(~covariate, nrow = 3) +
+  stat_summary(geom = "bar", fun = mean, position = "dodge",  fill = "#eccbae") +
+  facet_wrap(~covariate, nrow = 5) +
   labs(title = "Relative importance of factors in the model", subtitle = "Groupers") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1), strip.placement = "outside")
 
@@ -48,8 +48,8 @@ dip_relimp_p <- dip_relimp %>% pivot_longer(2:length(.)) %>% # Create a tibble o
   mutate(covariate = str_remove(string = covariate, pattern = "_rel_imp")) %>% 
   ggplot() +
   aes(x = species, y = rel_imp) +
-  stat_summary(geom = "bar", fun.y = mean, position = "dodge",  fill = "#d69c4e") +
-  facet_wrap(~covariate, nrow = 3) +
+  stat_summary(geom = "bar", fun = mean, position = "dodge",  fill = "#d69c4e") +
+  facet_wrap(~covariate, nrow = 5) +
   labs(title = "Relative importance of factors in the model", subtitle = "Seabream") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1), strip.placement = "outside")
 
@@ -61,8 +61,8 @@ herb_relimp_p <- herb_relimp %>% pivot_longer(2:length(.)) %>% # Create a tibble
   mutate(covariate = str_remove(string = covariate, pattern = "_rel_imp")) %>% 
   ggplot() +
   aes(x = species, y = rel_imp) +
-  stat_summary(geom = "bar", fun.y = mean, position = "dodge",  fill = "#046c9a") +
-  facet_wrap(~covariate, nrow = 3) +
+  stat_summary(geom = "bar", fun = mean, position = "dodge",  fill = "#046c9a") +
+  facet_wrap(~covariate, nrow = 5) +
   labs(title = "Relative importance of factors in the model", subtitle = "Herbivores") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1), strip.placement = "outside")
 
@@ -75,3 +75,6 @@ species_relimp_plots <- gridExtra::grid.arrange(grps_relimp_p, dip_relimp_p, her
 species_relimp_plots
 
 # ggsave("rel_imp_species.png", species_relimp_plots, "png", "results/", dpi = 150, height = 10, width = 10, units = "in")
+
+
+
