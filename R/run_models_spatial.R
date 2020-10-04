@@ -32,8 +32,9 @@ dip_spat <- MRFcov_spatial(dip_mat, n_nodes = 5, n_covariates = 4, coords = dip_
 herb_coords <- med_coords %>% 
   filter(rownames(med_coords) %in% rownames(herb_mat))
 nrow(herb_mat) == nrow(herb_coords)
-herb_spat <- MRFcov_spatial(herb_mat, n_nodes = 5, n_covariates = 4, coords = herb_coords,
+herb_spat <- MRFcov_spatial(herb_mat, n_nodes = 4, n_covariates = 4, coords = herb_coords,
                             family = "poisson", n_cores = 8)
 # herbHM_pois <- plotMRF_hm(herb_spat, main = "poisson")
 # herbHM_gaus <- plotMRF_hm(herb_mod, main = "gaussian (unscaled)")
 # gridExtra::grid.arrange(herbHM_gaus, herbHM_pois, nrow = 1, top = "Herbivores co-occurrence")
+

@@ -29,8 +29,9 @@ groupers <- c("Epinephelus.costae", "Epinephelus.marginatus",
 diplodus <- c("Diplodus.annularis", "Diplodus.puntazzo", "Diplodus.sargus",
               "Diplodus.vulgaris", "Diplodus.cervinus")
 herbivores <- c("Siganus.rivulatus", "Siganus.luridus", "Sarpa.salpa",
-                "Scarus.ghobban", "Sparisoma.cretense")
-
+                "Sparisoma.cretense")
+# "Scarus.ghobban" removed from 'herbivores'. Only 19 observations in the whole dataset, 
+# in 6 transects in achziv and 2 transects in shikmona
 
 # Env/Anthro vectors ------------------------------------------------------
 
