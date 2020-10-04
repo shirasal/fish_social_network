@@ -26,7 +26,7 @@ all_relimp_p <- all_relimp %>% bind_rows(.id = "taxa") %>% pivot_longer(3:length
   scale_fill_manual(values = wesanderson::wes_palette(n = 3, name = "Darjeeling2")) +
   labs(title = "Relative importance of factors in the model", subtitle = "All three taxa mean")
 
-ggsave("rel_imp_all_taxa.png", all_relimp_p, "png", "results/", dpi = 150)
+# ggsave("rel_imp_all_taxa.png", all_relimp_p, "png", "results/", dpi = 150)
 
 # Relative importance of covariates for each taxa -------------------------
 
@@ -36,9 +36,10 @@ grps_relimp_p <- grps_relimp %>% pivot_longer(2:length(.)) %>% # Create a tibble
   ggplot() +
   aes(x = species, y = rel_imp) +
   stat_summary(geom = "bar", fun = mean, position = "dodge",  fill = "#eccbae") +
-  facet_wrap(~covariate, nrow = 5) +
-  labs(title = "Relative importance of factors in the model", subtitle = "Groupers") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1), strip.placement = "outside")
+  facet_wrap(~covariate, nrow = 1) +
+  labs(subtitle = "Groupers") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), strip.placement = "outside") + 
+  theme(axis.title.x = element_blank(), axis.title.y = element_blank())
 
 # ggsave("rel_imp_groupers.png", grps_relimp_p, "png", "results/",
 #        dpi = 150, height = 8, width = 7, units = "in")
@@ -49,9 +50,10 @@ dip_relimp_p <- dip_relimp %>% pivot_longer(2:length(.)) %>% # Create a tibble o
   ggplot() +
   aes(x = species, y = rel_imp) +
   stat_summary(geom = "bar", fun = mean, position = "dodge",  fill = "#d69c4e") +
-  facet_wrap(~covariate, nrow = 5) +
-  labs(title = "Relative importance of factors in the model", subtitle = "Seabream") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1), strip.placement = "outside")
+  facet_wrap(~covariate, nrow = 1) +
+  labs(subtitle = "Seabream") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), strip.placement = "outside") + 
+  theme(axis.title.x = element_blank(), axis.title.y = element_blank())
 
 # ggsave("rel_imp_diplodus.png", dip_relimp_p, "png", "results/",
 #        dpi = 150, height = 8, width = 7, units = "in")
@@ -62,17 +64,15 @@ herb_relimp_p <- herb_relimp %>% pivot_longer(2:length(.)) %>% # Create a tibble
   ggplot() +
   aes(x = species, y = rel_imp) +
   stat_summary(geom = "bar", fun = mean, position = "dodge",  fill = "#046c9a") +
-  facet_wrap(~covariate, nrow = 5) +
-  labs(title = "Relative importance of factors in the model", subtitle = "Herbivores") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1), strip.placement = "outside")
+  facet_wrap(~covariate, nrow = 1) +
+  labs(subtitle = "Herbivores") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), strip.placement = "outside") + 
+  theme(axis.title.x = element_blank(), axis.title.y = element_blank())
 
 # ggsave("rel_imp_herbs.png", herb_relimp_p, "png", "results/",
 #        dpi = 150, height = 8, width = 7, units = "in")
 
-species_relimp_plots <- gridExtra::grid.arrange(grps_relimp_p, dip_relimp_p, herb_relimp_p,
-                                                nrow = 1)
-
-species_relimp_plots
+species_relimp_plots <- egg::ggarrange(grps_relimp_p, dip_relimp_p, herb_relimp_p)
 
 # ggsave("rel_imp_species.png", species_relimp_plots, "png", "results/", dpi = 150, height = 10, width = 10, units = "in")
 
