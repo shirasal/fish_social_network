@@ -260,7 +260,7 @@ model_predictions <- function(list_of_dfs, spp_coords, species_group){
                  values_to = "pred_abs") %>% 
     mutate(loc = stringr::str_replace(string = .$site, " ", "_")) %>% 
     left_join(locs, by = "loc") %>% 
-    select(loc, tmean, mpa, 2:5)
+    select(loc, tmean, mpa, 2:3)
   pres_pred <- MRFcov::predict_MRF(data = list_of_dfs$present, MRF_mod = pres_mod) %>%
     `colnames<-`(species_group) %>% 
     as.data.frame() %>% 
@@ -270,7 +270,7 @@ model_predictions <- function(list_of_dfs, spp_coords, species_group){
                  values_to = "pred_pres") %>% 
     mutate(loc = stringr::str_replace(string = .$site, " ", "_")) %>% 
     left_join(locs, by = "loc") %>% 
-    select(loc, tmean, mpa, 2:5)
+    select(loc, tmean, mpa, 2:3)
   
   abs_pred %>% left_join(pres_pred) %>% 
     pivot_longer(cols = pred_abs:pred_pres,
