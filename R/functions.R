@@ -223,7 +223,8 @@ create_pres_abs_df <- function(species_of_interest, species_group){
     spread(species, n, fill = 0) %>%
     ungroup() %>%
     na.omit() %>%
-    mutate(across(species_group[-which(species_group==species_of_interest)]), .fns = 0) %>%
+    mutate(across(.cols = all_of(species_group[-which(species_group==species_of_interest)]),
+                  .fns = function(x) 0)) %>% 
     mutate(loc = paste(site, trans)) %>%
     column_to_rownames("loc") %>%
     select(all_of(species_group), all_of(env_vector), all_of(anthro_vector))
@@ -233,7 +234,8 @@ create_pres_abs_df <- function(species_of_interest, species_group){
     spread(species, n, fill = 0) %>%
     ungroup() %>%
     na.omit() %>%
-    mutate(across(species_group[-which(species_group==species_of_interest)]), .fns = 1) %>%
+    mutate(across(.cols = all_of(species_group[-which(species_group==species_of_interest)]),
+                  .fns = function(x) 1)) %>% 
     mutate(loc = paste(site, trans)) %>%
     column_to_rownames("loc") %>%
     select(all_of(species_group), all_of(env_vector), all_of(anthro_vector))
@@ -296,7 +298,7 @@ plot_predictions <- function(predictions_long_df, species_of_interest){
     labs(title = "Observation predictions",
          subtitle = stringr::str_replace(species_of_interest, "\\.", "\\ "),
          colour = 'All other species') +
-    scale_colour_manual(labels = c('Absent','Present'), values = c("#ee3e81", "#6cd4d9"))
+    scale_colour_manual(labels = c('Absent','Present'), values = c("#031D44", "#FF99C9"))
 }
 
 # or plot for MPA (bar plot)
@@ -311,5 +313,5 @@ plot_bar_predictions <- function(predictions_long_df, species_of_interest){
     labs(title = "Observation predictions",
          subtitle = stringr::str_replace(species_of_interest, "\\.", "\\ "),
          colour = 'All other species') +
-    scale_colour_manual(labels = c('Absent','Present'), values = c("#ee3e81", "#6cd4d9"))
+    scale_fill_manual(labels = c('Absent','Present'), values = c("#031D44", "#FF99C9"))
 }
