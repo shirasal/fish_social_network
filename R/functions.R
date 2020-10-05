@@ -249,8 +249,8 @@ create_pres_abs_df <- function(species_of_interest, species_group){
 ## list_of_dfs = output from FUNC 8, spp_coords = grps_coords, species_group = groupers
 
 model_predictions <- function(list_of_dfs, spp_coords, species_group){
-  abs_mod <- MRFcov::MRFcov_spatial(list_of_dfs$absent, n_nodes = 5, n_covariates = 4, coords = spp_coords, family = "poisson")
-  pres_mod <- MRFcov::MRFcov_spatial(list_of_dfs$present, n_nodes = 5, n_covariates = 4, coords = spp_coords, family = "poisson")
+  abs_mod <- MRFcov::MRFcov_spatial(list_of_dfs$absent, n_nodes = length(species_group), n_covariates = 4, coords = spp_coords, family = "poisson")
+  pres_mod <- MRFcov::MRFcov_spatial(list_of_dfs$present, n_nodes = length(species_group), n_covariates = 4, coords = spp_coords, family = "poisson")
   abs_pred <- MRFcov::predict_MRF(data = list_of_dfs$absent, MRF_mod = abs_mod) %>%
     `colnames<-`(species_group) %>% 
     as.data.frame() %>% 
