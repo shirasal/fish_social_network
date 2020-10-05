@@ -14,12 +14,8 @@ create_spp_mat <- function(dataset, taxa, covariate){
     select(all_of(taxa), all_of(covariate)) # keep the species and covariates columns
 }
 
-# Graphical agents
-my_cols <- c(neg = '#3399CC', pos = '#FF3333')
-
-col_formatter <- formattable::formatter("span",
-                           style = x ~ style(color =
-                                               ifelse(x > 0, my_cols[["pos"]], ifelse(x < 0, my_cols[["neg"]], "black"))))
+# # Graphical agents
+# my_cols <- c(neg = '#3399CC', pos = '#FF3333')
 
 
 # Taxa vectors ------------------------------------------------------------
@@ -53,7 +49,6 @@ med_clean <- med_raw %>%
 
 locs <- med_raw %>% mutate(loc = paste0(site, "_", trans)) %>% select(loc, tmean) %>% unique()
 
-# TODO add covariates: invasive species count/biomass (spatial), MPA age, MPA size; salinity after completing NAs
 
 # Create species matrix for each taxa -------------------------------------
 
@@ -71,6 +66,41 @@ dip_mat <- create_spp_mat(dataset = med_clean, taxa = diplodus, covariate = c("m
 
 ## HERBIVORES
 herb_mat <- create_spp_mat(dataset = med_clean, taxa = herbivores, covariate = c("mpa", "temp", "depth", "prod"))
+
+
+# Create base matrix for predictions --------------------------------------
+
+# Create a tibble of metadata
+med_meta <- med_raw %>% 
+  distinct(country, site, trans, lon, lat, enforcement,
+           tmean, trange, depth, sal_mean, pp_mean, pp_range)
+
+# Create a species matrix with summation of each species in each site (abundance)
+med_mat <- med_raw %>% 
+  group_by(site, lon, lat, species) %>% # Sites and species (with coordinate-locations) only
+  summarise(n = sum(sp.n)) %>% 
+  spread(species, n, fill = 0) %>% 
+  ungroup()
+
+# Put the 2 data sets together (species and metadata)
+full_med_mat <- left_join(med_meta, med_mat, by = c("site", "lon", "lat"))
+
+# Constants
+mean_depth <- median(scale(med_raw$depth), na.rm = TRUE)
+mean_prod <- median(scale(med_raw$pp_mean))
+mean_temp <- median(scale(med_raw$tmean))
+
+# Create the matrix
+spp_mat_for_predictions <- full_med_mat %>% 
+  transmute(site = site,
+            temperature = tmean,
+            temp_scaled = scale(tmean),
+            depth = mean_depth,
+            productivity = mean_prod,
+            mpa = if_else(enforcement > 1, TRUE, FALSE)) %>% 
+  left_join(med_mat, by = "site") %>% 
+  select(site, temperature, temp_scaled, depth, productivity, mpa, all_of(c(groupers, diplodus, herbivores)))
+
 
 rm(create_spp_mat)
 save.image(file = "data/all_objects.RData")
