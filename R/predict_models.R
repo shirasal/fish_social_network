@@ -1,4 +1,4 @@
-source("R/run_models_spatial.R")
+# source("R/run_models_spatial.R")
 
 # Run predictions on the model
 
