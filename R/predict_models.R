@@ -94,7 +94,6 @@ dc_mpa_plot <- plot_bar_predictions(predictions_long_df = dc_preds, species_of_i
 # Herbivores --------------------------------------------------------------
 
 herb_coords <- create_coords_df(herb_mat)
-herb_spat$key_coefs$Scarus.ghobban <- NULL # this one is problematic
 herb_relimp <- rel_imp_sum(herb_spat)
 plot_rel_imp(species_relimp = herb_relimp, fill_colour = "#145d82", group_name = "Herbivores")
 ### All species are of interest
