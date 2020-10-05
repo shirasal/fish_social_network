@@ -9,8 +9,13 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
-source(here::here("R","run_models_spatial.R"))
-# source(here::here("R/predict_models.R"))
+source("C:/Users/shira/Documents/MSc/fish_social_network/R/packages.R")
+source("C:/Users/shira/Documents/MSc/fish_social_network/R/functions.R")
+load("C:/Users/shira/Documents/MSc/fish_social_network/data/all_objects.RData")
+source("C:/Users/shira/Documents/MSc/fish_social_network/R/run_models_spatial.R")
+source("C:/Users/shira/Documents/MSc/fish_social_network/R/rel_imp.R")
+source("C:/Users/shira/Documents/MSc/fish_social_network/R/predict_models.R")
+
 
 ```
 
