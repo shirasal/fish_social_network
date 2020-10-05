@@ -1,0 +1,38 @@
+---
+title: "Results"
+author: "Shira Salingré"
+date: "05/10/2020"
+output: 
+  powerpoint_presentation:
+    reference_doc: my-styles.pptx
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+source(here::here("R","run_models_spatial.R"))
+# source(here::here("R/predict_models.R"))
+
+```
+
+# Prediction Results
+
+## Groupers
+
+Relative importance
+
+```{r}
+plot_rel_imp(species_relimp = grps_relimp, fill_colour = "#eccbae", group_name = "Groupers")
+```
+
+The species of interest are: *Epinephelus coostae*, *Epinephelus marginatus* and *Mycteroperca rubra*
+
+## Groupers + Temp
+
+```{r}
+ec_pred_plot
+em_pred_plot
+mr_pred_plot
+
+```
+
+
