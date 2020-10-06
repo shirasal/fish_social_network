@@ -90,12 +90,13 @@ mean_temp <- median(scale(med_raw$tmean))
 
 # Create the matrix
 spp_mat_for_predictions <- med_mat %>% 
+  rownames_to_column("loc") %>% 
   mutate(temperature = tmean,
          temp_scaled = scale(tmean),
          depth = mean_depth,
          productivity = mean_prod,
          mpa = if_else(enforcement > 1, TRUE, FALSE)) %>% 
-  select(all_of(c(groupers, diplodus, herbivores)), temperature, temp_scaled, depth, productivity, mpa)
+  select(loc, all_of(c(groupers, diplodus, herbivores)), temperature, temp_scaled, depth, productivity, mpa)
 
 
 rm(create_spp_mat)
