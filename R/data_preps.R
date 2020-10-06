@@ -8,7 +8,7 @@ create_spp_mat <- function(dataset, taxa, covariate){
     spread(species, n, fill = 0) %>% # convert to species matrix
     ungroup() %>% 
     na.omit() %>% # remove NAs; make sure this part it minimised in the raw data
-    mutate(loc = paste(site, trans)) %>% # Create a variable of the location, which shpuld be unique
+    mutate(loc = paste(site, trans)) %>% # Create a variable of the location, which should be unique
     group_by(loc) %>% 
     column_to_rownames("loc") %>% # create row names by location
     select(all_of(taxa), all_of(covariate)) # keep the species and covariates columns
@@ -47,7 +47,7 @@ med_clean <- med_raw %>%
          prod = scale(pp_mean)) %>%
   select(site, lon, lat, trans, species, sp.n, mpa, temp, depth, prod)
 
-locs <- med_raw %>% mutate(loc = paste0(site, "_", trans)) %>% select(loc, tmean) %>% unique()
+locs <- med_raw %>% mutate(loc = paste0(site, "_", trans)) %>% distinct(lon, lat, loc)
 
 
 # Create species matrix for each taxa -------------------------------------
@@ -71,19 +71,17 @@ herb_mat <- create_spp_mat(dataset = med_clean, taxa = herbivores, covariate = c
 # Create base matrix for predictions --------------------------------------
 
 # Create a tibble of metadata
-med_meta <- med_raw %>% 
-  distinct(country, site, trans, lon, lat, enforcement,
-           tmean, trange, depth, sal_mean, pp_mean, pp_range)
-
-# Create a species matrix with summation of each species in each site (abundance)
 med_mat <- med_raw %>% 
-  group_by(site, lon, lat, species) %>% # Sites and species (with coordinate-locations) only
-  summarise(n = sum(sp.n)) %>% 
-  spread(species, n, fill = 0) %>% 
-  ungroup()
-
-# Put the 2 data sets together (species and metadata)
-full_med_mat <- left_join(med_meta, med_mat, by = c("site", "lon", "lat"))
+  group_by_at(.vars = c("lat", "lon", "site", "trans", "species",
+                        "enforcement", "tmean", "pp_mean", "depth")) %>%
+  summarise(n = sum(sp.n)) %>%
+  spread(species, n, fill = 0) %>%
+  ungroup() %>% 
+  na.omit() %>%
+  mutate(loc = paste(site, trans)) %>%
+  group_by(loc) %>% 
+  column_to_rownames("loc") %>%
+  select(all_of(c(groupers, diplodus, herbivores)), all_of(c("enforcement", "tmean", "pp_mean", "depth")))
 
 # Constants
 mean_depth <- median(scale(med_raw$depth), na.rm = TRUE)
@@ -91,15 +89,13 @@ mean_prod <- median(scale(med_raw$pp_mean))
 mean_temp <- median(scale(med_raw$tmean))
 
 # Create the matrix
-spp_mat_for_predictions <- full_med_mat %>% 
-  transmute(site = site,
-            temperature = tmean,
-            temp_scaled = scale(tmean),
-            depth = mean_depth,
-            productivity = mean_prod,
-            mpa = if_else(enforcement > 1, TRUE, FALSE)) %>% 
-  left_join(med_mat, by = "site") %>% 
-  select(site, temperature, temp_scaled, depth, productivity, mpa, all_of(c(groupers, diplodus, herbivores)))
+spp_mat_for_predictions <- med_mat %>% 
+  mutate(temperature = tmean,
+         temp_scaled = scale(tmean),
+         depth = mean_depth,
+         productivity = mean_prod,
+         mpa = if_else(enforcement > 1, TRUE, FALSE)) %>% 
+  select(all_of(c(groupers, diplodus, herbivores)), temperature, temp_scaled, depth, productivity, mpa)
 
 
 rm(create_spp_mat)
