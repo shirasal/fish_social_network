@@ -264,7 +264,7 @@ plot_predictions <- function(predictions_long_df, species_of_interest){
     geom_smooth(method = "lm", formula = y ~ x, cex = 3, alpha = 0.1) +
     xlab("Temperature (scaled)") +
     ylab("Prediction") +
-    labs(title = "Association predictions",
+    labs(title = "Observation predictions",
          subtitle = stringr::str_replace(species_of_interest, "\\.", "\\ "),
          colour = 'All other species') +
     scale_colour_manual(labels = c('Absent','Present'), values = c("#031D44", "#FF99C9")) +
@@ -295,7 +295,7 @@ plot_bar_predictions <- function(predictions_long_df, species_of_interest){
     stat_summary(geom = "bar", fun = "mean", position = "dodge") +
     # stat_summary(geom = "errorbar", fun.data = "mean_se", position = position_dodge(width = 0.8), width = 0.2) +
     xlab("MPA") + ylab("Prediction") +
-    labs(title = "Association predictions",
+    labs(title = "Observation predictions",
          subtitle = stringr::str_replace(species_of_interest, "\\.", "\\ "),
          colour = 'All other species') +
     scale_fill_manual(labels = c('Absent','Present'), values = c("#031D44", "#FF99C9"))
