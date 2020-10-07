@@ -25,12 +25,10 @@ grps_temp_max <- grps_mat %>%
 
 grps_temp_pred_mat <- bind_rows(grps_temp_abs, grps_temp_max)
 
-
 grps_temp_predict <- predict_MRF(grps_temp_pred_mat, grps_spat) %>% 
   `colnames<-`(groupers) %>% 
   as_data_frame() %>% 
-  mutate(temp = grps_temp_pred_mat$temp) %>% 
-  mutate(across(.cols = all_of(groupers), .fns = exp))
+  mutate(temp = grps_temp_pred_mat$temp)
 
 # Plot
 abs_pred <- grps_temp_predict %>% 
@@ -53,10 +51,10 @@ grps_predictions <- abs_pred %>% left_join(pres_pred) %>%
 grps_temp_plots <- list()
 for(i in groupers) { # for each species in this array
   grps_temp_plots[[i]] <- plot_predictions(grps_predictions, i)
-  ggsave(filename = str_glue("figures/predictions/{i}_temp.png"), plot = last_plot(), dpi = 300, device = "png")
+  # ggsave(filename = str_glue("figures/predictions/{i}_temp.png"), plot = last_plot(), dpi = 300, device = "png")
 }
 
-grps_temp_plots[[1]]
+grps_temp_plots[[4]]
 grps_temp_plots[[5]]
 
 grps_temp_grid_plots <- list()
