@@ -291,7 +291,7 @@ plot_predictions <- function(predictions_long_df, species_of_interest){
   predictions_long_df %>%
     filter(species == species_of_interest) %>% 
     ggplot() +
-    aes(x = tmean, y = prediction, color = model) +
+    aes(x = temp, y = prediction, color = model) +
     geom_smooth(method = "lm", formula = y ~ x, cex = 3, alpha = 0.1) +
     xlab("Temperature (degC)") +
     ylab("Predicted observations") +
@@ -308,7 +308,7 @@ plot_bar_predictions <- function(predictions_long_df, species_of_interest){
     ggplot() +
     aes(x = mpa, y = prediction, fill = model) +
     stat_summary(geom = "bar", fun = "mean", position = "dodge") +
-    stat_summary(geom = "errorbar", fun.data = "mean_se", position = position_dodge(width = 0.8), width = 0.2) +
+    # stat_summary(geom = "errorbar", fun.data = "mean_se", position = position_dodge(width = 0.8), width = 0.2) +
     xlab("MPA") + ylab("Predicted observations") +
     labs(title = "Observation predictions",
          subtitle = stringr::str_replace(species_of_interest, "\\.", "\\ "),
