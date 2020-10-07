@@ -293,10 +293,9 @@ plot_predictions <- function(predictions_long_df, species_of_interest){
     ggplot() +
     aes(x = temp, y = prediction, color = model) +
     geom_smooth(method = "lm", formula = y ~ x, cex = 3, alpha = 0.1) +
-    xlab("Temperature (degC)") +
+    xlab("Temperature (scaled)") +
     ylab("Predicted observations") +
-    labs(title = "Observation predictions",
-         subtitle = stringr::str_replace(species_of_interest, "\\.", "\\ "),
+    labs(subtitle = stringr::str_replace(species_of_interest, "\\.", "\\ "),
          colour = 'All other species') +
     scale_colour_manual(labels = c('Absent','Present'), values = c("#031D44", "#FF99C9"))
 }
