@@ -247,39 +247,8 @@ create_pres_abs_df <- function(species_of_interest, species_group){
 ##################
 
 # Func 9: create a list of dataframes for prediction
-# Arguments examples:
-## list_of_dfs = output from FUNC 8, spp_coords = grps_coords, species_group = groupers
 
-model_predictions <- function(list_of_dfs, spp_coords, species_group){
-  abs_mod <- MRFcov::MRFcov_spatial(list_of_dfs$absent, n_nodes = length(species_group), n_covariates = 4, coords = spp_coords, family = "poisson")
-  pres_mod <- MRFcov::MRFcov_spatial(list_of_dfs$present, n_nodes = length(species_group), n_covariates = 4, coords = spp_coords, family = "poisson")
-  abs_pred <- MRFcov::predict_MRF(data = list_of_dfs$absent, MRF_mod = abs_mod) %>%
-    `colnames<-`(species_group) %>% 
-    as.data.frame() %>% 
-    rownames_to_column("site") %>% 
-    pivot_longer(2:length(.),
-                 names_to = "species",
-                 values_to = "pred_abs") %>% 
-    mutate(loc = stringr::str_replace(string = .$site, " ", "_")) %>% 
-    left_join(locs, by = "loc") %>% 
-    select(loc, tmean, mpa, 2:3)
-  pres_pred <- MRFcov::predict_MRF(data = list_of_dfs$present, MRF_mod = pres_mod) %>%
-    `colnames<-`(species_group) %>% 
-    as.data.frame() %>% 
-    rownames_to_column("site") %>% 
-    pivot_longer(2:length(.),
-                 names_to = "species",
-                 values_to = "pred_pres") %>% 
-    mutate(loc = stringr::str_replace(string = .$site, " ", "_")) %>% 
-    left_join(locs, by = "loc") %>% 
-    select(loc, tmean, mpa, 2:3)
-  
-  abs_pred %>% left_join(pres_pred) %>% 
-    pivot_longer(cols = pred_abs:pred_pres,
-                 names_to = "model",
-                 values_to = "prediction")
-  
-}
+# Attempt in 'new_predict.R'
 
 ##################
 
@@ -295,9 +264,26 @@ plot_predictions <- function(predictions_long_df, species_of_interest){
     geom_smooth(method = "lm", formula = y ~ x, cex = 3, alpha = 0.1) +
     xlab("Temperature (scaled)") +
     ylab("Predicted observations") +
-    labs(subtitle = stringr::str_replace(species_of_interest, "\\.", "\\ "),
+    labs(title = "Observation predictions",
+         subtitle = stringr::str_replace(species_of_interest, "\\.", "\\ "),
          colour = 'All other species') +
-    scale_colour_manual(labels = c('Absent','Present'), values = c("#031D44", "#FF99C9"))
+    scale_colour_manual(labels = c('Absent','Present'), values = c("#031D44", "#FF99C9")) +
+    theme(plot.subtitle = element_text(face = "italic"))
+}
+
+# Temperature plotting for grid
+plot_temp_preds_grid <- function(predictions_long_df, species_of_interest){
+  predictions_long_df %>%
+    filter(species == species_of_interest) %>% 
+    ggplot() +
+    aes(x = temp, y = prediction, color = model) +
+    geom_smooth(method = "lm", formula = y ~ x, cex = 3, alpha = 0.1) +
+    labs(subtitle = stringr::str_replace(species_of_interest, "\\.", "\\ ")) +
+    scale_colour_manual(labels = c('Absent','Present'), values = c("#031D44", "#FF99C9")) +
+    theme(plot.subtitle = element_text(face = "italic"),
+          legend.position = "none",
+          axis.title.x = element_blank(),
+          axis.title.y = element_blank())
 }
 
 # or plot for MPA (bar plot)
@@ -313,4 +299,21 @@ plot_bar_predictions <- function(predictions_long_df, species_of_interest){
          subtitle = stringr::str_replace(species_of_interest, "\\.", "\\ "),
          colour = 'All other species') +
     scale_fill_manual(labels = c('Absent','Present'), values = c("#031D44", "#FF99C9"))
+}
+
+# MPA plotting for grid
+
+plot_mpa_preds_grid <- function(predictions_long_df, species_of_interest){
+  predictions_long_df %>%
+    filter(species == species_of_interest) %>% 
+    ggplot() +
+    aes(x = mpa, y = prediction, fill = model) +
+    stat_summary(geom = "bar", fun = "mean", position = "dodge") +
+    # stat_summary(geom = "errorbar", fun.data = "mean_se", position = position_dodge(width = 0.8), width = 0.2) +
+    labs(subtitle = stringr::str_replace(species_of_interest, "\\.", "\\ ")) +
+    scale_fill_manual(labels = c('Absent','Present'), values = c("#031D44", "#FF99C9")) +
+    theme(plot.subtitle = element_text(face = "italic"),
+          legend.position = "none",
+          axis.title.x = element_blank(),
+          axis.title.y = element_blank())
 }
