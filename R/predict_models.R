@@ -1,131 +1,389 @@
+# source("R/packages.R")
+# load("data/all_objects.RData")
 # source("R/run_models_spatial.R")
-
-# Run predictions on the model
-
-# ----------------------------------Temperature-------------------------- #
-
-# Create a dataframe of locations and temperatures
-locs <- med_raw %>% 
-  mutate(mpa = if_else(enforcement <= 1, FALSE, TRUE), loc = paste0(site, "_", trans)) %>% 
-  select(loc, tmean, mpa) %>% unique()
 
 
 # Groupers ----------------------------------------------------------------
 
-# Create coordinates dataframe for spatial analysis
-grps_coords <- create_coords_df(grps_mat)
+##### TEMP
 
-# Create relative importance graph to see which species are affected by other species
-grps_relimp <- rel_imp_sum(grps_spat)
-plot_rel_imp(species_relimp = grps_relimp, fill_colour = "#eccbae", group_name = "Groupers")
-### The species we're interested in are: E. costae, E. marginatus, M. rubra
+grps_temp_abs <- grps_mat %>% 
+  mutate(depth = median(depth),
+         prod = median(prod),
+         mpa = TRUE,
+         across(all_of(groupers), function(x) 0)) %>% 
+  group_by(temp = round(temp, digits = 1)) %>% 
+  sample_n(1)
 
-###### Epinephelus costae #####
-ec_mats <- create_pres_abs_df(species_of_interest = "Epinephelus.costae", species_group = groupers)
-ec_preds <- model_predictions(list_of_dfs = ec_mats, spp_coords = grps_coords, species_group = groupers)
-ec_pred_plot <- plot_predictions(predictions_long_df = ec_preds, species_of_interest = "Epinephelus.costae")
-# ggsave(ec_pred_plot, filename = "figures/predictions/e_costae_temp.png", device = "png", dpi = 300)
-ec_mpa_plot <- plot_bar_predictions(predictions_long_df = ec_preds, species_of_interest = "Epinephelus.costae")
-# ggsave(ec_mpa_plot, filename = "figures/predictions/e_costae_mpa.png", device = "png", dpi = 300)
+grps_temp_max <- grps_mat %>% 
+  mutate(depth = median(depth),
+         prod = median(prod),
+         mpa = TRUE,
+         across(all_of(groupers), .fns = max)) %>% 
+  group_by(temp = round(temp, digits = 1)) %>% 
+  sample_n(1)
 
-###### Epinephelus marginatus #####
-em_mats <- create_pres_abs_df(species_of_interest = "Epinephelus.marginatus", species_group = groupers)
-em_preds <- model_predictions(list_of_dfs = em_mats, spp_coords = grps_coords, species_group = groupers)
-em_pred_plot <- plot_predictions(predictions_long_df = em_preds, species_of_interest = "Epinephelus.marginatus")
-# ggsave(em_pred_plot, filename = "figures/predictions/e_marginatus_temp.png", device = "png", dpi = 300)
-em_mpa_plot <- plot_bar_predictions(predictions_long_df = em_preds, species_of_interest = "Epinephelus.marginatus")
-# ggsave(em_mpa_plot, filename = "figures/predictions/e_marginatus_mpa.png", device = "png", dpi = 300)
+grps_temp_pred_mat <- bind_rows(grps_temp_abs, grps_temp_max)
 
-###### Mycteroperca rubra #####
-mr_mats <- create_pres_abs_df(species_of_interest = "Mycteroperca.rubra", species_group = groupers)
-mr_preds <- model_predictions(list_of_dfs = mr_mats, spp_coords = grps_coords, species_group = groupers)
-mr_pred_plot <- plot_predictions(predictions_long_df = mr_preds, species_of_interest = "Mycteroperca.rubra")
-# ggsave(mr_pred_plot, filename = "figures/predictions/m_rubra_temp.png", device = "png", dpi = 300)
-mr_mpa_plot <- plot_bar_predictions(predictions_long_df = mr_preds, species_of_interest = "Mycteroperca.rubra")
-# ggsave(mr_mpa_plot, filename = "figures/predictions/m_rubra_mpa.png", device = "png", dpi = 300)
 
-# Seabream ----------------------------------------------------------------
+grps_temp_predict <- predict_MRF(grps_temp_pred_mat, grps_spat) %>% 
+  `colnames<-`(groupers) %>% 
+  as_data_frame() %>% 
+  mutate(temp = grps_temp_pred_mat$temp)
 
-dip_coords <- create_coords_df(dip_mat)
-dip_relimp <- rel_imp_sum(dip_spat)
-plot_rel_imp(species_relimp = dip_relimp, fill_colour = "#d29a4c", group_name = "Seabreams")
-### All the species are of interest
+# Plot
+abs_pred <- grps_temp_predict %>% 
+  dplyr::slice_head(prop = 0.5) %>% 
+  pivot_longer(all_of(groupers),
+               names_to = "species",
+               values_to = "pred_abs")
+pres_pred <- grps_temp_predict %>% 
+  dplyr::slice_tail(prop = 0.5) %>% 
+  pivot_longer(all_of(groupers),
+               names_to = "species",
+               values_to = "pred_pres")
 
-###### Diplodus annularis #####
-da_mats <- create_pres_abs_df(species_of_interest = diplodus[1], species_group = diplodus)
-da_preds <- model_predictions(list_of_dfs = da_mats, spp_coords = dip_coords, species_group = diplodus)
-da_pred_plot <- plot_predictions(predictions_long_df = da_preds, species_of_interest = diplodus[1])
-# ggsave(da_pred_plot, filename = "figures/predictions/d_annularis_temp.png", device = "png", dpi = 300)
-da_mpa_plot <- plot_bar_predictions(predictions_long_df = da_preds, species_of_interest = diplodus[1])
-# ggsave(da_mpa_plot, filename = "figures/predictions/d_annularis_mpa.png", device = "png", dpi = 300)
+grps_predictions <- abs_pred %>% left_join(pres_pred) %>% 
+  pivot_longer(cols = pred_abs:pred_pres,
+               names_to = "model",
+               values_to = "prediction")
 
-###### Diplodus puntazzo #####
-dp_mats <- create_pres_abs_df(species_of_interest = diplodus[2], species_group = diplodus)
-dp_preds <- model_predictions(list_of_dfs = dp_mats, spp_coords = dip_coords, species_group = diplodus)
-dp_pred_plot <- plot_predictions(predictions_long_df = dp_preds, species_of_interest = diplodus[2])
-# ggsave(dp_pred_plot, filename = "figures/predictions/d_puntazzo_temp.png", device = "png", dpi = 300)
-dp_mpa_plot <- plot_bar_predictions(predictions_long_df = dp_preds, species_of_interest = diplodus[2])
-# ggsave(dp_mpa_plot, filename = "figures/predictions/d_puntazzo_mpa.png", device = "png", dpi = 300)
+# Plot the predictions:
+grps_temp_plots <- list()
+for(i in groupers) { # for each species in this array
+  grps_temp_plots[[i]] <- plot_predictions(grps_predictions, i)
+  ggsave(filename = str_glue("figures/predictions/{i}_temp.png"), plot = last_plot(), dpi = 300, device = "png")
+}
 
-###### Diplodus sargus #####
-ds_mats <- create_pres_abs_df(species_of_interest = diplodus[3], species_group = diplodus)
-ds_preds <- model_predictions(list_of_dfs = ds_mats, spp_coords = dip_coords, species_group = diplodus)
-ds_pred_plot <- plot_predictions(predictions_long_df = ds_preds, species_of_interest = diplodus[3])
-# ggsave(ds_pred_plot, filename = "figures/predictions/d_sargus_temp.png", device = "png", dpi = 300)
-ds_mpa_plot <- plot_bar_predictions(predictions_long_df = ds_preds, species_of_interest = diplodus[3])
-# ggsave(ds_mpa_plot, filename = "figures/predictions/d_sargus_mpa.png", device = "png", dpi = 300)
+grps_temp_plots[[1]]
 
-###### Diplodus vulgaris #####
-dv_mats <- create_pres_abs_df(species_of_interest = diplodus[4], species_group = diplodus)
-dv_preds <- model_predictions(list_of_dfs = dv_mats, spp_coords = dip_coords, species_group = diplodus)
-dv_pred_plot <- plot_predictions(predictions_long_df = dv_preds, species_of_interest = diplodus[4])
-# ggsave(dv_pred_plot, filename = "figures/predictions/d_vulgaris_temp.png", device = "png", dpi = 300)
-dv_mpa_plot <- plot_bar_predictions(predictions_long_df = dv_preds, species_of_interest = diplodus[4])
-# ggsave(dv_mpa_plot, filename = "figures/predictions/d_vulgaris_mpa.png", device = "png", dpi = 300)
+grps_temp_grid_plots <- list()
+for(i in groupers) { # for each species in this array
+  grps_temp_grid_plots[[i]] <- plot_temp_preds_grid(grps_predictions, i)
+}
 
-###### Diplodus cervinus #####
-dc_mats <- create_pres_abs_df(species_of_interest = diplodus[5], species_group = diplodus)
-dc_preds <- model_predictions(list_of_dfs = dc_mats, spp_coords = dip_coords, species_group = diplodus)
-dc_pred_plot <- plot_predictions(predictions_long_df = dc_preds, species_of_interest = diplodus[5])
-# ggsave(dc_pred_plot, filename = "figures/predictions/d_cervinus_temp.png", device = "png", dpi = 300)
-dc_mpa_plot <- plot_bar_predictions(predictions_long_df = dc_preds, species_of_interest = diplodus[5])
-# ggsave(dc_mpa_plot, filename = "figures/predictions/d_cervinus_mpa.png", device = "png", dpi = 300)
+ggpubr::ggarrange(plotlist = grps_temp_grid_plots) %>% 
+  ggpubr::annotate_figure(top = ggpubr::text_grob("Observation predictions", face = "bold", size = 14),
+                          bottom = ggpubr::text_grob("Temperature (scaled)", size = 10),
+                          left = ggpubr::text_grob("Predicted observations", size = 10, rot = 90)) %>%
+  ggsave(filename = "figures/predictions/grps_temp.png", 
+         dpi = 300, device = "png", width = 20, height = 10, units = "cm")
+
+##### MPA
+
+grps_mpa_abs <- grps_mat %>% 
+  mutate(temp = median(temp),
+         depth = median(depth),
+         prod = median(prod),
+         across(all_of(groupers), function(x) 0)) %>% 
+  group_by(mpa) %>% 
+  sample_n(1)
+
+grps_mpa_max <- grps_mat %>% 
+  mutate(temp = median(temp),
+         depth = median(depth),
+         prod = median(prod),
+         across(all_of(groupers), .fns = max)) %>% 
+  group_by(mpa) %>% 
+  sample_n(1)
+
+grps_mpa_pred_mat <- bind_rows(grps_mpa_abs, grps_mpa_max)
+
+
+grps_temp_predict <- predict_MRF(grps_mpa_pred_mat, grps_spat) %>% 
+  `colnames<-`(groupers) %>% 
+  as_data_frame() %>% 
+  mutate(mpa = grps_mpa_pred_mat$mpa)
+
+# Plot
+abs_pred <- grps_mpa_pred_mat %>% 
+  dplyr::slice_head(prop = 0.5) %>% 
+  pivot_longer(all_of(groupers),
+               names_to = "species",
+               values_to = "pred_abs")
+pres_pred <- grps_mpa_pred_mat %>% 
+  dplyr::slice_tail(prop = 0.5) %>% 
+  pivot_longer(all_of(groupers),
+               names_to = "species",
+               values_to = "pred_pres")
+
+grps_predictions_mpa <- abs_pred %>% left_join(pres_pred) %>% 
+  pivot_longer(cols = pred_abs:pred_pres,
+               names_to = "model",
+               values_to = "prediction")
+
+# Plot the predictions:
+grps_mpa_plots <- list()
+for(i in groupers) { # for each species in this array
+  grps_mpa_plots[[i]] <- plot_bar_predictions(grps_predictions_mpa, i)
+  ggsave(filename = str_glue("figures/predictions/{i}_mpa.png"), plot = last_plot(), dpi = 300, device = "png")
+}
+
+grps_mpa_grid_plots <- list()
+for(i in groupers) { # for each species in this array
+  grps_mpa_grid_plots[[i]] <- plot_mpa_preds_grid(grps_predictions_mpa, i)
+}
+
+ggpubr::ggarrange(plotlist = grps_mpa_grid_plots) %>% 
+  ggpubr::annotate_figure(top = ggpubr::text_grob("Observation predictions", face = "bold", size = 14),
+                          bottom = ggpubr::text_grob("MPA", size = 10),
+                          left = ggpubr::text_grob("Predicted observations", size = 10, rot = 90)) %>%
+  ggsave(filename = "figures/predictions/grps_mpa.png", 
+         dpi = 300, device = "png", width = 20, height = 10, units = "cm")
+
+
+# Diplodus ----------------------------------------------------------------
+
+##### TEMP
+
+dip_temp_abs <- dip_mat %>% 
+  mutate(depth = median(depth),
+         prod = median(prod),
+         mpa = TRUE,
+         across(all_of(diplodus), function(x) 0)) %>% 
+  group_by(temp = round(temp, digits = 1)) %>% 
+  sample_n(1)
+
+dip_temp_max <- dip_mat %>% 
+  mutate(depth = median(depth),
+         prod = median(prod),
+         mpa = TRUE,
+         across(all_of(diplodus), .fns = max)) %>% 
+  group_by(temp = round(temp, digits = 1)) %>% 
+  sample_n(1)
+
+dip_temp_pred_mat <- bind_rows(dip_temp_abs, dip_temp_max)
+
+
+dip_temp_predict <- predict_MRF(dip_temp_pred_mat, dip_spat) %>% 
+  `colnames<-`(diplodus) %>% 
+  as_data_frame() %>% 
+  mutate(temp = dip_temp_pred_mat$temp)
+
+# Plot
+abs_pred <- dip_temp_predict %>% 
+  dplyr::slice_head(prop = 0.5) %>% 
+  pivot_longer(all_of(diplodus),
+               names_to = "species",
+               values_to = "pred_abs")
+pres_pred <- dip_temp_predict %>% 
+  dplyr::slice_tail(prop = 0.5) %>% 
+  pivot_longer(all_of(diplodus),
+               names_to = "species",
+               values_to = "pred_pres")
+
+dip_predictions <- abs_pred %>% left_join(pres_pred) %>% 
+  pivot_longer(cols = pred_abs:pred_pres,
+               names_to = "model",
+               values_to = "prediction")
+
+# Plot the predictions:
+dip_temp_plots <- list()
+for(i in diplodus) { # for each species in this array
+  dip_temp_plots[[i]] <- plot_predictions(dip_predictions, i)
+  ggsave(filename = str_glue("figures/predictions/{i}_temp.png"), plot = last_plot(), dpi = 300, device = "png")
+}
+
+dip_temp_grid_plots <- list()
+for(i in diplodus) { # for each species in this array
+  dip_temp_grid_plots[[i]] <- plot_temp_preds_grid(dip_predictions, i)
+}
+
+ggpubr::ggarrange(plotlist = dip_temp_grid_plots) %>% 
+  ggpubr::annotate_figure(top = ggpubr::text_grob("Observation predictions", face = "bold", size = 14),
+                          bottom = ggpubr::text_grob("Temperature (scaled)", size = 10),
+                          left = ggpubr::text_grob("Predicted observations", size = 10, rot = 90)) %>%
+  ggsave(filename = "figures/predictions/dip_temp.png", 
+         dpi = 300, device = "png", width = 20, height = 10, units = "cm")
+
+##### MPA
+
+dip_mpa_abs <- dip_mat %>% 
+  mutate(temp = median(temp),
+         depth = median(depth),
+         prod = median(prod),
+         across(all_of(diplodus), function(x) 0)) %>% 
+  group_by(mpa) %>% 
+  sample_n(1)
+
+dip_mpa_max <- dip_mat %>% 
+  mutate(temp = median(temp),
+         depth = median(depth),
+         prod = median(prod),
+         across(all_of(diplodus), .fns = max)) %>% 
+  group_by(mpa) %>% 
+  sample_n(1)
+
+dip_mpa_pred_mat <- bind_rows(dip_mpa_abs, dip_mpa_max)
+
+
+dip_temp_predict <- predict_MRF(dip_mpa_pred_mat, dip_spat) %>% 
+  `colnames<-`(diplodus) %>% 
+  as_data_frame() %>% 
+  mutate(mpa = dip_mpa_pred_mat$mpa)
+
+# Plot
+abs_pred <- dip_mpa_pred_mat %>% 
+  dplyr::slice_head(prop = 0.5) %>% 
+  pivot_longer(all_of(diplodus),
+               names_to = "species",
+               values_to = "pred_abs")
+pres_pred <- dip_mpa_pred_mat %>% 
+  dplyr::slice_tail(prop = 0.5) %>% 
+  pivot_longer(all_of(diplodus),
+               names_to = "species",
+               values_to = "pred_pres")
+
+dip_predictions_mpa <- abs_pred %>% left_join(pres_pred) %>% 
+  pivot_longer(cols = pred_abs:pred_pres,
+               names_to = "model",
+               values_to = "prediction")
+
+# Plot the predictions:
+dip_mpa_plots <- list()
+for(i in diplodus) { # for each species in this array
+  dip_mpa_plots[[i]] <- plot_bar_predictions(dip_predictions_mpa, i)
+  ggsave(filename = str_glue("figures/predictions/{i}_mpa.png"), plot = last_plot(), dpi = 300, device = "png")
+}
+
+
+dip_mpa_grid_plots <- list()
+for(i in diplodus) { # for each species in this array
+  dip_mpa_grid_plots[[i]] <- plot_mpa_preds_grid(dip_predictions_mpa, i)
+}
+
+ggpubr::ggarrange(plotlist = dip_mpa_grid_plots) %>% 
+  ggpubr::annotate_figure(top = ggpubr::text_grob("Observation predictions", face = "bold", size = 14),
+                          bottom = ggpubr::text_grob("MPA", size = 10),
+                          left = ggpubr::text_grob("Predicted observations", size = 10, rot = 90)) %>%
+  ggsave(filename = "figures/predictions/dip_mpa.png", 
+         dpi = 300, device = "png", width = 20, height = 10, units = "cm")
 
 # Herbivores --------------------------------------------------------------
 
-herb_coords <- create_coords_df(herb_mat)
-herb_relimp <- rel_imp_sum(herb_spat)
-plot_rel_imp(species_relimp = herb_relimp, fill_colour = "#145d82", group_name = "Herbivores")
-### All species are of interest
+##### TEMP
 
-###### Siganus rivulatus #####
-riv_mats <- create_pres_abs_df(species_of_interest = "Siganus.rivulatus", species_group = herbivores)
-riv_preds <- model_predictions(list_of_dfs = riv_mats, spp_coords = herb_coords, species_group = herbivores)
-riv_pred_plot <- plot_predictions(predictions_long_df = riv_preds, species_of_interest = "Siganus.rivulatus")
-# ggsave(riv_pred_plot, filename = "figures/predictions/s_rivulatus_temp.png", device = "png", dpi = 300)
-riv_mpa_plot <- plot_bar_predictions(predictions_long_df = riv_preds, species_of_interest = "Siganus.rivulatus")
-# ggsave(riv_mpa_plot, filename = "figures/predictions/s_rivulatus_mpa.png", device = "png", dpi = 300)
+herb_temp_abs <- herb_mat %>% 
+  mutate(depth = median(depth),
+         prod = median(prod),
+         mpa = TRUE,
+         across(all_of(herbivores), function(x) 0)) %>% 
+  group_by(temp = round(temp, digits = 1)) %>% 
+  sample_n(1)
 
-###### Siganus luridus #####
-lurid_mats <- create_pres_abs_df(species_of_interest = "Siganus.luridus", species_group = herbivores)
-lurid_preds <- model_predictions(list_of_dfs = lurid_mats, spp_coords = herb_coords, species_group = herbivores)
-lurid_pred_plot <- plot_predictions(predictions_long_df = lurid_preds, species_of_interest = "Siganus.luridus")
-# ggsave(lurid_pred_plot, filename = "figures/predictions/s_luridus_temp.png", device = "png", dpi = 300)
-lurid_mpa_plot <- plot_bar_predictions(predictions_long_df = lurid_preds, species_of_interest = "Siganus.luridus")
-# ggsave(lurid_mpa_plot, filename = "figures/predictions/s_luridus_mpa.png", device = "png", dpi = 300)
+herb_temp_max <- herb_mat %>% 
+  mutate(depth = median(depth),
+         prod = median(prod),
+         mpa = TRUE,
+         across(all_of(herbivores), .fns = max)) %>% 
+  group_by(temp = round(temp, digits = 1)) %>% 
+  sample_n(1)
 
-###### Sarpa salpa #####
-salpa_mats <- create_pres_abs_df(species_of_interest = "Sarpa.salpa", species_group = herbivores)
-salpa_preds <- model_predictions(list_of_dfs = salpa_mats, spp_coords = herb_coords, species_group = herbivores)
-salpa_pred_plot <- plot_predictions(predictions_long_df = salpa_preds, species_of_interest = "Sarpa.salpa")
-# ggsave(salpa_pred_plot, filename = "figures/predictions/s_salpa_temp.png", device = "png", dpi = 300)
-salpa_mpa_plot <- plot_bar_predictions(predictions_long_df = salpa_preds, species_of_interest = "Sarpa.salpa")
-# ggsave(salpa_mpa_plot, filename = "figures/predictions/s_salpa_mpa.png", device = "png", dpi = 300)
+herb_temp_pred_mat <- bind_rows(herb_temp_abs, herb_temp_max)
 
-###### Sparisoma cretense #####
-cret_mats <- create_pres_abs_df(species_of_interest = "Sparisoma.cretense", species_group = herbivores)
-cret_preds <- model_predictions(list_of_dfs = cret_mats, spp_coords = herb_coords, species_group = herbivores)
-cret_pred_plot <- plot_predictions(predictions_long_df = cret_preds, species_of_interest = "Sparisoma.cretense")
-# ggsave(cret_pred_plot, filename = "figures/predictions/s_cretense_temp.png", device = "png", dpi = 300)
-cret_mpa_plot <- plot_bar_predictions(predictions_long_df = cret_preds, species_of_interest = "Sparisoma.cretense")
-# ggsave(cret_mpa_plot, filename = "figures/predictions/s_cretense_mpa.png", device = "png", dpi = 300)
+
+herb_temp_predict <- predict_MRF(herb_temp_pred_mat, herb_spat) %>% 
+  `colnames<-`(herbivores) %>% 
+  as_data_frame() %>% 
+  mutate(temp = herb_temp_pred_mat$temp)
+
+# Plot
+abs_pred <- herb_temp_predict %>% 
+  dplyr::slice_head(prop = 0.5) %>% 
+  pivot_longer(all_of(herbivores),
+               names_to = "species",
+               values_to = "pred_abs")
+pres_pred <- herb_temp_predict %>% 
+  dplyr::slice_tail(prop = 0.5) %>% 
+  pivot_longer(all_of(herbivores),
+               names_to = "species",
+               values_to = "pred_pres")
+
+herb_predictions <- abs_pred %>% left_join(pres_pred) %>% 
+  pivot_longer(cols = pred_abs:pred_pres,
+               names_to = "model",
+               values_to = "prediction")
+
+# Plot the predictions:
+herb_temp_plots <- list()
+for(i in herbivores) { # for each species in this array
+  herb_temp_plots[[i]] <- plot_predictions(herb_predictions, i)
+  ggsave(filename = str_glue("figures/predictions/{i}_temp.png"), plot = last_plot(), dpi = 300, device = "png")
+}
+
+herb_temp_grid_plots <- list()
+for(i in herbivores) { # for each species in this array
+  herb_temp_grid_plots[[i]] <- plot_temp_preds_grid(herb_predictions, i)
+}
+
+ggpubr::ggarrange(plotlist = herb_temp_grid_plots, 
+                  common.legend = TRUE, legend.grob = leg, legend = "right") %>% 
+  ggpubr::annotate_figure(top = ggpubr::text_grob("Observation predictions", face = "bold", size = 14),
+                          bottom = ggpubr::text_grob("Temperature (scaled)", size = 10),
+                          left = ggpubr::text_grob("Predicted observations", size = 10, rot = 90)) %>%
+  ggsave(filename = "figures/predictions/herb_temp.png", 
+         dpi = 300, device = "png", width = 20, height = 10, units = "cm")
+
+##### MPA
+
+herb_mpa_abs <- herb_mat %>% 
+  mutate(temp = median(temp),
+         depth = median(depth),
+         prod = median(prod),
+         across(all_of(herbivores), function(x) 0)) %>% 
+  group_by(mpa) %>% 
+  sample_n(1)
+
+herb_mpa_max <- herb_mat %>% 
+  mutate(temp = median(temp),
+         depth = median(depth),
+         prod = median(prod),
+         across(all_of(herbivores), .fns = max)) %>% 
+  group_by(mpa) %>% 
+  sample_n(1)
+
+herb_mpa_pred_mat <- bind_rows(herb_mpa_abs, herb_mpa_max)
+
+
+herb_temp_predict <- predict_MRF(herb_mpa_pred_mat, herb_spat) %>% 
+  `colnames<-`(herbivores) %>% 
+  as_data_frame() %>% 
+  mutate(mpa = herb_mpa_pred_mat$mpa)
+
+# Plot
+abs_pred <- herb_mpa_pred_mat %>% 
+  dplyr::slice_head(prop = 0.5) %>% 
+  pivot_longer(all_of(herbivores),
+               names_to = "species",
+               values_to = "pred_abs")
+pres_pred <- herb_mpa_pred_mat %>% 
+  dplyr::slice_tail(prop = 0.5) %>% 
+  pivot_longer(all_of(herbivores),
+               names_to = "species",
+               values_to = "pred_pres")
+
+herb_predictions_mpa <- abs_pred %>% left_join(pres_pred) %>% 
+  pivot_longer(cols = pred_abs:pred_pres,
+               names_to = "model",
+               values_to = "prediction")
+
+# Plot the predictions:
+herb_mpa_plots <- list()
+for(i in herbivores) { # for each species in this array
+  herb_mpa_plots[[i]] <- plot_bar_predictions(herb_predictions_mpa, i)
+  ggsave(filename = str_glue("figures/predictions/{i}_mpa.png"), plot = last_plot(), dpi = 300, device = "png")
+}
+
+
+herb_mpa_grid_plots <- list()
+for(i in herbivores) { # for each species in this array
+  herb_mpa_grid_plots[[i]] <- plot_mpa_preds_grid(herb_predictions_mpa, i)
+}
+
+ggpubr::ggarrange(plotlist = herb_mpa_grid_plots, 
+                  common.legend = TRUE, legend.grob = leg, legend = "right") %>% 
+  ggpubr::annotate_figure(top = ggpubr::text_grob("Observation predictions", face = "bold", size = 14),
+                          bottom = ggpubr::text_grob("MPA", size = 10),
+                          left = ggpubr::text_grob("Predicted observations", size = 10, rot = 90)) %>%
+  ggsave(filename = "figures/predictions/herb_mpa.png", 
+         dpi = 300, device = "png", width = 20, height = 10, units = "cm")
