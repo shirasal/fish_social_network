@@ -63,7 +63,7 @@ for(i in groupers) { # for each species in this array
 }
 
 ggpubr::ggarrange(plotlist = grps_temp_grid_plots) %>% 
-  ggpubr::annotate_figure(top = ggpubr::text_grob("Association predictions", face = "bold", size = 14),
+  ggpubr::annotate_figure(top = ggpubr::text_grob("Observation predictions", face = "bold", size = 14),
                           bottom = ggpubr::text_grob("Temperature (scaled)", size = 10),
                           left = ggpubr::text_grob("Prediction", size = 10, rot = 90)) %>%
   ggsave(filename = "figures/predictions/grps_temp.png", 
@@ -127,7 +127,7 @@ for(i in groupers) { # for each species in this array
 ggpubr::ggarrange(plotlist = grps_mpa_grid_plots) %>% 
   ggpubr::annotate_figure(top = ggpubr::text_grob("Observation predictions", face = "bold", size = 14),
                           bottom = ggpubr::text_grob("MPA", size = 10),
-                          left = ggpubr::text_grob("Predicted observations", size = 10, rot = 90)) %>%
+                          left = ggpubr::text_grob("Prediction", size = 10, rot = 90)) %>%
   ggsave(filename = "figures/predictions/grps_mpa.png", 
          dpi = 300, device = "png", width = 20, height = 10, units = "cm")
 
@@ -192,7 +192,7 @@ for(i in diplodus) { # for each species in this array
 ggpubr::ggarrange(plotlist = dip_temp_grid_plots) %>% 
   ggpubr::annotate_figure(top = ggpubr::text_grob("Observation predictions", face = "bold", size = 14),
                           bottom = ggpubr::text_grob("Temperature (scaled)", size = 10),
-                          left = ggpubr::text_grob("Predicted observations", size = 10, rot = 90)) %>%
+                          left = ggpubr::text_grob("Prediction", size = 10, rot = 90)) %>%
   ggsave(filename = "figures/predictions/dip_temp.png", 
          dpi = 300, device = "png", width = 20, height = 10, units = "cm")
 
@@ -255,7 +255,7 @@ for(i in diplodus) { # for each species in this array
 ggpubr::ggarrange(plotlist = dip_mpa_grid_plots) %>% 
   ggpubr::annotate_figure(top = ggpubr::text_grob("Observation predictions", face = "bold", size = 14),
                           bottom = ggpubr::text_grob("MPA", size = 10),
-                          left = ggpubr::text_grob("Predicted observations", size = 10, rot = 90)) %>%
+                          left = ggpubr::text_grob("Prediction", size = 10, rot = 90)) %>%
   ggsave(filename = "figures/predictions/dip_mpa.png", 
          dpi = 300, device = "png", width = 20, height = 10, units = "cm")
 
