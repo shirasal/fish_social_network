@@ -2,6 +2,7 @@
 # load("data/all_objects.RData")
 # source("R/run_models.R")
 # file.edit("R/rel_imp.R")
+load("figures/predictions/legend_predictions.rdata")
 
 # Groupers ----------------------------------------------------------------
 
