@@ -74,8 +74,8 @@ dip_relimp_p <- dip_relimp %>% pivot_longer(2:length(.)) %>% # Create a tibble o
   theme(axis.title.x = element_blank(), axis.title.y = element_blank()) +
   theme(strip.text.x = element_text(size = 12, face = "bold"))
 
-# ggsave("rel_imp_diplodus.png", dip_relimp_p, "png", "results/",
-#        dpi = 150, height = 8, width = 7, units = "in")
+# ggsave("rel_imp_diplodus_nonspat.png", dip_relimp_p, "png", "figures/", dpi = 300,
+      # width = 11.74, height = 4, units = "in")
 
 herb_relimp_p <- herb_relimp %>% pivot_longer(2:length(.)) %>% # Create a tibble of all species
   rename(species = species, covariate = name, rel_imp = value) %>%
