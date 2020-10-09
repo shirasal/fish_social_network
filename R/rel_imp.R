@@ -1,8 +1,8 @@
-source("R/functions.R")
-load("data/all_objects.RData")
-source("R/packages.R")
-source("R/run_models.R")
-rm(list = c("grps_mod_nocov", "dip_mod_nocov", "herb_mod_nocov"))
+# source("R/functions.R")
+# load("data/all_objects.RData")
+# source("R/packages.R")
+# source("R/run_models.R")
+# rm(list = c("grps_mod_nocov", "dip_mod_nocov", "herb_mod_nocov"))
 
 # Figure 2. Relative importance per taxa ----------------------------------
 # How much is does a predictor affect the data
