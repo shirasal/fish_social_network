@@ -27,7 +27,7 @@ all_relimp_p <- all_relimp %>% bind_rows(.id = "taxa") %>% pivot_longer(3:length
   scale_fill_manual(values = wesanderson::wes_palette(n = 3, name = "Darjeeling2")) +
   labs(title = "Relative importance of factors in the model", subtitle = "All three taxa mean")
 
-ggsave("rel_imp_all_taxa_nonspat.png", all_relimp_p, "png", "figures/", dpi = 150)
+# ggsave("rel_imp_all_taxa_nonspat.png", all_relimp_p, "png", "figures/", dpi = 150)
 
 # Relative importance of covariates for each taxa -------------------------
 
@@ -36,11 +36,11 @@ grps_relimp_p <- grps_relimp %>% pivot_longer(2:length(.)) %>% # Create a tibble
   mutate(covariate = str_remove(string = covariate, pattern = "_rel_imp")) %>% 
   mutate(facet.title = case_when(covariate == "env" ~ "Environment",
                                  covariate == "anthro" ~ "MPA",
-                                 covariate == "biotic" ~ "Species Interactions",
+                                 covariate == "biotic" ~ "Species Associations",
                                  covariate == "env_bio" ~ "Env * Species",
                                  covariate == "mpa_bio" ~ "MPA * Species")) %>% 
   mutate(facet.title = fct_relevel(facet.title, 
-                                   "Environment", "MPA", "Species Interactions",
+                                   "Environment", "MPA", "Species Associations",
                                    "Env * Species", "MPA * Species")) %>% 
   ggplot() +
   aes(x = species, y = rel_imp) +
@@ -59,11 +59,11 @@ dip_relimp_p <- dip_relimp %>% pivot_longer(2:length(.)) %>% # Create a tibble o
   mutate(covariate = str_remove(string = covariate, pattern = "_rel_imp")) %>% 
   mutate(facet.title = case_when(covariate == "env" ~ "Environment",
                                  covariate == "anthro" ~ "MPA",
-                                 covariate == "biotic" ~ "Species Interactions",
+                                 covariate == "biotic" ~ "Species Associations",
                                  covariate == "env_bio" ~ "Env * Species",
                                  covariate == "mpa_bio" ~ "MPA * Species")) %>% 
   mutate(facet.title = fct_relevel(facet.title, 
-                                   "Environment", "MPA", "Species Interactions",
+                                   "Environment", "MPA", "Species Associations",
                                    "Env * Species", "MPA * Species")) %>% 
   ggplot() +
   aes(x = species, y = rel_imp) +
@@ -74,19 +74,19 @@ dip_relimp_p <- dip_relimp %>% pivot_longer(2:length(.)) %>% # Create a tibble o
   theme(axis.title.x = element_blank(), axis.title.y = element_blank()) +
   theme(strip.text.x = element_text(size = 12, face = "bold"))
 
-# ggsave("rel_imp_diplodus_nonspat.png", dip_relimp_p, "png", "figures/", dpi = 300,
-      # width = 11.74, height = 4, units = "in")
+ggsave("rel_imp_diplodus_nonspat.png", dip_relimp_p, "png", "figures/", dpi = 300,
+       width = 11.74, height = 4, units = "in")
 
 herb_relimp_p <- herb_relimp %>% pivot_longer(2:length(.)) %>% # Create a tibble of all species
   rename(species = species, covariate = name, rel_imp = value) %>%
   mutate(covariate = str_remove(string = covariate, pattern = "_rel_imp")) %>% 
   mutate(facet.title = case_when(covariate == "env" ~ "Environment",
                                  covariate == "anthro" ~ "MPA",
-                                 covariate == "biotic" ~ "Species Interactions",
+                                 covariate == "biotic" ~ "Species Associations",
                                  covariate == "env_bio" ~ "Env * Species",
                                  covariate == "mpa_bio" ~ "MPA * Species")) %>% 
   mutate(facet.title = fct_relevel(facet.title, 
-                                   "Environment", "MPA", "Species Interactions",
+                                   "Environment", "MPA", "Species Associations",
                                    "Env * Species", "MPA * Species")) %>% 
   ggplot() +
   aes(x = species, y = rel_imp) +
