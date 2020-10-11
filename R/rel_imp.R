@@ -36,12 +36,12 @@ grps_relimp_p <- grps_relimp %>% pivot_longer(2:length(.)) %>% # Create a tibble
   mutate(covariate = str_remove(string = covariate, pattern = "_rel_imp")) %>% 
   mutate(facet.title = case_when(covariate == "env" ~ "Environment",
                                  covariate == "anthro" ~ "MPA",
-                                 covariate == "biotic" ~ "Species Associations",
-                                 covariate == "env_bio" ~ "Env * Species",
-                                 covariate == "mpa_bio" ~ "MPA * Species")) %>% 
+                                 covariate == "biotic" ~ "Biotic Associations",
+                                 covariate == "env_bio" ~ "Env * Biotic",
+                                 covariate == "mpa_bio" ~ "MPA * Biotic")) %>% 
   mutate(facet.title = fct_relevel(facet.title, 
-                                   "Environment", "MPA", "Species Associations",
-                                   "Env * Species", "MPA * Species")) %>% 
+                                   "Environment", "MPA", "Biotic Associations",
+                                   "Env * Biotic", "MPA * Biotic")) %>% 
   ggplot() +
   aes(x = species, y = rel_imp) +
   stat_summary(geom = "bar", fun = mean, position = "dodge",  fill = "#eccbae") +
@@ -59,12 +59,12 @@ dip_relimp_p <- dip_relimp %>% pivot_longer(2:length(.)) %>% # Create a tibble o
   mutate(covariate = str_remove(string = covariate, pattern = "_rel_imp")) %>% 
   mutate(facet.title = case_when(covariate == "env" ~ "Environment",
                                  covariate == "anthro" ~ "MPA",
-                                 covariate == "biotic" ~ "Species Associations",
-                                 covariate == "env_bio" ~ "Env * Species",
-                                 covariate == "mpa_bio" ~ "MPA * Species")) %>% 
+                                 covariate == "biotic" ~ "Biotic Associations",
+                                 covariate == "env_bio" ~ "Env * Biotic",
+                                 covariate == "mpa_bio" ~ "MPA * Biotic")) %>% 
   mutate(facet.title = fct_relevel(facet.title, 
-                                   "Environment", "MPA", "Species Associations",
-                                   "Env * Species", "MPA * Species")) %>% 
+                                   "Environment", "MPA", "Biotic Associations",
+                                   "Env * Biotic", "MPA * Biotic")) %>% 
   ggplot() +
   aes(x = species, y = rel_imp) +
   stat_summary(geom = "bar", fun = mean, position = "dodge",  fill = "#d69c4e") +
@@ -82,12 +82,12 @@ herb_relimp_p <- herb_relimp %>% pivot_longer(2:length(.)) %>% # Create a tibble
   mutate(covariate = str_remove(string = covariate, pattern = "_rel_imp")) %>% 
   mutate(facet.title = case_when(covariate == "env" ~ "Environment",
                                  covariate == "anthro" ~ "MPA",
-                                 covariate == "biotic" ~ "Species Associations",
-                                 covariate == "env_bio" ~ "Env * Species",
-                                 covariate == "mpa_bio" ~ "MPA * Species")) %>% 
+                                 covariate == "biotic" ~ "Biotic Associations",
+                                 covariate == "env_bio" ~ "Env * Biotic",
+                                 covariate == "mpa_bio" ~ "MPA * Biotic")) %>% 
   mutate(facet.title = fct_relevel(facet.title, 
-                                   "Environment", "MPA", "Species Associations",
-                                   "Env * Species", "MPA * Species")) %>% 
+                                   "Environment", "MPA", "Biotic Associations",
+                                   "Env * Biotic", "MPA * Biotic")) %>% 
   ggplot() +
   aes(x = species, y = rel_imp) +
   stat_summary(geom = "bar", fun = mean, position = "dodge",  fill = "#046c9a") +
