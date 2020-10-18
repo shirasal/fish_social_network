@@ -44,3 +44,4 @@ herbHM_cov <- plotMRF_hm(herb_mod, main = "with covariates")
 herbHM_nocov <- plotMRF_hm(herb_mod_nocov, main = "without covariates")
 # gridExtra::grid.arrange(herbHM_cov, herbHM_nocov, nrow = 1, top = "Herbivores co-occurrence")
 
+rm(list = c("grps_mod_nocov", "dip_mod_nocov", "herb_mod_nocov", "grpsHM_nocov", "dipHM_nocov", "herbHM_nocov"))
