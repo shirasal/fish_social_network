@@ -42,7 +42,7 @@ nrow(grps_biomat) == nrow(grps_coords)
 grps_bioms_mod <- MRFcov_spatial(grps_biomat, prep_covariates = TRUE, n_nodes = 5,
                                  n_covariates = 4, family = "gaussian", coords = grps_coords)
 
-plotMRF_hm(grps_bioms_mod)
+plotMRF_hm(grps_bioms_mod, main = "Groupers associations (biomass model)")
 
 ## SEABREAM (Diplodus species)
 dip_biomat <- create_biomass_mat(dataset = med_biomass, taxa = diplodus, covariate = c("mpa", "temp", "depth", "prod"))
@@ -53,7 +53,7 @@ nrow(dip_biomat) == nrow(dip_coords)
 dip_bioms_mod <- MRFcov_spatial(dip_biomat, prep_covariates = TRUE, n_nodes = 5,
                                  n_covariates = 4, family = "gaussian", coords = dip_coords)
 
-plotMRF_hm(dip_bioms_mod)
+plotMRF_hm(dip_bioms_mod, main = "Seabream associations (biomass model)")
 
 ## HERBIVORES
 herb_biomat <- create_biomass_mat(dataset = med_biomass,
@@ -66,7 +66,7 @@ nrow(herb_biomat) == nrow(herb_coords)
 herb_bioms_mod <- MRFcov_spatial(herb_biomat, prep_covariates = TRUE, n_nodes = 4,
                                  n_covariates = 4, family = "gaussian", coords = herb_coords)
 
-plotMRF_hm(herb_bioms_mod)
+plotMRF_hm(herb_bioms_mod, main = "Herbivores associations (biomass model)")
 
 
 
