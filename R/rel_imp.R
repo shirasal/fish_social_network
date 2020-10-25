@@ -6,9 +6,9 @@
 
 # Figure 2. Relative importance per taxa ----------------------------------
 # How much is does a predictor affect the data
-grps_relimp <- rel_imp_sum(grps_mod)
-dip_relimp <- rel_imp_sum(dip_mod)
-herb_relimp <- rel_imp_sum(herb_mod)
+grps_relimp <- rel_imp_sum(grps_spat)
+dip_relimp <- rel_imp_sum(dip_spat)
+herb_relimp <- rel_imp_sum(herb_spat)
 
 all_relimp <- list(groupers = grps_relimp,
                    seabream = dip_relimp,
@@ -51,8 +51,7 @@ grps_relimp_p <- grps_relimp %>% pivot_longer(2:length(.)) %>% # Create a tibble
   theme(axis.title.x = element_blank(), axis.title.y = element_blank()) +
   theme(strip.text.x = element_text(size = 12, face = "bold"))
 
-# ggsave("rel_imp_groupers.png", grps_relimp_p, "png", "results/",
-       # dpi = 150, height = 8, width = 7, units = "in")
+# ggsave("rel_imp_grps_spat.png", grps_relimp_p, "png", "figures/rel_imp/", dpi = 300, width = 11.74, height = 4, units = "in")
 
 dip_relimp_p <- dip_relimp %>% pivot_longer(2:length(.)) %>% # Create a tibble of all species
   rename(species = species, covariate = name, rel_imp = value) %>%
@@ -74,8 +73,7 @@ dip_relimp_p <- dip_relimp %>% pivot_longer(2:length(.)) %>% # Create a tibble o
   theme(axis.title.x = element_blank(), axis.title.y = element_blank()) +
   theme(strip.text.x = element_text(size = 12, face = "bold"))
 
-# ggsave("rel_imp_diplodus_nonspat.png", dip_relimp_p, "png", "figures/", dpi = 300,
-#        width = 11.74, height = 4, units = "in")
+# ggsave("rel_imp_diplodus_spat.png", dip_relimp_p, "png", "figures/rel_imp/", dpi = 300, width = 11.74, height = 4, units = "in")
 
 herb_relimp_p <- herb_relimp %>% pivot_longer(2:length(.)) %>% # Create a tibble of all species
   rename(species = species, covariate = name, rel_imp = value) %>%
@@ -97,12 +95,11 @@ herb_relimp_p <- herb_relimp %>% pivot_longer(2:length(.)) %>% # Create a tibble
   theme(axis.title.x = element_blank(), axis.title.y = element_blank()) +
   theme(strip.text.x = element_text(size = 12, face = "bold"))
 
-# ggsave("rel_imp_herbs.png", herb_relimp_p, "png", "results/",
-#        dpi = 150, height = 8, width = 7, units = "in")
+# ggsave("rel_imp_dherb_spat.png", herb_relimp_p, "png", "figures/rel_imp/", dpi = 300, width = 11.74, height = 4, units = "in")
 
 species_relimp_plots <- egg::ggarrange(grps_relimp_p, dip_relimp_p, herb_relimp_p)
 
-# ggsave("rel_imp_species_nonspat.png", species_relimp_plots, "png", "figures/", dpi = 150, height = 10, width = 10, units = "in")
+# ggsave("rel_imp_species_spat.png", species_relimp_plots, "png", "figures/rel_imp/", dpi = 150, height = 10, width = 10, units = "in")
 
 
 
