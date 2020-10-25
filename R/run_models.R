@@ -1,6 +1,6 @@
-source("R/packages.R")
-load("data/all_objects.RData")
-source("R/functions.R")
+# source("R/packages.R")
+# load("data/all_objects.RData")
+# source("R/functions.R")
 
 # Run all models with and without covariates
 
