@@ -1,0 +1,32 @@
+---
+title: "Results"
+author: 
+- Shira Salingré^1^, Prof. Jonathan Belmaker^1^^2^
+- ^1^School of Zoology, Tel Aviv University, ^2^The Steinhardt Museum of Natural History
+output:
+  bookdown::word_document2:
+    fig_caption: yes
+    toc: yes
+date: "Last updated: ` r format(Sys.time(), '%d %B, %Y')`"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(here)
+knitr::opts_knit$set(root.dir = here())
+source("../R/packages.R")
+load("../data/all_objects.RData")
+source("../R/functions.R")
+```
+
+The results show...
+```{r source_scripts, include=FALSE}
+source("R/run_models.R")
+source("R/rel_imp.R")
+```
+
+
+```{r fig-rel_imp_total, fig.cap = "Relative importance of all covariates for each species", echo = FALSE, fig.align='center'}
+species_relimp_plots
+
+```
