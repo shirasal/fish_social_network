@@ -52,7 +52,7 @@ grps_predictions <- abs_pred %>% left_join(pres_pred) %>%
 grps_temp_plots <- list()
 for(i in groupers) { # for each species in this array
   grps_temp_plots[[i]] <- plot_predictions(grps_predictions, i)
-  ggsave(filename = str_glue("figures/predictions/{i}_temp_nonspat.png"), plot = last_plot(), dpi = 300, device = "png")
+  # ggsave(filename = str_glue("figures/predictions/{i}_temp_nonspat.png"), plot = last_plot(), dpi = 300, device = "png")
 }
 
 grps_temp_plots[[4]]
@@ -66,9 +66,9 @@ for(i in groupers) { # for each species in this array
 ggpubr::ggarrange(plotlist = grps_temp_grid_plots) %>% 
   ggpubr::annotate_figure(top = ggpubr::text_grob("Observation predictions", face = "bold", size = 14),
                           bottom = ggpubr::text_grob("Temperature (scaled)", size = 10),
-                          left = ggpubr::text_grob("Prediction", size = 10, rot = 90)) %>%
-  ggsave(filename = "figures/predictions/grps_temp_nonspat.png", 
-         dpi = 300, device = "png", width = 20, height = 10, units = "cm")
+                          left = ggpubr::text_grob("Prediction", size = 10, rot = 90))
+  # ggsave(filename = "figures/predictions/grps_temp_nonspat.png", 
+  #        dpi = 300, device = "png", width = 20, height = 10, units = "cm")
 
 ##### MPA
 
@@ -117,7 +117,7 @@ grps_predictions_mpa <- abs_pred %>% left_join(pres_pred) %>%
 grps_mpa_plots <- list()
 for(i in groupers) { # for each species in this array
   grps_mpa_plots[[i]] <- plot_bar_predictions(grps_predictions_mpa, i)
-  ggsave(filename = str_glue("figures/predictions/{i}_mpa_nonspat.png"), plot = last_plot(), dpi = 300, device = "png")
+  # ggsave(filename = str_glue("figures/predictions/{i}_mpa_nonspat.png"), plot = last_plot(), dpi = 300, device = "png")
 }
 
 grps_mpa_grid_plots <- list()
@@ -128,9 +128,9 @@ for(i in groupers) { # for each species in this array
 ggpubr::ggarrange(plotlist = grps_mpa_grid_plots) %>% 
   ggpubr::annotate_figure(top = ggpubr::text_grob("Observation predictions", face = "bold", size = 14),
                           bottom = ggpubr::text_grob("MPA", size = 10),
-                          left = ggpubr::text_grob("Prediction", size = 10, rot = 90)) %>%
-  ggsave(filename = "figures/predictions/grps_mpa_nonspat.png", 
-         dpi = 300, device = "png", width = 20, height = 10, units = "cm")
+                          left = ggpubr::text_grob("Prediction", size = 10, rot = 90))
+  # ggsave(filename = "figures/predictions/grps_mpa_nonspat.png", 
+  #        dpi = 300, device = "png", width = 20, height = 10, units = "cm")
 
 
 # Diplodus ----------------------------------------------------------------
@@ -182,7 +182,7 @@ dip_predictions <- abs_pred %>% left_join(pres_pred) %>%
 dip_temp_plots <- list()
 for(i in diplodus) { # for each species in this array
   dip_temp_plots[[i]] <- plot_predictions(dip_predictions, i)
-  ggsave(filename = str_glue("figures/predictions/{i}_temp_nonspat.png"), plot = last_plot(), dpi = 300, device = "png")
+  # ggsave(filename = str_glue("figures/predictions/{i}_temp_nonspat.png"), plot = last_plot(), dpi = 300, device = "png")
 }
 
 dip_temp_grid_plots <- list()
@@ -193,9 +193,9 @@ for(i in diplodus) { # for each species in this array
 ggpubr::ggarrange(plotlist = dip_temp_grid_plots) %>% 
   ggpubr::annotate_figure(top = ggpubr::text_grob("Observation predictions", face = "bold", size = 14),
                           bottom = ggpubr::text_grob("Temperature (scaled)", size = 10),
-                          left = ggpubr::text_grob("Prediction", size = 10, rot = 90)) %>%
-  ggsave(filename = "figures/predictions/dip_temp_nonspat.png", 
-         dpi = 300, device = "png", width = 20, height = 10, units = "cm")
+                          left = ggpubr::text_grob("Prediction", size = 10, rot = 90))
+  # ggsave(filename = "figures/predictions/dip_temp_nonspat.png", 
+  #        dpi = 300, device = "png", width = 20, height = 10, units = "cm")
 
 ##### MPA
 
@@ -218,18 +218,18 @@ dip_mpa_max <- dip_mat %>%
 dip_mpa_pred_mat <- bind_rows(dip_mpa_abs, dip_mpa_max)
 
 
-dip_temp_predict <- predict_MRF(dip_mpa_pred_mat, dip_mod) %>% 
+dip_mpa_predict <- predict_MRF(dip_mpa_pred_mat, dip_mod) %>% 
   `colnames<-`(diplodus) %>% 
   as_data_frame() %>% 
   mutate(mpa = dip_mpa_pred_mat$mpa)
 
 # Plot
-abs_pred <- dip_mpa_pred_mat %>% 
+abs_pred <- dip_mpa_predict %>% 
   dplyr::slice_head(prop = 0.5) %>% 
   pivot_longer(all_of(diplodus),
                names_to = "species",
                values_to = "pred_abs")
-pres_pred <- dip_mpa_pred_mat %>% 
+pres_pred <- dip_mpa_predict %>% 
   dplyr::slice_tail(prop = 0.5) %>% 
   pivot_longer(all_of(diplodus),
                names_to = "species",
@@ -256,8 +256,8 @@ for(i in diplodus) { # for each species in this array
 ggpubr::ggarrange(plotlist = dip_mpa_grid_plots) %>% 
   ggpubr::annotate_figure(top = ggpubr::text_grob("Observation predictions", face = "bold", size = 14),
                           bottom = ggpubr::text_grob("MPA", size = 10),
-                          left = ggpubr::text_grob("Prediction", size = 10, rot = 90)) %>%
-  ggsave(filename = "figures/predictions/dip_mpa_nonspat.png", 
+                          left = ggpubr::text_grob("Prediction", size = 10, rot = 90)) %>% 
+  ggsave(filename = "figures/predictions/dip_mpa_nonspat.png",
          dpi = 300, device = "png", width = 20, height = 10, units = "cm")
 
 # Herbivores --------------------------------------------------------------
