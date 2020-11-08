@@ -1,7 +1,7 @@
 # source("R/functions.R")
 # load("data/all_objects.RData")
 # source("R/packages.R")
-# source("R/run_models_spatial.R")
+source("R/run_models_spatial.R")
 
 # Figure 2. Relative importance per taxa ----------------------------------
 # How much is does a predictor affect the data
