@@ -2,7 +2,7 @@ source("R/packages.R")
 load("data/all_objects.RData")
 source("R/run_models.R")
 source("R/functions.R")
-# file.edit("R/rel_imp.R")
+file.edit("R/rel_imp.R")
 load("figures/predictions/legend_predictions.rdata")
 
 # Groupers ----------------------------------------------------------------
@@ -92,7 +92,7 @@ grps_mpa_max <- grps_mat %>%
 grps_mpa_pred_mat <- bind_rows(grps_mpa_abs, grps_mpa_max)
 
 
-grps_temp_predict <- predict_MRF(grps_mpa_pred_mat, grps_mod) %>% 
+grps_mpa_predict <- predict_MRF(grps_mpa_pred_mat, grps_mod) %>% 
   `colnames<-`(groupers) %>% 
   as_data_frame() %>% 
   mutate(mpa = grps_mpa_pred_mat$mpa)
@@ -310,7 +310,7 @@ herb_predictions <- abs_pred %>% left_join(pres_pred) %>%
 herb_temp_plots <- list()
 for(i in herbivores) { # for each species in this array
   herb_temp_plots[[i]] <- plot_predictions(herb_predictions, i)
-  ggsave(filename = str_glue("figures/predictions/{i}_temp_nonspat.png"), plot = last_plot(), dpi = 300, device = "png")
+  # ggsave(filename = str_glue("figures/predictions/{i}_temp_nonspat.png"), plot = last_plot(), dpi = 300, device = "png")
 }
 
 herb_temp_grid_plots <- list()
