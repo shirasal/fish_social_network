@@ -355,103 +355,6 @@ sriv_predictions <- abs_pred %>% left_join(pres_pred) %>%
 plot_predictions(sriv_predictions, herbivores[[1]])
 # ggsave(filename = "figures/predictions/Srivulatus_Sluridus_temp_nonspat.png", plot = last_plot(), dpi = 300, device = "png")
 
-# S rivulatus predition
-sriv_temp_abs <- herb_mat %>% 
-  mutate(depth = median(depth),
-         prod = median(prod),
-         mpa = TRUE,
-         Siganus.luridus = 0,
-         across(all_of(herbivores[3:4]), .funs = mean)) %>% 
-  group_by(temp = round(temp, digits = 1)) %>% 
-  sample_n(1)
-
-sriv_temp_max <- herb_mat %>% 
-  mutate(depth = median(depth),
-         prod = median(prod),
-         mpa = TRUE,
-         Siganus.luridus = max(Siganus.luridus),
-         across(all_of(herbivores[3:4]), .fns = mean)) %>% 
-  group_by(temp = round(temp, digits = 1)) %>% 
-  sample_n(1)
-
-sriv_temp_pred_mat <- bind_rows(sriv_temp_abs, sriv_temp_max)
-
-
-sriv_temp_predict <- predict_MRF(sriv_temp_pred_mat, herb_mod) %>% 
-  `colnames<-`(herbivores) %>% 
-  as_data_frame() %>% 
-  mutate(temp = sriv_temp_pred_mat$temp)
-
-# Plot
-abs_pred <- sriv_temp_predict %>% 
-  dplyr::slice_head(prop = 0.5) %>% 
-  pivot_longer(all_of(herbivores),
-               names_to = "species",
-               values_to = "pred_abs")
-pres_pred <- sriv_temp_predict %>% 
-  dplyr::slice_tail(prop = 0.5) %>% 
-  pivot_longer(all_of(herbivores),
-               names_to = "species",
-               values_to = "pred_pres")
-
-sriv_predictions <- abs_pred %>% left_join(pres_pred) %>% 
-  pivot_longer(cols = pred_abs:pred_pres,
-               names_to = "model",
-               values_to = "prediction")
-
-# Plot the predictions:
-plot_predictions(sriv_predictions, herbivores[[1]])
-# ggsave(filename = "figures/predictions/Srivulatus_Sluridus_temp_nonspat.png", plot = last_plot(), dpi = 300, device = "png")
-
-# S rivulatus predition
-sriv_temp_abs <- herb_mat %>% 
-  mutate(depth = median(depth),
-         prod = median(prod),
-         mpa = TRUE,
-         Siganus.luridus = 0,
-         across(all_of(herbivores[3:4]), .funs = mean)) %>% 
-  group_by(temp = round(temp, digits = 1)) %>% 
-  sample_n(1)
-
-sriv_temp_max <- herb_mat %>% 
-  mutate(depth = median(depth),
-         prod = median(prod),
-         mpa = TRUE,
-         Siganus.luridus = max(Siganus.luridus),
-         across(all_of(herbivores[3:4]), .fns = mean)) %>% 
-  group_by(temp = round(temp, digits = 1)) %>% 
-  sample_n(1)
-
-sriv_temp_pred_mat <- bind_rows(sriv_temp_abs, sriv_temp_max)
-
-
-sriv_temp_predict <- predict_MRF(sriv_temp_pred_mat, herb_mod) %>% 
-  `colnames<-`(herbivores) %>% 
-  as_data_frame() %>% 
-  mutate(temp = sriv_temp_pred_mat$temp)
-
-# Plot
-abs_pred <- sriv_temp_predict %>% 
-  dplyr::slice_head(prop = 0.5) %>% 
-  pivot_longer(all_of(herbivores),
-               names_to = "species",
-               values_to = "pred_abs")
-pres_pred <- sriv_temp_predict %>% 
-  dplyr::slice_tail(prop = 0.5) %>% 
-  pivot_longer(all_of(herbivores),
-               names_to = "species",
-               values_to = "pred_pres")
-
-sriv_predictions <- abs_pred %>% left_join(pres_pred) %>% 
-  pivot_longer(cols = pred_abs:pred_pres,
-               names_to = "model",
-               values_to = "prediction")
-
-# Plot the predictions:
-plot_predictions(sriv_predictions, herbivores[[1]])
-# ggsave(filename = "figures/predictions/Srivulatus_Sluridus_temp_nonspat.png", plot = last_plot(), dpi = 300, device = "png")
-
-
 # S luridus prediction
 slurid_temp_abs <- herb_mat %>% 
   mutate(depth = median(depth),
@@ -500,3 +403,102 @@ slurid_predictions <- abs_pred %>% left_join(pres_pred) %>%
 plot_predictions(slurid_predictions, herbivores[[2]])
 # ggsave(filename = "figures/predictions/Sluridus_Srivulatus_temp_nonspat.png", plot = last_plot(), dpi = 300, device = "png")
 
+
+
+# E. marginatus + M. rubra + Temp -----------------------------------------
+
+# E. marginatus prediction
+em_mr_temp_abs <- grps_mat %>% 
+  mutate(depth = median(depth),
+         prod = median(prod),
+         mpa = TRUE,
+         Mycteroperca.rubra = 0,
+         across(all_of(c(c(groupers[1], groupers[4:5]))), .funs = mean)) %>% 
+  group_by(temp = round(temp, digits = 1)) %>% 
+  sample_n(1)
+
+em_mr_temp_max <- grps_mat %>% 
+  mutate(depth = median(depth),
+         prod = median(prod),
+         mpa = TRUE,
+         Mycteroperca.rubra = max(Mycteroperca.rubra),
+         across(all_of(c(c(groupers[1], groupers[4:5]))), .fns = mean)) %>% 
+  group_by(temp = round(temp, digits = 1)) %>% 
+  sample_n(1)
+
+em_mr_temp_pred_mat <- bind_rows(em_mr_temp_abs, em_mr_temp_max)
+
+
+em_mr_temp_predict <- predict_MRF(em_mr_temp_pred_mat, grps_mod) %>% 
+  `colnames<-`(groupers) %>% 
+  as_data_frame() %>% 
+  mutate(temp = em_mr_temp_pred_mat$temp)
+
+# Plot
+abs_pred <- em_mr_temp_predict %>% 
+  dplyr::slice_head(prop = 0.5) %>% 
+  pivot_longer(all_of(groupers),
+               names_to = "species",
+               values_to = "pred_abs")
+pres_pred <- em_mr_temp_predict %>% 
+  dplyr::slice_tail(prop = 0.5) %>% 
+  pivot_longer(all_of(groupers),
+               names_to = "species",
+               values_to = "pred_pres")
+
+em_mr_predictions <- abs_pred %>% left_join(pres_pred) %>% 
+  pivot_longer(cols = pred_abs:pred_pres,
+               names_to = "model",
+               values_to = "prediction")
+
+# Plot the predictions:
+plot_predictions(em_mr_predictions, groupers[[2]])
+# ggsave(filename = "figures/predictions/Emargin_Mrubra_temp_nonspat.png", plot = last_plot(), dpi = 300, device = "png")
+
+# M rubra predcition
+mr_em_temp_abs <- grps_mat %>% 
+  mutate(depth = median(depth),
+         prod = median(prod),
+         mpa = TRUE,
+         Epinephelus.marginatus = 0,
+         across(all_of(c(c(groupers[1], groupers[4:5]))), .funs = mean)) %>% 
+  group_by(temp = round(temp, digits = 1)) %>% 
+  sample_n(1)
+
+mr_em_temp_max <- grps_mat %>% 
+  mutate(depth = median(depth),
+         prod = median(prod),
+         mpa = TRUE,
+         Epinephelus.marginatus = max(Epinephelus.marginatus),
+         across(all_of(c(c(groupers[1], groupers[4:5]))), .fns = mean)) %>% 
+  group_by(temp = round(temp, digits = 1)) %>% 
+  sample_n(1)
+
+mr_em_temp_pred_mat <- bind_rows(mr_em_temp_abs, mr_em_temp_max)
+
+
+mr_em_temp_predict <- predict_MRF(mr_em_temp_pred_mat, grps_mod) %>% 
+  `colnames<-`(groupers) %>% 
+  as_data_frame() %>% 
+  mutate(temp = mr_em_temp_pred_mat$temp)
+
+# Plot
+abs_pred <- mr_em_temp_predict %>% 
+  dplyr::slice_head(prop = 0.5) %>% 
+  pivot_longer(all_of(groupers),
+               names_to = "species",
+               values_to = "pred_abs")
+pres_pred <- mr_em_temp_predict %>% 
+  dplyr::slice_tail(prop = 0.5) %>% 
+  pivot_longer(all_of(groupers),
+               names_to = "species",
+               values_to = "pred_pres")
+
+mr_em_predictions <- abs_pred %>% left_join(pres_pred) %>% 
+  pivot_longer(cols = pred_abs:pred_pres,
+               names_to = "model",
+               values_to = "prediction")
+
+# Plot the predictions:
+plot_predictions(mr_em_predictions, groupers[[3]])
+# ggsave(filename = "figures/predictions/Mrubra_Emargin_temp_nonspat.png", plot = last_plot(), dpi = 300, device = "png")
