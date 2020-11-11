@@ -203,10 +203,17 @@ dvulgaris_predictions_mpa <- abs_pred %>% left_join(pres_pred) %>%
 # Plot the predictions:
 plot_bar_predictions(dvulgaris_predictions_mpa, diplodus[[4]])
 # ggsave(filename = "figures/predictions/Dvulgaris_Dpuntazzo_mpa_nonspat.png", plot = last_plot(), dpi = 300, device = "png")
+<<<<<<< HEAD
 # 
 # 
 # # D. sargus + D. vulgaris + MPA -------------------------------------------
 
+=======
+
+
+# D. sargus + D. vulgaris + MPA -------------------------------------------
+
+>>>>>>> 64a69a7e3288418c6ee7a5b463c2021f08d99b60
 # D. sargus preditions
 dsargus_abs <- dip_mat %>% 
   mutate(temp = median(temp),
@@ -309,6 +316,12 @@ plot_bar_predictions(dvulgaris_ds_predictions_mpa, diplodus[[4]])
 
 # S rivulatus predition
 sriv_temp_abs <- herb_mat %>% 
+<<<<<<< HEAD
+  mutate(depth = median(depth),
+         prod = median(prod),
+         mpa = TRUE,
+         Siganus.luridus = 0,
+=======
   mutate(depth = median(depth),
          prod = median(prod),
          mpa = TRUE,
@@ -355,6 +368,182 @@ sriv_predictions <- abs_pred %>% left_join(pres_pred) %>%
 plot_predictions(sriv_predictions, herbivores[[1]])
 # ggsave(filename = "figures/predictions/Srivulatus_Sluridus_temp_nonspat.png", plot = last_plot(), dpi = 300, device = "png")
 
+# S rivulatus predition
+sriv_temp_abs <- herb_mat %>% 
+  mutate(depth = median(depth),
+         prod = median(prod),
+         mpa = TRUE,
+         Siganus.luridus = 0,
+         across(all_of(herbivores[3:4]), .funs = mean)) %>% 
+  group_by(temp = round(temp, digits = 1)) %>% 
+  sample_n(1)
+
+sriv_temp_max <- herb_mat %>% 
+  mutate(depth = median(depth),
+         prod = median(prod),
+         mpa = TRUE,
+         Siganus.luridus = max(Siganus.luridus),
+         across(all_of(herbivores[3:4]), .fns = mean)) %>% 
+  group_by(temp = round(temp, digits = 1)) %>% 
+  sample_n(1)
+
+sriv_temp_pred_mat <- bind_rows(sriv_temp_abs, sriv_temp_max)
+
+
+sriv_temp_predict <- predict_MRF(sriv_temp_pred_mat, herb_mod) %>% 
+  `colnames<-`(herbivores) %>% 
+  as_data_frame() %>% 
+  mutate(temp = sriv_temp_pred_mat$temp)
+
+# Plot
+abs_pred <- sriv_temp_predict %>% 
+  dplyr::slice_head(prop = 0.5) %>% 
+  pivot_longer(all_of(herbivores),
+               names_to = "species",
+               values_to = "pred_abs")
+pres_pred <- sriv_temp_predict %>% 
+  dplyr::slice_tail(prop = 0.5) %>% 
+  pivot_longer(all_of(herbivores),
+               names_to = "species",
+               values_to = "pred_pres")
+
+sriv_predictions <- abs_pred %>% left_join(pres_pred) %>% 
+  pivot_longer(cols = pred_abs:pred_pres,
+               names_to = "model",
+               values_to = "prediction")
+
+# Plot the predictions:
+plot_predictions(sriv_predictions, herbivores[[1]])
+# ggsave(filename = "figures/predictions/Srivulatus_Sluridus_temp_nonspat.png", plot = last_plot(), dpi = 300, device = "png")
+
+# S rivulatus predition
+sriv_temp_abs <- herb_mat %>% 
+  mutate(depth = median(depth),
+         prod = median(prod),
+         mpa = TRUE,
+         Siganus.luridus = 0,
+         across(all_of(herbivores[3:4]), .funs = mean)) %>% 
+  group_by(temp = round(temp, digits = 1)) %>% 
+  sample_n(1)
+
+sriv_temp_max <- herb_mat %>% 
+  mutate(depth = median(depth),
+         prod = median(prod),
+         mpa = TRUE,
+         Siganus.luridus = max(Siganus.luridus),
+         across(all_of(herbivores[3:4]), .fns = mean)) %>% 
+  group_by(temp = round(temp, digits = 1)) %>% 
+  sample_n(1)
+
+sriv_temp_pred_mat <- bind_rows(sriv_temp_abs, sriv_temp_max)
+
+
+sriv_temp_predict <- predict_MRF(sriv_temp_pred_mat, herb_mod) %>% 
+  `colnames<-`(herbivores) %>% 
+  as_data_frame() %>% 
+  mutate(temp = sriv_temp_pred_mat$temp)
+
+# Plot
+abs_pred <- sriv_temp_predict %>% 
+  dplyr::slice_head(prop = 0.5) %>% 
+  pivot_longer(all_of(herbivores),
+               names_to = "species",
+               values_to = "pred_abs")
+pres_pred <- sriv_temp_predict %>% 
+  dplyr::slice_tail(prop = 0.5) %>% 
+  pivot_longer(all_of(herbivores),
+               names_to = "species",
+               values_to = "pred_pres")
+
+sriv_predictions <- abs_pred %>% left_join(pres_pred) %>% 
+  pivot_longer(cols = pred_abs:pred_pres,
+               names_to = "model",
+               values_to = "prediction")
+
+# Plot the predictions:
+plot_predictions(sriv_predictions, herbivores[[1]])
+# ggsave(filename = "figures/predictions/Srivulatus_Sluridus_temp_nonspat.png", plot = last_plot(), dpi = 300, device = "png")
+
+
+# S luridus prediction
+slurid_temp_abs <- herb_mat %>% 
+  mutate(depth = median(depth),
+         prod = median(prod),
+         mpa = TRUE,
+         Siganus.rivulatus = 0,
+>>>>>>> 64a69a7e3288418c6ee7a5b463c2021f08d99b60
+         across(all_of(herbivores[3:4]), .funs = mean)) %>% 
+  group_by(temp = round(temp, digits = 1)) %>% 
+  sample_n(1)
+
+<<<<<<< HEAD
+sriv_temp_max <- herb_mat %>% 
+  mutate(depth = median(depth),
+         prod = median(prod),
+         mpa = TRUE,
+         Siganus.luridus = max(Siganus.luridus),
+=======
+slurid_temp_max <- herb_mat %>% 
+  mutate(depth = median(depth),
+         prod = median(prod),
+         mpa = TRUE,
+         Siganus.rivulatus = max(Siganus.rivulatus),
+>>>>>>> 64a69a7e3288418c6ee7a5b463c2021f08d99b60
+         across(all_of(herbivores[3:4]), .fns = mean)) %>% 
+  group_by(temp = round(temp, digits = 1)) %>% 
+  sample_n(1)
+
+<<<<<<< HEAD
+sriv_temp_pred_mat <- bind_rows(sriv_temp_abs, sriv_temp_max)
+
+
+sriv_temp_predict <- predict_MRF(sriv_temp_pred_mat, herb_mod) %>% 
+  `colnames<-`(herbivores) %>% 
+  as_data_frame() %>% 
+  mutate(temp = sriv_temp_pred_mat$temp)
+
+# Plot
+abs_pred <- sriv_temp_predict %>% 
+=======
+slurid_temp_pred_mat <- bind_rows(slurid_temp_abs, slurid_temp_max)
+
+
+slurid_temp_predict <- predict_MRF(slurid_temp_pred_mat, herb_mod) %>% 
+  `colnames<-`(herbivores) %>% 
+  as_data_frame() %>% 
+  mutate(temp = slurid_temp_pred_mat$temp)
+
+# Plot
+abs_pred <- slurid_temp_predict %>% 
+>>>>>>> 64a69a7e3288418c6ee7a5b463c2021f08d99b60
+  dplyr::slice_head(prop = 0.5) %>% 
+  pivot_longer(all_of(herbivores),
+               names_to = "species",
+               values_to = "pred_abs")
+<<<<<<< HEAD
+pres_pred <- sriv_temp_predict %>% 
+=======
+pres_pred <- slurid_temp_predict %>% 
+>>>>>>> 64a69a7e3288418c6ee7a5b463c2021f08d99b60
+  dplyr::slice_tail(prop = 0.5) %>% 
+  pivot_longer(all_of(herbivores),
+               names_to = "species",
+               values_to = "pred_pres")
+
+<<<<<<< HEAD
+sriv_predictions <- abs_pred %>% left_join(pres_pred) %>% 
+=======
+slurid_predictions <- abs_pred %>% left_join(pres_pred) %>% 
+>>>>>>> 64a69a7e3288418c6ee7a5b463c2021f08d99b60
+  pivot_longer(cols = pred_abs:pred_pres,
+               names_to = "model",
+               values_to = "prediction")
+
+# Plot the predictions:
+<<<<<<< HEAD
+plot_predictions(sriv_predictions, herbivores[[1]])
+# ggsave(filename = "figures/predictions/Srivulatus_Sluridus_temp_nonspat.png", plot = last_plot(), dpi = 300, device = "png")
+
 # S luridus prediction
 slurid_temp_abs <- herb_mat %>% 
   mutate(depth = median(depth),
@@ -364,6 +553,10 @@ slurid_temp_abs <- herb_mat %>%
          across(all_of(herbivores[3:4]), .funs = mean)) %>% 
   group_by(temp = round(temp, digits = 1)) %>% 
   sample_n(1)
+=======
+plot_predictions(slurid_predictions, herbivores[[2]])
+# ggsave(filename = "figures/predictions/Sluridus_Srivulatus_temp_nonspat.png", plot = last_plot(), dpi = 300, device = "png")
+>>>>>>> 64a69a7e3288418c6ee7a5b463c2021f08d99b60
 
 slurid_temp_max <- herb_mat %>% 
   mutate(depth = median(depth),
