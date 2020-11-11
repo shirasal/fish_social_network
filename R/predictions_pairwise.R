@@ -203,9 +203,9 @@ dvulgaris_predictions_mpa <- abs_pred %>% left_join(pres_pred) %>%
 # Plot the predictions:
 plot_bar_predictions(dvulgaris_predictions_mpa, diplodus[[4]])
 # ggsave(filename = "figures/predictions/Dvulgaris_Dpuntazzo_mpa_nonspat.png", plot = last_plot(), dpi = 300, device = "png")
-
-
-# D. sargus + D. vulgaris + MPA -------------------------------------------
+# 
+# 
+# # D. sargus + D. vulgaris + MPA -------------------------------------------
 
 # D. sargus preditions
 dsargus_abs <- dip_mat %>% 
