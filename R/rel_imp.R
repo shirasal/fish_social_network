@@ -1,13 +1,13 @@
 # source("R/functions.R")
 # load("data/all_objects.RData")
 # source("R/packages.R")
-source("R/run_models_spatial.R")
+source("R/run_models.R")
 
 # Figure 2. Relative importance per taxa ----------------------------------
 # How much is does a predictor affect the data
-grps_relimp <- rel_imp_sum(grps_spat)
-dip_relimp <- rel_imp_sum(dip_spat)
-herb_relimp <- rel_imp_sum(herb_spat)
+grps_relimp <- rel_imp_sum(grps_mod)
+dip_relimp <- rel_imp_sum(dip_mod)
+herb_relimp <- rel_imp_sum(herb_mod)
 
 all_relimp <- list(groupers = grps_relimp,
                    seabream = dip_relimp,
@@ -98,7 +98,7 @@ herb_relimp_p <- herb_relimp %>% pivot_longer(2:length(.)) %>% # Create a tibble
 
 species_relimp_plots <- egg::ggarrange(grps_relimp_p, dip_relimp_p, herb_relimp_p)
 
-# ggsave("rel_imp_species_spat.png", species_relimp_plots, "png", "figures/rel_imp/", dpi = 150, height = 10, width = 10, units = "in")
+# ggsave("rel_imp_species_nonspat.png", species_relimp_plots, "png", "figures/rel_imp/", dpi = 150, height = 10, width = 10, units = "in")
 
 
 
