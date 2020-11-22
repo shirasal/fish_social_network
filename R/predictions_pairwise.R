@@ -144,53 +144,49 @@ vis_temp_pred_pair <- function(species_i, species_j, spp_mat, spp_mod, guild, n_
 lapply(grps_mod$key_coefs, function(x) x %>% 
          filter(Rel_importance > 0.1) %>% 
          filter(str_detect(string = Variable, pattern = "_")))
+# Epinephelus.costae ~ mpa_Epinephelus.marginatus (0.1147587) [-]
+# Epinephelus.marginatus ~ mpa_Epinephelus.costae (0.1597966) [-]
 
 lapply(dip_mod$key_coefs, function(x) x %>% 
          filter(Rel_importance > 0.1) %>% 
          filter(str_detect(string = Variable, pattern = "_")))
-# Diplodus.annularis + temp_Diplodus.vulgaris (0.28701685) V
-# Diplodus.annularis + temp_Diplodus.sargus (0.15717596) V
-# Diplodus.annularis + mpa_Diplodus.vulgaris (0.04576242) V
-# Diplodus.puntazzo + mpa_Diplodus.vulgaris (0.82966304) V
+# Diplodus.annularis ~ temp_Diplodus.sargus (0.4188775) [+]
+# Diplodus.annularis ~ temp_Diplodus.vulgaris (0.1550212) [+]
 
 lapply(herb_mod$key_coefs, function(x) x %>% 
          filter(Rel_importance > 0.1) %>% 
          filter(str_detect(string = Variable, pattern = "_")))
-# Siganus.luridus + temp_Siganus.rivulatus
+# Siganus.luridus ~ temp_Siganus.rivulatus (0.3665292) [-]
 
 
 ############################    Predictions    ############################
 
+# Epinephelus.costae ~ mpa_Epinephelus.marginatus (0.1147587) [-] ---------
+vis_mpa_pred_pair(species_i = "Epinephelus.costae", species_j = "Epinephelus.marginatus", 
+                  spp_mat = grps_mat, spp_mod = grps_mod, guild = groupers, n_spp = 5) %>% 
+  ggsave(filename = "figures/predictions/E_costae--E_marginatus--MPA.png", device = "png")
 
-# Diplodus annularis ~ Diplodus vulgaris * TEMP ---------------------------
 
+# Epinephelus.marginatus ~ mpa_Epinephelus.costae (0.1597966) [-] ---------
+vis_mpa_pred_pair(species_i = "Epinephelus.marginatus", species_j = "Epinephelus.costae", 
+                  spp_mat = grps_mat, spp_mod = grps_mod, guild = groupers, n_spp = 5) %>% 
+  ggsave(filename = "figures/predictions/E_marginatus--E_costae--MPA.png", device = "png")
+
+
+# Diplodus.annularis ~ temp_Diplodus.sargus (0.4188775) [+] ---------------
+vis_temp_pred_pair(species_i = "Diplodus.annularis", species_j = "Diplodus.sargus", 
+                   spp_mat = dip_mat, spp_mod = dip_mod, guild = diplodus, n_spp = 5) %>% 
+  ggsave(filename = "figures/predictions/D_annularis--D_sargus--TEMP.png", device = "png")
+
+
+# Diplodus.annularis ~ temp_Diplodus.vulgaris (0.1550212) [+] -------------
 vis_temp_pred_pair(species_i = "Diplodus.annularis", species_j = "Diplodus.vulgaris", 
                    spp_mat = dip_mat, spp_mod = dip_mod, guild = diplodus, n_spp = 5) %>% 
   ggsave(filename = "figures/predictions/D_annularis--D_vulgaris--TEMP.png", device = "png")
 
 
-# Diplodus annularis ~ Diplodus vulgaris * MPA ----------------------------
-
-vis_mpa_pred_pair(species_i = "Diplodus.annularis", species_j = "Diplodus.vulgaris", 
-                  spp_mat = dip_mat, spp_mod = dip_mod, guild = diplodus, n_spp = 5) %>% 
-  ggsave(filename = "figures/predictions/D_annularis--D_vulgaris--MPA.png", device = "png")
-
-
-# Diplodus annularis ~ Diplodus sargus * TEMP -----------------------------
-
-vis_temp_pred_pair(species_i = "Diplodus.annularis", species_j = "Diplodus.sargus", 
-                   spp_mat = dip_mat, spp_mod = dip_mod, guild = diplodus, n_spp = 5) %>% 
-  ggsave(filename = "figures/predictions/D_annularis--D_sargus--TEMP.png", device = "png")
-
-# Diplodus puntazzo ~ Diplodus vulgaris * MPA -----------------------------
-
-vis_mpa_pred_pair(species_i = "Diplodus.puntazzo", species_j = "Diplodus.vulgaris", 
-                  spp_mat = dip_mat, spp_mod = dip_mod, guild = diplodus, n_spp = 5) %>% 
-  ggsave(filename = "figures/predictions/D_puntazzo--D_vulgaris--MPA.png", device = "png")
-
-# Siganus luridus ~ Siganus rivulatus * TEMP ------------------------------
-
+# Siganus.luridus ~ temp_Siganus.rivulatus (0.3665292) [-] ----------------
 vis_temp_pred_pair(species_i = "Siganus.luridus", species_j = "Siganus.rivulatus", 
                    spp_mat = herb_mat, spp_mod = herb_mod, guild = herbivores, n_spp = 4) %>% 
-  ggsave(filename = "figures/predictions/S_luridus_S_rivulatus--TEMP.png", device = "png")
+  ggsave(filename = "figures/predictions/S_luridus--S_rivulatus--TEMP.png", device = "png")
 
