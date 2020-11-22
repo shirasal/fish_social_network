@@ -4,55 +4,153 @@ source("R/run_models.R")
 source("R/functions.R")
 
 
-# E. costae + E. marginatus + MPA -----------------------------------------
+# Functions ---------------------------------------------------------------
 
-# E. costae prediction
-ecostae_abs <- grps_mat %>% 
+vis_mpa_pred_pair <- function(species_i, species_j, spp_mat, spp_mod, guild, n_spp){
+  # Create a vector of all other species except species_j
+  all_other_species <- guild[-which(guild == species_j)]
+  
+  # Scenario 1: species_j is absent, other species are at their mean abundance
+  j_abs <- spp_mat %>% 
+    mutate(temp = median(temp),
+           depth = median(depth),
+           prod = median(prod),
+           across(.cols = all_of(species_j), .fns = function(x) 0),
+           across(all_of(all_other_species), .fns = mean)) %>% 
+    group_by(mpa) %>% 
+    sample_n(1)
+  # Scenario 2: species_j is at its max abundance, other species are at their mean abundance
+  j_max <- spp_mat %>% 
+    mutate(temp = median(temp),
+           depth = median(depth),
+           prod = median(prod),
+           across(.cols = all_of(species_j), .fns = max),
+           across(all_of(all_other_species), .fns = mean)) %>% 
+    group_by(mpa) %>% 
+    sample_n(1)
+  
+  # Create predictions
+  ## For when species j is absent
+  predict_abs <- predict_MRF(j_abs, spp_mod) %>% 
+    `colnames<-`(guild) %>% 
+    as_data_frame() %>% 
+    mutate(mpa = j_abs$mpa)
+  ## For when species j is absent
+  predict_max <- predict_MRF(j_max, spp_mod) %>% 
+    `colnames<-`(guild) %>% 
+    as_data_frame() %>% 
+    mutate(mpa = j_max$mpa)
+  
+  # Put the two scenarios together
+  mpa_predict <- bind_rows(predict_abs, predict_max, .id = "scenario") %>% 
+    mutate(scenario = case_when(scenario == 1 ~ "absent",
+                                scenario == 2 ~ "present"))
+  
+  # Visualise the predictions
+  ## Create a dataframe with all the predictions, sorted by scenario
+  
+  predictions_mpa <- mpa_predict %>% 
+    pivot_longer(cols = all_of(2:(1+n_spp)),
+                 names_to = "species",
+                 values_to = "prediction", 
+                 names_repair = "minimal")
+  
+  ## Plot the predictions:
+  predictions_mpa %>%
+    filter(species == species_i) %>% 
+    ggplot() +
+    aes(x = mpa, y = prediction, fill = scenario) +
+    stat_summary(geom = "bar", fun = "mean", position = "dodge") +
+    # stat_summary(geom = "errorbar", fun.data = "mean_se", position = position_dodge(width = 0.8), width = 0.2) +
+    xlab("MPA") + ylab("Prediction") +
+    labs(title = "Observation predictions",
+         subtitle = stringr::str_replace(species_i, "\\.", "\\ "),
+         fill = stringr::str_replace(species_j, "\\.", "\\ ")) +
+    scale_fill_manual(labels = c('Absent','Present'), values = c("#031D44", "#FF99C9")) +
+    theme(legend.title = element_text(face = "italic"), plot.subtitle = element_text(face = "italic"))
+}
+
+
+
+# Check which species pairs to visualise ----------------------------------
+
+lapply(grps_mod$key_coefs, function(x) x %>% 
+         filter(Rel_importance > 0.1) %>% 
+         filter(str_detect(string = Variable, pattern = "_")))
+
+lapply(dip_mod$key_coefs, function(x) x %>% 
+  filter(Rel_importance > 0.1) %>% 
+  filter(str_detect(string = Variable, pattern = "_")))
+# Diplodus.annularis + temp_Diplodus.vulgaris (0.28701685)
+# Diplodus.annularis + temp_Diplodus.sargus (0.15717596)
+# Diplodus.annularis + mpa_Diplodus.vulgaris (0.04576242)
+# Diplodus.puntazzo + mpa_Diplodus.vulgaris (0.82966304)
+# Diplodus.puntazzo + mpa_Diplodus.vulgaris (0.829663)
+
+lapply(herb_mod$key_coefs, function(x) x %>% 
+         filter(Rel_importance > 0.1) %>% 
+         filter(str_detect(string = Variable, pattern = "_")))
+# Siganus.luridus + temp_Siganus.rivulatus
+
+
+# Diplodus.annularis + temp_Diplodus.vulgaris -----------------------------
+
+# Diplodus.annularis prediction
+da_abs <- dip_mat %>% 
   mutate(temp = median(temp),
          depth = median(depth),
          prod = median(prod),
-         "Epinephelus.marginatus" = 0,
-         across(all_of(groupers[3:5]), .funs = mean)) %>% 
+         "Diplodus.vulgaris" = 0,
+         across(which(diplodus != "Diplodus.vulgaris"), .funs = mean)) %>% 
   group_by(mpa) %>% 
-  sample_n(10)
+  sample_n(1)
 
-ecostae_max <- grps_mat %>% 
+da_max <- dip_mat %>% 
   mutate(temp = median(temp),
          depth = median(depth),
          prod = median(prod),
-         "Epinephelus.marginatus" = max(Epinephelus.marginatus),
-         across(all_of(groupers[3:5]), .funs = mean)) %>% 
+         "Diplodus.vulgaris" = max(Diplodus.vulgaris),
+         across(which(diplodus != "Diplodus.vulgaris"), .funs = mean)) %>% 
   group_by(mpa) %>% 
-  sample_n(10)
+  sample_n(1)
+
+da_mpa_pred_mat <- bind_rows(da_abs, da_max)
 
 
-ecostae_mpa_pred_mat <- bind_rows(ecostae_abs, ecostae_max)
-
-
-ecostae_mpa_predict <- predict_MRF(ecostae_mpa_pred_mat, grps_mod) %>% 
-  `colnames<-`(groupers) %>% 
+da_mpa_predict <- predict_MRF(da_mpa_pred_mat, dip_mod) %>% 
+  `colnames<-`(diplodus) %>% 
   as_data_frame() %>% 
-  mutate(mpa = ecostae_mpa_pred_mat$mpa)
+  mutate(mpa = da_mpa_pred_mat$mpa)
 
 # Plot
-abs_pred <- ecostae_mpa_pred_mat %>% 
+abs_pred <- da_mpa_pred_mat %>% 
   dplyr::slice_head(prop = 0.5) %>% 
-  pivot_longer(all_of(groupers),
+  pivot_longer(all_of(diplodus),
                names_to = "species",
                values_to = "pred_abs")
-pres_pred <- ecostae_mpa_pred_mat %>% 
+pres_pred <- da_mpa_pred_mat %>% 
   dplyr::slice_tail(prop = 0.5) %>% 
-  pivot_longer(all_of(groupers),
+  pivot_longer(all_of(diplodus),
                names_to = "species",
                values_to = "pred_pres")
 
-ecostae_predictions_mpa <- abs_pred %>% left_join(pres_pred) %>% 
+da_predictions_mpa <- abs_pred %>% left_join(pres_pred) %>% 
   pivot_longer(cols = pred_abs:pred_pres,
                names_to = "model",
                values_to = "prediction")
 
 # Plot the predictions:
-plot_bar_predictions(ecostae_predictions_mpa, groupers[[1]])
+da_predictions_mpa %>%
+  filter(species == diplodus[[2]]) %>% 
+  ggplot() +
+  aes(x = mpa, y = prediction, fill = model) +
+  stat_summary(geom = "bar", fun = "mean", position = "dodge") +
+  # stat_summary(geom = "errorbar", fun.data = "mean_se", position = position_dodge(width = 0.8), width = 0.2) +
+  xlab("MPA") + ylab("Prediction") +
+  labs(title = "Observation predictions",
+       subtitle = stringr::str_replace(diplodus[[2]], "\\.", "\\ "),
+       colour = diplodus[[4]]) +
+  scale_fill_manual(labels = c('Absent','Present'), values = c("#031D44", "#FF99C9"))
 # ggsave(filename = str_glue("figures/predictions/Ecostae_Emargin_mpa_nonspat.png"), plot = last_plot(), dpi = 300, device = "png")
 
 
