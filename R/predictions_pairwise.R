@@ -2,7 +2,7 @@ source("R/packages.R")
 load("data/all_objects.RData")
 source("R/run_models.R")
 source("R/functions.R")
-
+source("R/rel_imp.R")
 
 # Functions ---------------------------------------------------------------
 
@@ -129,7 +129,7 @@ vis_temp_pred_pair <- function(species_i, species_j, spp_mat, spp_mod, guild, n_
     ggplot() +
     aes(x = temp, y = prediction, col = scenario) +
     geom_smooth(method = "lm", formula = y ~ x, cex = 3, alpha = 0.1) +
-    xlab("MPA") + ylab("Prediction") +
+    xlab("Temperature (scaled)") + ylab("Prediction") +
     labs(title = "Observation predictions",
          subtitle = stringr::str_replace(species_i, "\\.", "\\ "),
          col = stringr::str_replace(species_j, "\\.", "\\ ")) +
@@ -146,13 +146,12 @@ lapply(grps_mod$key_coefs, function(x) x %>%
          filter(str_detect(string = Variable, pattern = "_")))
 
 lapply(dip_mod$key_coefs, function(x) x %>% 
-  filter(Rel_importance > 0.1) %>% 
-  filter(str_detect(string = Variable, pattern = "_")))
-# Diplodus.annularis + temp_Diplodus.vulgaris (0.28701685)
-# Diplodus.annularis + temp_Diplodus.sargus (0.15717596)
-# Diplodus.annularis + mpa_Diplodus.vulgaris (0.04576242)
-# Diplodus.puntazzo + mpa_Diplodus.vulgaris (0.82966304)
-# Diplodus.puntazzo + mpa_Diplodus.vulgaris (0.829663)
+         filter(Rel_importance > 0.1) %>% 
+         filter(str_detect(string = Variable, pattern = "_")))
+# Diplodus.annularis + temp_Diplodus.vulgaris (0.28701685) V
+# Diplodus.annularis + temp_Diplodus.sargus (0.15717596) V
+# Diplodus.annularis + mpa_Diplodus.vulgaris (0.04576242) V
+# Diplodus.puntazzo + mpa_Diplodus.vulgaris (0.82966304) V
 
 lapply(herb_mod$key_coefs, function(x) x %>% 
          filter(Rel_importance > 0.1) %>% 
@@ -160,5 +159,38 @@ lapply(herb_mod$key_coefs, function(x) x %>%
 # Siganus.luridus + temp_Siganus.rivulatus
 
 
-########################## Predictions ##########################
+############################    Predictions    ############################
+
+
+# Diplodus annularis ~ Diplodus vulgaris * TEMP ---------------------------
+
+vis_temp_pred_pair(species_i = "Diplodus.annularis", species_j = "Diplodus.vulgaris", 
+                   spp_mat = dip_mat, spp_mod = dip_mod, guild = diplodus, n_spp = 5) %>% 
+  ggsave(filename = "figures/predictions/D_annularis--D_vulgaris--TEMP.png", device = "png")
+
+
+# Diplodus annularis ~ Diplodus vulgaris * MPA ----------------------------
+
+vis_mpa_pred_pair(species_i = "Diplodus.annularis", species_j = "Diplodus.vulgaris", 
+                  spp_mat = dip_mat, spp_mod = dip_mod, guild = diplodus, n_spp = 5) %>% 
+  ggsave(filename = "figures/predictions/D_annularis--D_vulgaris--MPA.png", device = "png")
+
+
+# Diplodus annularis ~ Diplodus sargus * TEMP -----------------------------
+
+vis_temp_pred_pair(species_i = "Diplodus.annularis", species_j = "Diplodus.sargus", 
+                   spp_mat = dip_mat, spp_mod = dip_mod, guild = diplodus, n_spp = 5) %>% 
+  ggsave(filename = "figures/predictions/D_annularis--D_sargus--TEMP.png", device = "png")
+
+# Diplodus puntazzo ~ Diplodus vulgaris * MPA -----------------------------
+
+vis_mpa_pred_pair(species_i = "Diplodus.puntazzo", species_j = "Diplodus.vulgaris", 
+                  spp_mat = dip_mat, spp_mod = dip_mod, guild = diplodus, n_spp = 5) %>% 
+  ggsave(filename = "figures/predictions/D_puntazzo--D_vulgaris--MPA.png", device = "png")
+
+# Siganus luridus ~ Siganus rivulatus * TEMP ------------------------------
+
+vis_temp_pred_pair(species_i = "Siganus.luridus", species_j = "Siganus.rivulatus", 
+                   spp_mat = herb_mat, spp_mod = herb_mod, guild = herbivores, n_spp = 4) %>% 
+  ggsave(filename = "figures/predictions/S_luridus_S_rivulatus--TEMP.png", device = "png")
 
