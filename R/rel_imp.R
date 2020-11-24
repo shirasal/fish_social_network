@@ -67,7 +67,7 @@ dip_relimp_p <- dip_relimp %>% pivot_longer(2:length(.)) %>% # Create a tibble o
   aes(x = species, y = rel_imp) +
   stat_summary(geom = "bar", fun = mean, position = "dodge",  fill = "#d69c4e") +
   facet_wrap(~facet.title, nrow = 1) +
-  labs(subtitle = "Seabream") +
+  labs(subtitle = "Seabreams") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1), strip.placement = "outside") + 
   theme(axis.title.x = element_blank(), axis.title.y = element_blank()) +
   theme(strip.text.x = element_text(size = 12, face = "bold"))
