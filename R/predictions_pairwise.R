@@ -167,12 +167,10 @@ lapply(herb_mod$key_coefs, function(x) x %>%
 
 ############################    Predictions    ############################
 
-
 # Epinephelus.marginatus ~ temp_Mycteroperca.rubra (0.1426722) [+0 --------
 vis_temp_pred_pair(species_i = "Epinephelus.marginatus", species_j = "Mycteroperca.rubra", 
                   spp_mat = grps_mat, spp_mod = grps_mod, guild = groupers, n_spp = 5) %>% 
   ggsave(filename = "figures/predictions/E_marginatus-M_rubra--TEMP.png", device = "png")
-
 
 # Mycteroperca.rubra ~ emp_Epinephelus.marginatus (0.1134032) [+0. --------
 vis_temp_pred_pair(species_i = "Mycteroperca.rubra", species_j = "Epinephelus.marginatus", 
@@ -187,7 +185,8 @@ vis_temp_pred_pair("Diplodus.annularis", "Diplodus.vulgaris",
   ggsave(filename = "figures/predictions/D_annularis-D_vulgaris--TEMP.png", device = "png")
 
 # Diplodus.puntazzo ~ mpa_Diplodus.vulgaris (0.3427963) [0.1612258] -------
-vis_mpa_pred_pair("Diplodus.puntazzo", "Diplodus.vulgaris", dip_mat, dip_mod, diplodus, 5) %>% 
+vis_mpa_pred_pair(species_i = "Diplodus.puntazzo", species_j = "Diplodus.vulgaris", 
+                  spp_mat = dip_mat, spp_mod = dip_mod, guild = diplodus, n_spp = 5) %>% 
   ggsave(filename = "figures/predictions/D_puntazzo-D_vulgaris--MPA.png", device = "png")
 
 # Diplodus.sargus ~ mpa_Diplodus.vulgaris (0.1305238) [0.2598522] ---------
@@ -224,8 +223,6 @@ vis_temp_pred_pair("Sparisoma.cretense", "Siganus.rivulatus",
 vis_mpa_pred_pair(species_i = "Sparisoma.cretense", species_j = "Siganus.luridus", 
                   spp_mat = herb_mat, spp_mod = herb_mod, guild = herbivores, n_spp = 4) %>% 
   ggsave(filename = "figures/predictions/S_cretense-S_luridus--MPA.png", device = "png")
-
-
 
 
 
