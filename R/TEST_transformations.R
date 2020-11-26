@@ -88,3 +88,60 @@ p_pois <- plotMRF_hm(pois, main = "Poisson")
 gridExtra::grid.arrange(p_gaus, p_pois, nrow = 1)
 
 
+
+
+# Data transformations ----------------------------------------------------
+
+med_log <- med_raw %>%
+  filter(data.origin != "azz_asi") %>% # presence-absence
+  mutate(sp.n = log10(sp.n)+1,
+         mpa = if_else(enforcement <= 1, FALSE, TRUE),
+         temp = scale(tmean),
+         depth = scale(depth),
+         sal = scale(sal_mean),
+         prod = scale(pp_mean)) %>%
+  select(site, lon, lat, trans, species, sp.n, mpa, temp, depth, prod)
+
+med_nonparanormal <- med_raw %>%
+  filter(data.origin != "azz_asi") %>% # presence-absence
+  mutate(sp.n = log2(sp.n + 0.1),
+         mpa = if_else(enforcement <= 1, FALSE, TRUE),
+         temp = scale(tmean),
+         depth = scale(depth),
+         sal = scale(sal_mean),
+         prod = scale(pp_mean)) %>%
+  select(site, lon, lat, trans, species, sp.n, mpa, temp, depth, prod)
+
+med_sqrt <- med_raw %>%
+  filter(data.origin != "azz_asi") %>% # presence-absence
+  mutate(sp.n = sqrt(sp.n),
+         mpa = if_else(enforcement <= 1, FALSE, TRUE),
+         temp = scale(tmean),
+         depth = scale(depth),
+         sal = scale(sal_mean),
+         prod = scale(pp_mean)) %>%
+  select(site, lon, lat, trans, species, sp.n, mpa, temp, depth, prod)
+
+p0 <- med_clean %>% 
+  filter(species == all_of(groupers) | species == all_of(diplodus) | species == all_of(herbivores)) %>%
+  ggplot() + aes(x = species, y = sp.n) + geom_boxplot() + ggtitle("None") + 
+  theme(axis.text.x = element_text(angle = 30))
+
+p1 <- med_log %>% 
+  filter(species == all_of(groupers) | species == all_of(diplodus) | species == all_of(herbivores)) %>%
+  ggplot() + aes(x = species, y = sp.n) + geom_boxplot() + ggtitle("Log10") +
+  theme(axis.text.x = element_text(angle = 30))
+
+p2 <- med_nonparanormal %>% 
+  filter(species == all_of(groupers) | species == all_of(diplodus) | species == all_of(herbivores)) %>%
+  ggplot() + aes(x = species, y = sp.n) + geom_boxplot() + ggtitle("Log2 (nonparanormal)") +
+  theme(axis.text.x = element_text(angle = 30))
+
+p3 <- med_sqrt %>% 
+  filter(species == all_of(groupers) | species == all_of(diplodus) | species == all_of(herbivores)) %>%
+  ggplot() + aes(x = species, y = sp.n) + geom_boxplot() + ggtitle("Sqare root") +
+  theme(axis.text.x = element_text(angle = 30))
+
+egg::ggarrange(p0, p1, p2, p3, top = "Transformations") %>% 
+  ggsave(filename = "figures/transformations.png", device = "png", height = 10, width = 7, units = "in")
+
