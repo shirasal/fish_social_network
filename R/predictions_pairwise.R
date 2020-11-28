@@ -145,6 +145,7 @@ vis_temp_pred_pair <- function(species_i, species_j, spp_mat, spp_mod, guild, n_
 lapply(grps_mod$key_coefs, function(x) x %>% 
          filter(Rel_importance > 0.1) %>% 
          filter(str_detect(string = Variable, pattern = "_")))
+# Epinephelus.costae ~ temp_Serranus.cabrilla (0.1075085) [0.06423452]
 # Epinephelus.marginatus ~ temp_Mycteroperca.rubra (0.1426722) [+0.08344348]
 # Mycteroperca.rubra ~ emp_Epinephelus.marginatus (0.1134032) [+0.08344348]
 

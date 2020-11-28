@@ -31,7 +31,7 @@ herbivores <- c("Siganus.rivulatus", "Siganus.luridus", "Sarpa.salpa",
 
 # Env/Anthro vectors ------------------------------------------------------
 
-env_vector <- c("temp", "depth", "prod") # Salinity (sal) removed to avoid data loss (NAs)
+env_vector <- c("temp", "depth", "prod")
 anthro_vector <- c("mpa")
 
 # Add medata --------------------------------------------------------------
