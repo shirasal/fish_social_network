@@ -24,9 +24,11 @@ species_temp <- lapply(as.list(c(groupers, diplodus, herbivores)), function(sp) 
     ggplot() + 
     aes(x = tmean, y = sp.n) + 
     geom_point() +
-    ggtitle(str_replace(sp, "\\.", "\\ ")) + xlab("Temperature") + ylab("Abundance") +
+    ggtitle(str_replace(sp, "\\.", "\\ ")) + xlab("") + ylab("") +
     theme(title = element_text(face = "italic"))
 })
 
-ggpubr::ggarrange(plotlist = species_temp, ncol = 4, nrow = 4)
-ggsave("species_dist_temp.png", device = "png", path = "figures", scale = 3)
+ggpubr::ggarrange(plotlist = species_temp, ncol = 5, nrow = 3) %>% 
+  ggpubr::annotate_figure(bottom = ggpubr::text_grob("Temperature (C)"),
+                left = ggpubr::text_grob("Abundance", rot = 90))
+ggsave("species_dist_temp.png", device = "png", path = "figures", width = 15, height = 10, units = "in")
