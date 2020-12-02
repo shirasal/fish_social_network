@@ -7,7 +7,7 @@ create_spp_mat <- function(dataset, guild, covariate){
   cols <- c(c("lat", "lon", "site", "trans", "species"), env_vector, anthro_vector)
   dataset %>%
     group_by_at(.vars = cols) %>%
-    summarise(n = sum(sp.n)) %>% 
+    summarise(n = sum(abundance)) %>% 
     spread(species, n, fill = 0) %>% 
     ungroup() %>%
     na.omit() %>% 
@@ -17,6 +17,74 @@ create_spp_mat <- function(dataset, guild, covariate){
     select(all_of(guild), all_of(covariate)) 
 }
 
+### Summarise the relative importance of each type of covariate for each species
+rel_imp_sum <- function(guild_mod){
+  env_relimp <- sapply(guild_mod$key_coefs, FUN = function(x) x %>%  # Take the taxa model and apply the following:
+                         filter(Variable %in% env_vector) %>%  # Filter by relevant covariates
+                         summarise(n = sum(Rel_importance))) %>% # Summarise Rel_importance column
+    unlist() %>% # Take out of the list
+    enframe(name = "species", value = "env_rel_imp") %>%  # Rearrange
+    mutate(species = str_sub(string = species, end = -3)) # Fix species names
+  
+  anthro_relimp <- sapply(guild_mod$key_coefs, FUN = function(x) x %>% 
+                            filter(Variable %in% anthro_vector) %>%
+                            summarise(n = sum(Rel_importance))) %>% 
+    unlist() %>%
+    enframe(name = "species", value = "anthro_rel_imp") %>% 
+    mutate(species = str_sub(string = species, end = -3))
+  
+  biotic_relimp <- sapply(guild_mod$key_coefs, FUN = function(x) x %>% 
+                            filter(!(Variable %in% env_vector | Variable %in% anthro_vector | str_detect(string = Variable, pattern = "_"))) %>%
+                            summarise(n = sum(Rel_importance))) %>% 
+    unlist() %>%
+    enframe(name = "species", value = "biotic_rel_imp") %>% 
+    mutate(species = str_sub(string = species, end = -3))
+  
+  env_bio_relimp <- sapply(guild_mod$key_coefs, FUN = function(x) x %>% 
+                             filter(str_detect(string = Variable, pattern = "temp_")) %>% 
+                             summarise(n = sum(Rel_importance))) %>% 
+    unlist() %>%
+    enframe(name = "species", value = "env_bio_rel_imp") %>% 
+    mutate(species = str_sub(string = species, end = -3))
+  
+  anthro_bio_relimp <- sapply(guild_mod$key_coefs, FUN = function(x) x %>% 
+                                filter(str_detect(string = Variable, pattern = "mpa_")) %>% 
+                                summarise(n = sum(Rel_importance))) %>% 
+    unlist() %>%
+    enframe(name = "species", value = "mpa_bio_rel_imp") %>% 
+    mutate(species = str_sub(string = species, end = -3))
+  
+  env_relimp %>%
+    left_join(anthro_relimp, by = "species") %>%
+    left_join(biotic_relimp, by = "species") %>%
+    left_join(env_bio_relimp, by = "species") %>%
+    left_join(anthro_bio_relimp, by = "species")
+}
+
+
+### Plot relative importance of covariates by covariate for each species, within guild:
+plot_relimp <- function(rel_imp_df, col, guild_name){
+  rel_imp_df %>% 
+    pivot_longer(2:length(.)) %>% 
+    rename(species = species, covariate = name, rel_imp = value) %>%
+    mutate(covariate = str_remove(string = covariate, pattern = "_rel_imp")) %>% 
+    mutate(facet.title = case_when(covariate == "env" ~ "Environment",
+                                   covariate == "anthro" ~ "MPA",
+                                   covariate == "biotic" ~ "Biotic Associations",
+                                   covariate == "env_bio" ~ "Temp * Biotic",
+                                   covariate == "mpa_bio" ~ "MPA * Biotic")) %>% 
+    mutate(facet.title = fct_relevel(facet.title, 
+                                     "Environment", "MPA", "Biotic Associations",
+                                     "Temp * Biotic", "MPA * Biotic")) %>% 
+    ggplot() +
+    aes(x = species, y = rel_imp) +
+    stat_summary(geom = "bar", fun = mean, position = "dodge",  fill = col) +
+    facet_wrap(~facet.title, nrow = 1) +
+    labs(subtitle = guild_name) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1), strip.placement = "outside",
+          axis.title.x = element_blank(), axis.title.y = element_blank(),
+          strip.text.x = element_text(size = 12, face = "bold"))
+}
 # Data --------------------------------------------------------------------
 
 ### Variables (fitting with med_clean)
@@ -34,9 +102,8 @@ herbivores <- c("Siganus.rivulatus", "Siganus.luridus", "Sarpa.salpa",
 grps_col <- "#eccbae"
 dip_col <- "#d29a4c"
 herb_col <- "#145d82"
-  
-all_guilds <- list(groupers, diplodus, herbivores)
-names(all_guilds) <- c("groupers", "seabreams", "herbivores")
+
+all_guilds <- list(groupers = groupers, seabreams = diplodus, herbivores = herbivores)
 
 ### MEData
 med_raw <- read_rds("data/medata.Rds") %>% 
@@ -49,7 +116,10 @@ med_clean <- med_raw %>%
          depth = scale(depth),
          sal = scale(sal_mean),
          prod = scale(pp_mean)) %>%
-  select(site, lon, lat, trans, species, sp.n, mpa, temp, depth, prod)
+  group_by(lon, lat, site, trans, species, mpa, temp, depth, prod) %>% 
+  summarise(abundance = sum(sp.n)) %>%
+  select(site, lon, lat, trans, species, abundance, mpa, temp, depth, prod) %>% 
+  ungroup()
 
 guilds_data <- med_raw %>%
   filter(species %in% c(groupers, diplodus, herbivores)) %>% 
@@ -61,7 +131,10 @@ guilds_data <- med_raw %>%
          guild = case_when(species %in% groupers ~ "groupers",
                            species %in% diplodus ~ "seabreams",
                            species %in% herbivores ~ "herbivores")) %>%
-  select(site, lon, lat, trans, species, sp.n, guild, mpa, temp, depth, prod)
+  group_by(lon, lat, site, trans, species, guild, mpa, temp, depth, prod) %>% 
+  summarise(abundance = sum(sp.n)) %>%
+  select(site, lon, lat, trans, species, abundance, guild, mpa, temp, depth, prod) %>% 
+  ungroup()
 
 ### Mean vectors for continuous variables
 mean_depth <- median(scale(med_raw$depth), na.rm = TRUE)
@@ -170,7 +243,7 @@ species_histograms
 # }
 
 
-### Raw data with smoothed trend line
+## SPECIES ABUNDANCE ~ COVARIATE per guild
 
 guilds_data %>% 
   filter(species %in% groupers) %>% 
@@ -240,5 +313,87 @@ spp_maps[[1]] # Check
 list.files(path = "figures/species_maps") # Check all maps have been written to the directory
 
 
+
+
+
+
+
+# Models ------------------------------------------------------------------
+
+### Poisson
+
+grps_pois <- MRFcov(grps_mat, n_nodes = 5, family = "poisson")
+dip_pois <- MRFcov(dip_mat, n_nodes = 4, family = "poisson")
+herb_pois <- MRFcov(herb_mat, n_nodes = 4, family = "poisson")
+
+## Check for interactions
+lapply(grps_pois$key_coefs, function(x) x %>% 
+         filter(Rel_importance > 0.1) %>% 
+         filter(str_detect(string = Variable, pattern = "_")))
+
+lapply(dip_pois$key_coefs, function(x) x %>% 
+         filter(Rel_importance > 0.1) %>% 
+         filter(str_detect(string = Variable, pattern = "_")))
+
+lapply(herb_pois$key_coefs, function(x) x %>% 
+         filter(Rel_importance > 0.1) %>% 
+         filter(str_detect(string = Variable, pattern = "_")))
+
+## Relative importance summary
+grps_pois_relimp <- rel_imp_sum(grps_pois)
+dip_pois_relimp <- rel_imp_sum(dip_pois)
+herb_pois_relimp <- rel_imp_sum(herb_pois)
+
+p_relimp_grps_pois <- plot_relimp(grps_pois_relimp, grps_col, "Groupers")
+# ggsave("p_relimp_grps_pois_nonspat.png", p_relimp_grps_pois, "png", "figures/rel_imp/", dpi = 300, width = 11.74, height = 4, units = "in")
+p_relimp_dip_pois <- plot_relimp(dip_pois_relimp, dip_col, "Diplodus")
+# ggsave("p_relimp_dip_pois_nonspat.png", p_relimp_dip_pois, "png", "figures/rel_imp/", dpi = 300, width = 11.74, height = 4, units = "in")
+p_relimp_herb_pois <- plot_relimp(herb_pois_relimp, herb_col, "Herbivores")
+# ggsave("p_relimp_herb_pois_nonspat.png", p_relimp_herb_pois, "png", "figures/rel_imp/", dpi = 300, width = 11.74, height = 4, units = "in")
+egg::ggarrange(p_relimp_grps_pois, p_relimp_dip_pois, p_relimp_herb_pois) # %>% ggsave("rel_imp_pois_nonspat.png", "png", "figures/rel_imp/", dpi = 150, height = 10, width = 10, units = "in")
+
+
+### Gaussian
+
+std_grps_mat <- grps_mat %>% mutate(across(1:5, .fns = scale))
+std_dip_mat <- dip_mat %>% mutate(across(1:5, .fns = scale))
+std_herb_mat <- herb_mat %>% mutate(across(1:5, .fns = scale))
+
+grps_gaus <- MRFcov(std_grps_mat, n_nodes = 5, family = "gaussian")
+dip_gaus <- MRFcov(std_dip_mat, n_nodes = 4, family = "gaussian")
+herb_gaus <- MRFcov(std_herb_mat, n_nodes = 4, family = "gaussian")
+
+## Check for interactions
+lapply(grps_gaus$key_coefs, function(x) x %>% 
+         filter(Rel_importance > 0.1) %>% 
+         filter(str_detect(string = Variable, pattern = "_")))
+
+lapply(dip_gaus$key_coefs, function(x) x %>% 
+         filter(Rel_importance > 0.1) %>% 
+         filter(str_detect(string = Variable, pattern = "_")))
+
+lapply(herb_gaus$key_coefs, function(x) x %>% 
+         filter(Rel_importance > 0.1) %>% 
+         filter(str_detect(string = Variable, pattern = "_")))
+
+## Relative importance summary
+grps_gaus_relimp <- rel_imp_sum(grps_gaus)
+dip_gaus_relimp <- rel_imp_sum(dip_gaus)
+herb_gaus_relimp <- rel_imp_sum(herb_gaus)
+
+p_relimp_grps_gaus <- plot_relimp(grps_gaus_relimp, grps_col, "Groupers")
+# ggsave("p_relimp_grps_gaus_nonspat.png", p_relimp_grps_gaus, "png", "figures/rel_imp/", dpi = 300, width = 11.74, height = 4, units = "in")
+p_relimp_dip_gaus <- plot_relimp(dip_gaus_relimp, dip_col, "Diplodus")
+# ggsave("p_relimp_dip_gaus_nonspat.png", p_relimp_dip_gaus, "png", "figures/rel_imp/", dpi = 300, width = 11.74, height = 4, units = "in")
+p_relimp_herb_gaus <- plot_relimp(herb_gaus_relimp, herb_col, "Herbivores")
+# ggsave("p_relimp_herb_gaus_nonspat.png", p_relimp_herb_gaus, "png", "figures/rel_imp/", dpi = 300, width = 11.74, height = 4, units = "in")
+egg::ggarrange(p_relimp_grps_gaus, p_relimp_dip_gaus, p_relimp_herb_gaus) # %>% ggsave("rel_imp_gaus_nonspat.png", "png", "figures/rel_imp/", dpi = 150, height = 10, width = 10, units = "in")
+
+grps_data <- guilds_data %>% filter(guild == "groupers")
+
+grps_data %>% 
+  group_by(lon, lat, site, trans, species, mpa, temp, depth, prod) %>% 
+  summarise(abundance = sum(sp.n))
+grps_data %>% colnames()
 
 
