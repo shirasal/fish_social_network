@@ -400,7 +400,9 @@ p_relimp_dip_pois <- plot_relimp(dip_pois_relimp, guild_colours$dip, "Diplodus")
 # ggsave("p_relimp_dip_pois_nonspat.png", p_relimp_dip_pois, "png", "figures/rel_imp/", dpi = 300, width = 11.74, height = 4, units = "in")
 p_relimp_herb_pois <- plot_relimp(herb_pois_relimp, guild_colours$herb, "Herbivores")
 # ggsave("p_relimp_herb_pois_nonspat.png", p_relimp_herb_pois, "png", "figures/rel_imp/", dpi = 300, width = 11.74, height = 4, units = "in")
-egg::ggarrange(p_relimp_grps_pois, p_relimp_dip_pois, p_relimp_herb_pois) # %>% ggsave("rel_imp_pois_nonspat.png", "png", "figures/rel_imp/", dpi = 150, height = 10, width = 10, units = "in")
+egg::ggarrange(p_relimp_grps_pois, p_relimp_dip_pois, p_relimp_herb_pois) %>% 
+  ggsave(filename = "rel_imp_pois_nonspat.png", device = "png", path = "figures/rel_imp/", 
+         dpi = 150, height = 10, width = 10, units = "in")
 
 
 ### Gaussian
@@ -437,8 +439,13 @@ p_relimp_dip_gaus <- plot_relimp(dip_gaus_relimp, guild_colours$dip, "Diplodus")
 # ggsave("p_relimp_dip_gaus_nonspat.png", p_relimp_dip_gaus, "png", "figures/rel_imp/", dpi = 300, width = 11.74, height = 4, units = "in")
 p_relimp_herb_gaus <- plot_relimp(herb_gaus_relimp, guild_colours$herb, "Herbivores")
 # ggsave("p_relimp_herb_gaus_nonspat.png", p_relimp_herb_gaus, "png", "figures/rel_imp/", dpi = 300, width = 11.74, height = 4, units = "in")
-egg::ggarrange(p_relimp_grps_gaus, p_relimp_dip_gaus, p_relimp_herb_gaus) # %>% ggsave("rel_imp_gaus_nonspat.png", "png", "figures/rel_imp/", dpi = 150, height = 10, width = 10, units = "in")
+egg::ggarrange(p_relimp_grps_gaus, p_relimp_dip_gaus, p_relimp_herb_gaus) %>% 
+  ggsave(filename = "rel_imp_gaus_nonspat.png", device = "png", path = "figures/rel_imp/", 
+         dpi = 150, height = 10, width = 10, units = "in")
 
+### Abundance rankings
 
+ 
+  
 
 
