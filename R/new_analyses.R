@@ -74,42 +74,96 @@ herb_mat <- create_spp_mat(dataset = med_clean, guild = herbivores, covariate = 
 
 # Raw data view -----------------------------------------------------------
 
-guilds_data %>% 
-  filter(species %in% groupers) %>% 
-  ggplot() +
-  aes(x = species, y = sp.n) +
-  geom_boxplot()
+## BOXPLOTS per GUILD
 
-guilds_data %>% 
+grps_boxplot <- guilds_data %>% 
   filter(species %in% groupers) %>% 
   group_by(lon, lat, species) %>% 
   summarise(mean_abund = mean(sp.n)) %>% 
   ggplot() +
   aes(x = species, y = mean_abund) +
-  geom_boxplot()
+  geom_boxplot(col = "#eccbae") +
+  xlab("") + ylab("Abundance") +
+  ggtitle(names(guilds_data$guild)) +
+  theme(axis.text.x = element_text(angle = 30, vjust = 0.5))
 
-lapply(all_guilds, myfun, df = df)
+dip_boxplot <- guilds_data %>% 
+  filter(species %in% diplodus) %>% 
+  group_by(lon, lat, species) %>% 
+  summarise(mean_abund = mean(sp.n)) %>% 
+  ggplot() +
+  aes(x = species, y = mean_abund) +
+  geom_boxplot(col = "#d29a4c") +
+  xlab("") + ylab("Abundance") +
+  ggtitle(names(guilds_data$guild)) +
+  theme(axis.text.x = element_text(angle = 30, vjust = 0.5))
 
-guild_df <- NULL
-for (i in all_guilds){
-  guild_df[[i]] <- guilds_data %>%
-    filter(guild == i)
-}
-spp_list[[5]] # Check
+herb_boxplot <- guilds_data %>% 
+  filter(species %in% herbivores) %>% 
+  group_by(lon, lat, species) %>% 
+  summarise(mean_abund = mean(sp.n)) %>% 
+  ggplot() +
+  aes(x = species, y = mean_abund) +
+  geom_boxplot(col = "#145d82") +
+  xlab("") + ylab("Abundance") +
+  ggtitle(names(guilds_data$guild)) +
+  theme(axis.text.x = element_text(angle = 30, vjust = 0.5))
 
-spp_maps <- list()
-for (j in 1:length(spp_list)) {
-  spp_maps[[j]] <- ggplot(data = spp_list[[j]]) +
-    geom_sf(data = med_seas, colour = "black", fill = "#00E5E5", alpha = 0.3) +
-    geom_point(aes(x = lon, y = lat), colour = "#F7347A", size = 5, alpha = 0.6) +
-    ggtitle(label = str_replace(spp_list[[j]]$species, "\\.", "\\ ")) +
-    xlab("") + ylab("") + 
-    theme(title = element_text(face = "italic"))
-  
-  ggsave(filename = paste0(j, "_raw_obs.png"), path = "figures/species_maps/", plot = last_plot(),
-         width = 12, height = 8, units = "in", dpi = 300, device = "png")
-  
-}
+boxplot_guilds <- list(grps_boxplot, dip_boxplot, herb_boxplot)
+patchwork::wrap_plots(boxplot_guilds, ncol = 1) %>% 
+  ggsave(filename = "guilds_boxplots.png", 
+         device = "png", path = "figures", height = 8, width = 6, units = "in")
+
+# boxplot_guilds <- list()
+# for (j in 1:length(all_guilds)) {
+#   boxplot_guilds[[i]] <- guilds_data %>% 
+#     filter(species %in% all_guilds[[j]]) %>% 
+#     group_by(lon, lat, species) %>% 
+#     summarise(mean_abund = mean(sp.n)) %>% 
+#     ggplot(aes(x = species, y = mean_abund)) +
+#     geom_boxplot() +
+#     xlab("Species") + ylab("Abundance") + 
+#     theme(axis.text.x = element_text(angle = 45))
+# }
+
+
+## HISTOGRAMS per SPECIES
+grps_hist <- guilds_data %>% 
+  filter(species %in% groupers) %>% 
+  group_by(lon, lat, species) %>% 
+  summarise(mean_abund = mean(sp.n)) %>% 
+  ggplot() +
+  aes(log2(mean_abund)) +
+  geom_histogram(fill = "#eccbae", binwidth = 0.2) +
+  xlab("Abundance (log2)") + ylab("Frequency") +
+  facet_wrap(~species)
+
+dip_hist <- guilds_data %>% 
+  filter(species %in% diplodus) %>% 
+  group_by(lon, lat, species) %>% 
+  summarise(mean_abund = mean(sp.n)) %>% 
+  ggplot() +
+  aes(log2(mean_abund)) +
+  geom_histogram(fill = "#d29a4c", binwidth = .2) +
+  xlab("Abundance (log2)") + ylab("Frequency") +
+  facet_wrap(~species)
+
+herb_hist <- guilds_data %>% 
+  filter(species %in% herbivores) %>% 
+  group_by(lon, lat, species) %>% 
+  summarise(mean_abund = mean(sp.n)) %>% 
+  ggplot() +
+  aes(log2(mean_abund)) +
+  geom_histogram(fill = "#145d82", binwidth = 0.3) +
+  xlab("Abundance (log2)") + ylab("Frequency") +
+  facet_wrap(~species)
+
+species_histograms <- list(grps_hist, dip_hist, herb_hist)
+species_histograms
+
+# for(i in 1:length(species_histograms)){
+#   ggsave(plot = species_histograms[[i]], filename = str_glue("figures/{i}.png"), device = "png")
+# }
 
 # Species maps ------------------------------------------------------------
 
@@ -132,16 +186,16 @@ for (j in 1:length(spp_list)) {
     xlab("") + ylab("") + 
     theme(title = element_text(face = "italic"))
   
-  ggsave(filename = paste0(spp_list[[j]]$species, "_raw_obs.png"), path = "figures/species_maps/", plot = last_plot(),
-         width = 12, height = 8, units = "in", dpi = 300, device = "png")
+  # ggsave(filename = paste0(spp_list[[j]]$species, "_raw_obs.png"), path = "figures/species_maps/", plot = last_plot(),
+  #        width = 12, height = 8, units = "in", dpi = 300, device = "png")
   
 }
 
 spp_maps[[1]] # Check
 
 # # Plot all together in two methods (very time consuming)
-patchwork::wrap_plots(spp_maps) %>% ggsave(filename = "species_maps.png", 
-                                           device = "png", path = "figures", height = 16, width = 30, units = "in")
+# patchwork::wrap_plots(spp_maps) %>% ggsave(filename = "species_maps.png", 
+#                                            device = "png", path = "figures", height = 16, width = 30, units = "in")
 
 list.files(path = "figures/species_maps") # Check all maps have been written to the directory
 
