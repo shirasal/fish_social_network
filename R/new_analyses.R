@@ -218,19 +218,6 @@ patchwork::wrap_plots(boxplot_guilds_log, ncol = 1) %>%
   ggsave(filename = "guilds_boxplots_log.png", 
          device = "png", path = "figures", height = 8, width = 6, units = "in")
 
-# boxplot_guilds <- list()
-# for (j in 1:length(all_guilds)) {
-#   boxplot_guilds[[i]] <- guilds_data %>% 
-#     filter(species %in% all_guilds[[j]]) %>% 
-#     group_by(lon, lat, species) %>% 
-#     summarise(mean_abund = mean(abundance)) %>% 
-#     ggplot(aes(x = species, y = mean_abund)) +
-#     geom_boxplot() +
-#     xlab("Species") + ylab("Abundance") + 
-#     theme(axis.text.x = element_text(angle = 45))
-# }
-
-
 ## HISTOGRAMS per SPECIES
 grps_hist <- guilds_data %>% 
   filter(species %in% groupers) %>% 
@@ -443,9 +430,76 @@ egg::ggarrange(p_relimp_grps_gaus, p_relimp_dip_gaus, p_relimp_herb_gaus) %>%
   ggsave(filename = "rel_imp_gaus_nonspat.png", device = "png", path = "figures/rel_imp/", 
          dpi = 150, height = 10, width = 10, units = "in")
 
-### Abundance rankings
+### Abundance rankings + Gaussian
+
+grps_rank <- grps_mat %>% 
+  mutate(across(1:4, .fns = rank))
+dip_rank <- dip_mat %>% 
+  mutate(across(1:4, .fns = rank))
+herb_rank <- herb_mat %>% 
+  mutate(across(1:4, .fns = rank))
+
+t <- grps_rank %>% 
+  pivot_longer(cols = all_of(groupers), names_to = "species", values_to = "rank")
+median(t$rank)
+
+grps_rank %>% 
+  pivot_longer(cols = all_of(groupers), names_to = "species", values_to = "rank") %>% 
+  ggplot() +
+  aes(rank) +
+  geom_histogram(fill = guild_colours$grps, binwidth = 200) +
+  xlab("Rank") + ylab("Frequency") +
+  facet_wrap(~species)
+
+dip_rank %>% 
+  pivot_longer(cols = all_of(diplodus), names_to = "species", values_to = "rank") %>% 
+  ggplot() +
+  aes(rank) +
+  geom_histogram(fill = guild_colours$dip, binwidth = 200) +
+  xlab("Rank") + ylab("Frequency") +
+  facet_wrap(~species)
+
+herb_rank %>% 
+  pivot_longer(cols = all_of(herbivores), names_to = "species", values_to = "rank") %>% 
+  ggplot() +
+  aes(rank) +
+  geom_histogram(fill = guild_colours$herb, binwidth = 200) +
+  xlab("Rank") + ylab("Frequency") +
+  facet_wrap(~species)
+
+grps_rank_mod <- MRFcov(grps_rank, n_nodes = 5, family = "gaussian")
+dip_rank_mod <- MRFcov(dip_rank, n_nodes = 4, family = "gaussian")
+herb_rank_mod <- MRFcov(herb_rank, n_nodes = 4, family = "gaussian")
+
+## Check for interactions
+lapply(grps_rank_mod$key_coefs, function(x) x %>% 
+         filter(Rel_importance > 0.1) %>% 
+         filter(str_detect(string = Variable, pattern = "_")))
+
+lapply(dip_rank_mod$key_coefs, function(x) x %>% 
+         filter(Rel_importance > 0.1) %>% 
+         filter(str_detect(string = Variable, pattern = "_")))
+
+lapply(herb_rank_mod$key_coefs, function(x) x %>% 
+         filter(Rel_importance > 0.1) %>% 
+         filter(str_detect(string = Variable, pattern = "_")))
+
+## Relative importance summary
+grps_rank_relimp <- rel_imp_sum(grps_rank_mod)
+dip_rank_relimp <- rel_imp_sum(dip_rank_mod)
+herb_rank_relimp <- rel_imp_sum(herb_rank_mod)
+
+p_relimp_grps_rank <- plot_relimp(grps_rank_relimp, guild_colours$grps, "Groupers")
+# ggsave("p_relimp_grps_rank_nonspat.png", p_relimp_grps_rank, "png", "figures/rel_imp/", dpi = 300, width = 11.74, height = 4, units = "in")
+p_relimp_dip_rank <- plot_relimp(dip_rank_relimp, guild_colours$dip, "Diplodus")
+# ggsave("p_relimp_dip_rank_nonspat.png", p_relimp_dip_rank, "png", "figures/rel_imp/", dpi = 300, width = 11.74, height = 4, units = "in")
+p_relimp_herb_rank <- plot_relimp(herb_rank_relimp, guild_colours$herb, "Herbivores")
+# ggsave("p_relimp_herb_rank_nonspat.png", p_relimp_herb_rank, "png", "figures/rel_imp/", dpi = 300, width = 11.74, height = 4, units = "in")
+egg::ggarrange(p_relimp_grps_rank, p_relimp_dip_rank, p_relimp_herb_rank) %>% 
+  ggsave(filename = "rel_imp_rank_nonspat.png", device = "png", path = "figures/rel_imp/", 
+         dpi = 150, height = 10, width = 10, units = "in")
 
  
-  
+
 
 
