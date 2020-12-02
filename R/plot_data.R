@@ -8,9 +8,8 @@ med_raw %>%
                            species %in% diplodus ~ "Seabreams",
                            species %in% herbivores ~ "Herbivores")) %>% 
   ggplot() + 
-  aes(x = tmean, y = sp.n) + 
+  aes(x = tmean, y = log10(sp.n)) + 
   geom_point(aes(col = guild)) + 
-  scale_y_log10() +
   facet_wrap(~species) + 
   xlab("Temperature") + ylab("Abundance (log)") +
   scale_color_manual("Guild", 
@@ -62,7 +61,7 @@ species_mpa <- lapply(as.list(c(groupers, diplodus, herbivores)), function(sp) {
     na.omit() %>% 
     ggplot() + 
     aes(x = mpa, y = sp.n) + 
-    geom_bar(stat = "identity") + 
+    geom_point() + 
     ggtitle(str_replace(sp, "\\.", "\\ ")) + xlab("") + ylab("") +
     theme(title = element_text(face = "italic"))
 })
