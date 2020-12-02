@@ -15,7 +15,9 @@ herbivores <- c("Siganus.rivulatus", "Siganus.luridus", "Sarpa.salpa",
                 "Sparisoma.cretense")
 
 ### MEData
-med_raw <- read_rds("data/medata.Rds") %>% ungroup()
+med_raw <- read_rds("data/medata.Rds") %>% 
+  filter(data.origin != "azz_asi") %>% # presence-absence
+  ungroup()
 
 med_clean <- med_raw %>%
   filter(data.origin != "azz_asi") %>% # presence-absence
@@ -56,3 +58,12 @@ dip_mat <- create_spp_mat(dataset = med_clean, guild = diplodus, covariate = c("
 herb_mat <- create_spp_mat(dataset = med_clean, guild = herbivores, covariate = c("mpa", "temp", "depth", "prod"))
 
 # save.image(file = "data/base_data_and_matrices.RData")
+
+guilds_data <- med_raw %>%
+  filter(data.origin != "azz_asi") %>% # presence-absence
+  mutate(mpa = if_else(enforcement <= 1, FALSE, TRUE),
+         temp = scale(tmean),
+         depth = scale(depth),
+         sal = scale(sal_mean),
+         prod = scale(pp_mean)) %>%
+  select(site, lon, lat, trans, species, sp.n, mpa, temp, depth, prod)
