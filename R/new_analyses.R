@@ -234,45 +234,39 @@ patchwork::wrap_plots(boxplot_guilds_log, ncol = 1) %>%
 ## HISTOGRAMS per SPECIES
 grps_hist <- guilds_data %>% 
   filter(species %in% groupers) %>% 
-  group_by(lon, lat, species) %>% 
-  summarise(mean_abund = mean(abundance)) %>% 
   ggplot() +
-  aes(log2(mean_abund)) +
-  geom_histogram(fill = "#eccbae", binwidth = 0.2) +
+  aes(log2(abundance)) +
+  geom_histogram(fill = guild_colours$grps, binwidth = .5) +
   xlab("Abundance (log2)") + ylab("Frequency") +
   facet_wrap(~species)
 
 dip_hist <- guilds_data %>% 
   filter(species %in% diplodus) %>% 
-  group_by(lon, lat, species) %>% 
-  summarise(mean_abund = mean(abundance)) %>% 
   ggplot() +
-  aes(log2(mean_abund)) +
-  geom_histogram(fill = "#d29a4c", binwidth = .2) +
+  aes(log2(abundance)) +
+  geom_histogram(fill = guild_colours$dip, binwidth = .5) +
   xlab("Abundance (log2)") + ylab("Frequency") +
   facet_wrap(~species)
 
 herb_hist <- guilds_data %>% 
   filter(species %in% herbivores) %>% 
-  group_by(lon, lat, species) %>% 
-  summarise(mean_abund = mean(abundance)) %>% 
   ggplot() +
-  aes(log2(mean_abund)) +
-  geom_histogram(fill = "#145d82", binwidth = 0.3) +
+  aes(log2(abundance)) +
+  geom_histogram(fill = guild_colours$herb, binwidth = .5) +
   xlab("Abundance (log2)") + ylab("Frequency") +
   facet_wrap(~species)
 
-species_histograms <- list(grps_hist, dip_hist, herb_hist)
+species_histograms <- list(grps = grps_hist, dip = dip_hist, herb = herb_hist)
 species_histograms
 
-# for(i in 1:length(species_histograms)){
-#   ggsave(plot = species_histograms[[i]], filename = str_glue("figures/{i}.png"), device = "png")
-# }
+for(i in 1:length(species_histograms)){
+  ggsave(plot = species_histograms[[i]], filename = str_glue("figures/{names(species_histograms)[i]}_hist.png"), device = "png")
+}
 
 
 ## SPECIES ABUNDANCE ~ COVARIATE per guild
 
-guilds_data %>% 
+grps_temp <- guilds_data %>% 
   filter(species %in% groupers) %>% 
   ggplot() +
   aes(x = temp, y = log2(abundance)) +
@@ -281,7 +275,7 @@ guilds_data %>%
   xlab("Temperature (scaled)") + ylab("Abundance (log2)") +
   facet_wrap(~species)
 
-guilds_data %>% 
+dip_temp <- guilds_data %>% 
   filter(species %in% diplodus) %>% 
   ggplot() +
   aes(x = temp, y = log2(abundance)) +
@@ -290,7 +284,7 @@ guilds_data %>%
   xlab("Temperature (scaled)") + ylab("Abundance (log2)") +
   facet_wrap(~species)
 
-guilds_data %>% 
+herb_temp <- guilds_data %>% 
   filter(species %in% herbivores) %>% 
   ggplot() +
   aes(x = temp, y = log2(abundance)) +
@@ -299,7 +293,12 @@ guilds_data %>%
   xlab("Temperature (scaled)") + ylab("Abundance (log2)") +
   facet_wrap(~species)
 
-guilds_data %>% 
+temp_plots <- list(grps = grps_temp, dip = dip_temp, herb = herb_temp)
+for(i in 1:length(temp_plots)){
+  ggsave(plot = temp_plots[[i]], filename = str_glue("figures/{names(temp_plots)[i]}_temp.png"), device = "png")
+}
+
+grps_mpa <- guilds_data %>% 
   filter(species %in% groupers) %>% 
   na.omit() %>% 
   ggplot() +
@@ -308,7 +307,7 @@ guilds_data %>%
   xlab("MPA") + ylab("Abundance (log2)") +
   facet_wrap(~species)
 
-guilds_data %>% 
+dip_mpa <- guilds_data %>% 
   filter(species %in% diplodus) %>% 
   na.omit() %>% 
   ggplot() +
@@ -317,7 +316,7 @@ guilds_data %>%
   xlab("MPA") + ylab("Abundance (log2)") +
   facet_wrap(~species)
 
-guilds_data %>% 
+herb_mpa <- guilds_data %>% 
   filter(species %in% herbivores) %>% 
   na.omit() %>% 
   ggplot() +
@@ -325,6 +324,12 @@ guilds_data %>%
   geom_boxplot(col = guild_colours$herb) +
   xlab("MPA") + ylab("Abundance (log2)") +
   facet_wrap(~species)
+
+mpa_plots <- list(grps = grps_mpa, dip = dip_mpa, herb = herb_mpa)
+for(i in 1:length(mpa_plots)){
+  ggsave(plot = mpa_plots[[i]], filename = str_glue("figures/{names(mpa_plots)[i]}_mpa.png"), device = "png")
+}
+
 
 
 # Species maps ------------------------------------------------------------
