@@ -31,6 +31,10 @@ diplodus <- c("Diplodus.annularis", "Diplodus.puntazzo", "Diplodus.sargus",
 herbivores <- c("Siganus.rivulatus", "Siganus.luridus", "Sarpa.salpa",
                 "Sparisoma.cretense")
 
+grps_col <- "#eccbae"
+dip_col <- "#d29a4c"
+herb_col <- "#145d82"
+  
 all_guilds <- list(groupers, diplodus, herbivores)
 names(all_guilds) <- c("groupers", "seabreams", "herbivores")
 
@@ -70,7 +74,7 @@ dip_mat <- create_spp_mat(dataset = med_clean, guild = diplodus, covariate = c("
 herb_mat <- create_spp_mat(dataset = med_clean, guild = herbivores, covariate = c("mpa", "temp", "depth", "prod"))
 
 # save.image(file = "data/base_data_and_matrices.RData")
-# load("data/base_data_and_matrices.RData")
+load("data/base_data_and_matrices.RData")
 
 # Raw data view -----------------------------------------------------------
 
@@ -82,7 +86,7 @@ grps_boxplot <- guilds_data %>%
   summarise(mean_abund = mean(sp.n)) %>% 
   ggplot() +
   aes(x = species, y = mean_abund) +
-  geom_boxplot(col = "#eccbae") +
+  geom_boxplot(col = grps_col) +
   xlab("") + ylab("Abundance") +
   ggtitle(names(guilds_data$guild)) +
   theme(axis.text.x = element_text(angle = 30, vjust = 0.5))
@@ -93,7 +97,7 @@ dip_boxplot <- guilds_data %>%
   summarise(mean_abund = mean(sp.n)) %>% 
   ggplot() +
   aes(x = species, y = mean_abund) +
-  geom_boxplot(col = "#d29a4c") +
+  geom_boxplot(col = dip_col) +
   xlab("") + ylab("Abundance") +
   ggtitle(names(guilds_data$guild)) +
   theme(axis.text.x = element_text(angle = 30, vjust = 0.5))
@@ -104,7 +108,7 @@ herb_boxplot <- guilds_data %>%
   summarise(mean_abund = mean(sp.n)) %>% 
   ggplot() +
   aes(x = species, y = mean_abund) +
-  geom_boxplot(col = "#145d82") +
+  geom_boxplot(col = herb_col) +
   xlab("") + ylab("Abundance") +
   ggtitle(names(guilds_data$guild)) +
   theme(axis.text.x = element_text(angle = 30, vjust = 0.5))
@@ -164,6 +168,48 @@ species_histograms
 # for(i in 1:length(species_histograms)){
 #   ggsave(plot = species_histograms[[i]], filename = str_glue("figures/{i}.png"), device = "png")
 # }
+
+
+### Raw data with smoothed trend line
+
+guilds_data %>% 
+  filter(species %in% groupers) %>% 
+  group_by(lon, lat, species, temp, depth, prod, mpa) %>% 
+  summarise(mean_abund = mean(sp.n)) %>% 
+  ggplot() +
+  aes(x = temp, y = log2(mean_abund)) +
+  geom_point(col = "#d29a4c") +
+  stat_smooth(method = "lm", col = "darkcyan", alpha = 0.3) +
+  xlab("Temperature (scaled)") + ylab("Abundance (log2)") +
+  facet_wrap(~species)
+
+guilds_data %>% 
+  filter(species %in% groupers) %>% 
+  group_by(lon, lat, species, temp, depth, prod, mpa) %>% 
+  mutate(mpa = case_when(isTRUE(mpa) ~ "yes",
+                         isFALSE(mpa) ~ "no")) %>% 
+  summarise(mean_abund = mean(sp.n)) %>% 
+  na.omit() %>% 
+  ggplot() +
+  aes(x = mpa, y = mean_abund) +
+  geom_point(col = "#d29a4c") +
+  stat_smooth(formula = cbind(yes, no) ~ x, col = "darkcyan", alpha = 0.3) +
+  xlab("MPA") + ylab("Abundance") +
+  facet_wrap(~species)
+
+guilds_data %>% 
+  filter(species %in% diplodus) %>% 
+  group_by(lon, lat, species, temp, depth, prod, mpa) %>% 
+  mutate(mpa = case_when(isTRUE(mpa) ~ "yes",
+                         isFALSE(mpa) ~ "no")) %>% 
+  summarise(mean_abund = mean(sp.n)) %>% 
+  na.omit() %>% 
+  ggplot() +
+  aes(x = mpa, y = mean_abund) +
+  geom_point(col = "#d29a4c") +
+  stat_smooth(formula = cbind(yes, no) ~ x, col = "darkcyan", alpha = 0.3) +
+  xlab("MPA") + ylab("Abundance") +
+  facet_wrap(~species)
 
 # Species maps ------------------------------------------------------------
 
