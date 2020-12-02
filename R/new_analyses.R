@@ -155,10 +155,8 @@ load("data/base_data_and_matrices.RData")
 
 grps_boxplot <- guilds_data %>% 
   filter(species %in% groupers) %>% 
-  group_by(lon, lat, species) %>% 
-  summarise(mean_abund = mean(sp.n)) %>% 
   ggplot() +
-  aes(x = species, y = mean_abund) +
+  aes(x = species, y = abundance) +
   geom_boxplot(col = grps_col) +
   xlab("") + ylab("Abundance") +
   ggtitle(names(guilds_data$guild)) +
@@ -166,10 +164,8 @@ grps_boxplot <- guilds_data %>%
 
 dip_boxplot <- guilds_data %>% 
   filter(species %in% diplodus) %>% 
-  group_by(lon, lat, species) %>% 
-  summarise(mean_abund = mean(sp.n)) %>% 
   ggplot() +
-  aes(x = species, y = mean_abund) +
+  aes(x = species, y = abundance) +
   geom_boxplot(col = dip_col) +
   xlab("") + ylab("Abundance") +
   ggtitle(names(guilds_data$guild)) +
@@ -177,10 +173,8 @@ dip_boxplot <- guilds_data %>%
 
 herb_boxplot <- guilds_data %>% 
   filter(species %in% herbivores) %>% 
-  group_by(lon, lat, species) %>% 
-  summarise(mean_abund = mean(sp.n)) %>% 
   ggplot() +
-  aes(x = species, y = mean_abund) +
+  aes(x = species, y = abundance) +
   geom_boxplot(col = herb_col) +
   xlab("") + ylab("Abundance") +
   ggtitle(names(guilds_data$guild)) +
@@ -191,12 +185,46 @@ patchwork::wrap_plots(boxplot_guilds, ncol = 1) %>%
   ggsave(filename = "guilds_boxplots.png", 
          device = "png", path = "figures", height = 8, width = 6, units = "in")
 
+## BOXPLOTS per GUILD - transformed
+
+grps_log_boxplot <- guilds_data %>% 
+  filter(species %in% groupers) %>% 
+  ggplot() +
+  aes(x = species, y = log2(abundance)) +
+  geom_boxplot(col = grps_col) +
+  xlab("") + ylab("Abundance (log2)") +
+  ggtitle(names(guilds_data$guild)) +
+  theme(axis.text.x = element_text(angle = 30, vjust = 0.5))
+
+dip_log_boxplot <- guilds_data %>% 
+  filter(species %in% diplodus) %>% 
+  ggplot() +
+  aes(x = species, y = log2(abundance)) +
+  geom_boxplot(col = dip_col) +
+  xlab("") + ylab("Abundance (log2)") +
+  ggtitle(names(guilds_data$guild)) +
+  theme(axis.text.x = element_text(angle = 30, vjust = 0.5))
+
+herb_log_boxplot <- guilds_data %>% 
+  filter(species %in% herbivores) %>% 
+  ggplot() +
+  aes(x = species, y = log2(abundance)) +
+  geom_boxplot(col = herb_col) +
+  xlab("") + ylab("Abundance (log2)") +
+  ggtitle(names(guilds_data$guild)) +
+  theme(axis.text.x = element_text(angle = 30, vjust = 0.5))
+
+boxplot_guilds_log <- list(grps_log_boxplot, dip_log_boxplot, herb_log_boxplot)
+patchwork::wrap_plots(boxplot_guilds_log, ncol = 1) %>% 
+  ggsave(filename = "guilds_boxplots_log.png", 
+         device = "png", path = "figures", height = 8, width = 6, units = "in")
+
 # boxplot_guilds <- list()
 # for (j in 1:length(all_guilds)) {
 #   boxplot_guilds[[i]] <- guilds_data %>% 
 #     filter(species %in% all_guilds[[j]]) %>% 
 #     group_by(lon, lat, species) %>% 
-#     summarise(mean_abund = mean(sp.n)) %>% 
+#     summarise(mean_abund = mean(abundance)) %>% 
 #     ggplot(aes(x = species, y = mean_abund)) +
 #     geom_boxplot() +
 #     xlab("Species") + ylab("Abundance") + 
@@ -208,7 +236,7 @@ patchwork::wrap_plots(boxplot_guilds, ncol = 1) %>%
 grps_hist <- guilds_data %>% 
   filter(species %in% groupers) %>% 
   group_by(lon, lat, species) %>% 
-  summarise(mean_abund = mean(sp.n)) %>% 
+  summarise(mean_abund = mean(abundance)) %>% 
   ggplot() +
   aes(log2(mean_abund)) +
   geom_histogram(fill = "#eccbae", binwidth = 0.2) +
@@ -218,7 +246,7 @@ grps_hist <- guilds_data %>%
 dip_hist <- guilds_data %>% 
   filter(species %in% diplodus) %>% 
   group_by(lon, lat, species) %>% 
-  summarise(mean_abund = mean(sp.n)) %>% 
+  summarise(mean_abund = mean(abundance)) %>% 
   ggplot() +
   aes(log2(mean_abund)) +
   geom_histogram(fill = "#d29a4c", binwidth = .2) +
@@ -228,7 +256,7 @@ dip_hist <- guilds_data %>%
 herb_hist <- guilds_data %>% 
   filter(species %in% herbivores) %>% 
   group_by(lon, lat, species) %>% 
-  summarise(mean_abund = mean(sp.n)) %>% 
+  summarise(mean_abund = mean(abundance)) %>% 
   ggplot() +
   aes(log2(mean_abund)) +
   geom_histogram(fill = "#145d82", binwidth = 0.3) +
@@ -248,7 +276,7 @@ species_histograms
 guilds_data %>% 
   filter(species %in% groupers) %>% 
   group_by(species, temp, depth, prod, mpa) %>% 
-  summarise(mean_abund = mean(sp.n)) %>% 
+  summarise(mean_abund = mean(abundance)) %>% 
   ggplot() +
   aes(x = temp, y = log2(mean_abund)) +
   geom_point(col = grps_col) +
@@ -259,7 +287,7 @@ guilds_data %>%
 guilds_data %>% 
   filter(species %in% diplodus) %>% 
   group_by(species, temp, depth, prod, mpa) %>% 
-  summarise(mean_abund = mean(sp.n)) %>% 
+  summarise(mean_abund = mean(abundance)) %>% 
   ggplot() +
   aes(x = temp, y = log2(mean_abund)) +
   geom_point(col = dip_col) +
@@ -270,7 +298,7 @@ guilds_data %>%
 guilds_data %>% 
   filter(species %in% herbivores) %>% 
   group_by(species, temp, depth, prod, mpa) %>% 
-  summarise(mean_abund = mean(sp.n)) %>% 
+  summarise(mean_abund = mean(abundance)) %>% 
   ggplot() +
   aes(x = temp, y = log2(mean_abund)) +
   geom_point(col = herb_col) +
@@ -282,7 +310,7 @@ guilds_data %>%
 
 # Base map of the Mediterranean Sea
 med_seas <- sf::st_read("C:/Users/shira/Documents/MSc/medata/Med_World_Seas_IHO_v3_MarineRegions/Medit_seas_IHO.shp")
-species_locations <- guilds_data %>% select(lon, lat, species, sp.n, guild) %>% arrange(guild)
+species_locations <- guilds_data %>% select(lon, lat, species, abundance, guild) %>% arrange(guild)
 spp_list <- NULL
 for (i in unique(species_locations$species)){
   spp_list[[i]] <- species_locations %>%
@@ -311,10 +339,6 @@ spp_maps[[1]] # Check
 #                                            device = "png", path = "figures", height = 16, width = 30, units = "in")
 
 list.files(path = "figures/species_maps") # Check all maps have been written to the directory
-
-
-
-
 
 
 
@@ -389,11 +413,9 @@ p_relimp_herb_gaus <- plot_relimp(herb_gaus_relimp, herb_col, "Herbivores")
 # ggsave("p_relimp_herb_gaus_nonspat.png", p_relimp_herb_gaus, "png", "figures/rel_imp/", dpi = 300, width = 11.74, height = 4, units = "in")
 egg::ggarrange(p_relimp_grps_gaus, p_relimp_dip_gaus, p_relimp_herb_gaus) # %>% ggsave("rel_imp_gaus_nonspat.png", "png", "figures/rel_imp/", dpi = 150, height = 10, width = 10, units = "in")
 
-grps_data <- guilds_data %>% filter(guild == "groupers")
-
 grps_data %>% 
   group_by(lon, lat, site, trans, species, mpa, temp, depth, prod) %>% 
-  summarise(abundance = sum(sp.n))
+  summarise(abundance = sum(abundance))
 grps_data %>% colnames()
 
 
