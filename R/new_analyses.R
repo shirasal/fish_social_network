@@ -115,7 +115,7 @@ for (j in 1:length(spp_list)) {
 
 # Base map of the Mediterranean Sea
 med_seas <- sf::st_read("C:/Users/shira/Documents/MSc/medata/Med_World_Seas_IHO_v3_MarineRegions/Medit_seas_IHO.shp")
-species_locations <- guilds_data %>% select(lon, lat, species, sp.n, guild)
+species_locations <- guilds_data %>% select(lon, lat, species, sp.n, guild) %>% arrange(guild)
 spp_list <- NULL
 for (i in unique(species_locations$species)){
   spp_list[[i]] <- species_locations %>%
@@ -140,9 +140,11 @@ for (j in 1:length(spp_list)) {
 spp_maps[[1]] # Check
 
 # # Plot all together in two methods (very time consuming)
-# cowplot::plot_grid(plotlist = spp_maps, ncol = 4)
 patchwork::wrap_plots(spp_maps) %>% ggsave(filename = "species_maps.png", 
                                            device = "png", path = "figures", height = 16, width = 30, units = "in")
 
 list.files(path = "figures/species_maps") # Check all maps have been written to the directory
+
+
+
 
