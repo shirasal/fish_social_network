@@ -174,41 +174,35 @@ species_histograms
 
 guilds_data %>% 
   filter(species %in% groupers) %>% 
-  group_by(lon, lat, species, temp, depth, prod, mpa) %>% 
+  group_by(species, temp, depth, prod, mpa) %>% 
   summarise(mean_abund = mean(sp.n)) %>% 
   ggplot() +
   aes(x = temp, y = log2(mean_abund)) +
-  geom_point(col = "#d29a4c") +
-  stat_smooth(method = "lm", col = "darkcyan", alpha = 0.3) +
+  geom_point(col = grps_col) +
+  stat_smooth(method = "gam", formula = y ~ s(x, bs = "cs"), col = "darkcyan", alpha = 0.3) +
   xlab("Temperature (scaled)") + ylab("Abundance (log2)") +
   facet_wrap(~species)
 
 guilds_data %>% 
-  filter(species %in% groupers) %>% 
-  group_by(lon, lat, species, temp, depth, prod, mpa) %>% 
-  mutate(mpa = case_when(isTRUE(mpa) ~ "yes",
-                         isFALSE(mpa) ~ "no")) %>% 
+  filter(species %in% diplodus) %>% 
+  group_by(species, temp, depth, prod, mpa) %>% 
   summarise(mean_abund = mean(sp.n)) %>% 
-  na.omit() %>% 
   ggplot() +
-  aes(x = mpa, y = mean_abund) +
-  geom_point(col = "#d29a4c") +
-  stat_smooth(formula = cbind(yes, no) ~ x, col = "darkcyan", alpha = 0.3) +
-  xlab("MPA") + ylab("Abundance") +
+  aes(x = temp, y = log2(mean_abund)) +
+  geom_point(col = dip_col) +
+  stat_smooth(method = "gam", formula = y ~ s(x, bs = "cs"), col = "darkcyan", alpha = 0.3) +
+  xlab("Temperature (scaled)") + ylab("Abundance (log2)") +
   facet_wrap(~species)
 
 guilds_data %>% 
-  filter(species %in% diplodus) %>% 
-  group_by(lon, lat, species, temp, depth, prod, mpa) %>% 
-  mutate(mpa = case_when(isTRUE(mpa) ~ "yes",
-                         isFALSE(mpa) ~ "no")) %>% 
+  filter(species %in% herbivores) %>% 
+  group_by(species, temp, depth, prod, mpa) %>% 
   summarise(mean_abund = mean(sp.n)) %>% 
-  na.omit() %>% 
   ggplot() +
-  aes(x = mpa, y = mean_abund) +
-  geom_point(col = "#d29a4c") +
-  stat_smooth(formula = cbind(yes, no) ~ x, col = "darkcyan", alpha = 0.3) +
-  xlab("MPA") + ylab("Abundance") +
+  aes(x = temp, y = log2(mean_abund)) +
+  geom_point(col = herb_col) +
+  stat_smooth(method = "gam", formula = y ~ s(x, bs = "cs"), col = "darkcyan", alpha = 0.3) +
+  xlab("Temperature (scaled)") + ylab("Abundance (log2)") +
   facet_wrap(~species)
 
 # Species maps ------------------------------------------------------------
