@@ -85,6 +85,7 @@ plot_relimp <- function(rel_imp_df, col, guild_name){
           axis.title.x = element_blank(), axis.title.y = element_blank(),
           strip.text.x = element_text(size = 12, face = "bold"))
 }
+
 # Data --------------------------------------------------------------------
 
 ### Variables (fitting with med_clean)
@@ -99,9 +100,7 @@ diplodus <- c("Diplodus.annularis", "Diplodus.puntazzo", "Diplodus.sargus",
 herbivores <- c("Siganus.rivulatus", "Siganus.luridus", "Sarpa.salpa",
                 "Sparisoma.cretense")
 
-grps_col <- "#eccbae"
-dip_col <- "#d29a4c"
-herb_col <- "#145d82"
+guild_colours <- list(grps = "#C54607", dip = "#145D82", herb = "#43AA8B")
 
 all_guilds <- list(groupers = groupers, seabreams = diplodus, herbivores = herbivores)
 
@@ -157,7 +156,7 @@ grps_boxplot <- guilds_data %>%
   filter(species %in% groupers) %>% 
   ggplot() +
   aes(x = species, y = abundance) +
-  geom_boxplot(col = grps_col) +
+  geom_boxplot(col = guild_colours$grps) +
   xlab("") + ylab("Abundance") +
   ggtitle(names(guilds_data$guild)) +
   theme(axis.text.x = element_text(angle = 30, vjust = 0.5))
@@ -166,7 +165,7 @@ dip_boxplot <- guilds_data %>%
   filter(species %in% diplodus) %>% 
   ggplot() +
   aes(x = species, y = abundance) +
-  geom_boxplot(col = dip_col) +
+  geom_boxplot(col = guild_colours$dip) +
   xlab("") + ylab("Abundance") +
   ggtitle(names(guilds_data$guild)) +
   theme(axis.text.x = element_text(angle = 30, vjust = 0.5))
@@ -175,7 +174,7 @@ herb_boxplot <- guilds_data %>%
   filter(species %in% herbivores) %>% 
   ggplot() +
   aes(x = species, y = abundance) +
-  geom_boxplot(col = herb_col) +
+  geom_boxplot(col = guild_colours$herb) +
   xlab("") + ylab("Abundance") +
   ggtitle(names(guilds_data$guild)) +
   theme(axis.text.x = element_text(angle = 30, vjust = 0.5))
@@ -191,7 +190,7 @@ grps_log_boxplot <- guilds_data %>%
   filter(species %in% groupers) %>% 
   ggplot() +
   aes(x = species, y = log2(abundance)) +
-  geom_boxplot(col = grps_col) +
+  geom_boxplot(col = guild_colours$grps) +
   xlab("") + ylab("Abundance (log2)") +
   ggtitle(names(guilds_data$guild)) +
   theme(axis.text.x = element_text(angle = 30, vjust = 0.5))
@@ -200,7 +199,7 @@ dip_log_boxplot <- guilds_data %>%
   filter(species %in% diplodus) %>% 
   ggplot() +
   aes(x = species, y = log2(abundance)) +
-  geom_boxplot(col = dip_col) +
+  geom_boxplot(col = guild_colours$dip) +
   xlab("") + ylab("Abundance (log2)") +
   ggtitle(names(guilds_data$guild)) +
   theme(axis.text.x = element_text(angle = 30, vjust = 0.5))
@@ -209,7 +208,7 @@ herb_log_boxplot <- guilds_data %>%
   filter(species %in% herbivores) %>% 
   ggplot() +
   aes(x = species, y = log2(abundance)) +
-  geom_boxplot(col = herb_col) +
+  geom_boxplot(col = guild_colours$herb) +
   xlab("") + ylab("Abundance (log2)") +
   ggtitle(names(guilds_data$guild)) +
   theme(axis.text.x = element_text(angle = 30, vjust = 0.5))
@@ -275,36 +274,58 @@ species_histograms
 
 guilds_data %>% 
   filter(species %in% groupers) %>% 
-  group_by(species, temp, depth, prod, mpa) %>% 
-  summarise(mean_abund = mean(abundance)) %>% 
   ggplot() +
-  aes(x = temp, y = log2(mean_abund)) +
-  geom_point(col = grps_col) +
+  aes(x = temp, y = log2(abundance)) +
+  geom_point(col = guild_colours$grps) +
   stat_smooth(method = "gam", formula = y ~ s(x, bs = "cs"), col = "darkcyan", alpha = 0.3) +
   xlab("Temperature (scaled)") + ylab("Abundance (log2)") +
   facet_wrap(~species)
 
 guilds_data %>% 
   filter(species %in% diplodus) %>% 
-  group_by(species, temp, depth, prod, mpa) %>% 
-  summarise(mean_abund = mean(abundance)) %>% 
   ggplot() +
-  aes(x = temp, y = log2(mean_abund)) +
-  geom_point(col = dip_col) +
+  aes(x = temp, y = log2(abundance)) +
+  geom_point(col = guild_colours$dip) +
   stat_smooth(method = "gam", formula = y ~ s(x, bs = "cs"), col = "darkcyan", alpha = 0.3) +
   xlab("Temperature (scaled)") + ylab("Abundance (log2)") +
   facet_wrap(~species)
 
 guilds_data %>% 
   filter(species %in% herbivores) %>% 
-  group_by(species, temp, depth, prod, mpa) %>% 
-  summarise(mean_abund = mean(abundance)) %>% 
   ggplot() +
-  aes(x = temp, y = log2(mean_abund)) +
-  geom_point(col = herb_col) +
+  aes(x = temp, y = log2(abundance)) +
+  geom_point(col = guild_colours$herb) +
   stat_smooth(method = "gam", formula = y ~ s(x, bs = "cs"), col = "darkcyan", alpha = 0.3) +
   xlab("Temperature (scaled)") + ylab("Abundance (log2)") +
   facet_wrap(~species)
+
+guilds_data %>% 
+  filter(species %in% groupers) %>% 
+  na.omit() %>% 
+  ggplot() +
+  aes(x = mpa, y = log2(abundance)) +
+  geom_boxplot(col = guild_colours$grps) +
+  xlab("MPA") + ylab("Abundance (log2)") +
+  facet_wrap(~species)
+
+guilds_data %>% 
+  filter(species %in% diplodus) %>% 
+  na.omit() %>% 
+  ggplot() +
+  aes(x = mpa, y = log2(abundance)) +
+  geom_boxplot(col = guild_colours$dip) +
+  xlab("MPA") + ylab("Abundance (log2)") +
+  facet_wrap(~species)
+
+guilds_data %>% 
+  filter(species %in% herbivores) %>% 
+  na.omit() %>% 
+  ggplot() +
+  aes(x = mpa, y = log2(abundance)) +
+  geom_boxplot(col = guild_colours$herb) +
+  xlab("MPA") + ylab("Abundance (log2)") +
+  facet_wrap(~species)
+
 
 # Species maps ------------------------------------------------------------
 
@@ -368,11 +389,11 @@ grps_pois_relimp <- rel_imp_sum(grps_pois)
 dip_pois_relimp <- rel_imp_sum(dip_pois)
 herb_pois_relimp <- rel_imp_sum(herb_pois)
 
-p_relimp_grps_pois <- plot_relimp(grps_pois_relimp, grps_col, "Groupers")
+p_relimp_grps_pois <- plot_relimp(grps_pois_relimp, guild_colours$grps, "Groupers")
 # ggsave("p_relimp_grps_pois_nonspat.png", p_relimp_grps_pois, "png", "figures/rel_imp/", dpi = 300, width = 11.74, height = 4, units = "in")
-p_relimp_dip_pois <- plot_relimp(dip_pois_relimp, dip_col, "Diplodus")
+p_relimp_dip_pois <- plot_relimp(dip_pois_relimp, guild_colours$dip, "Diplodus")
 # ggsave("p_relimp_dip_pois_nonspat.png", p_relimp_dip_pois, "png", "figures/rel_imp/", dpi = 300, width = 11.74, height = 4, units = "in")
-p_relimp_herb_pois <- plot_relimp(herb_pois_relimp, herb_col, "Herbivores")
+p_relimp_herb_pois <- plot_relimp(herb_pois_relimp, guild_colours$herb, "Herbivores")
 # ggsave("p_relimp_herb_pois_nonspat.png", p_relimp_herb_pois, "png", "figures/rel_imp/", dpi = 300, width = 11.74, height = 4, units = "in")
 egg::ggarrange(p_relimp_grps_pois, p_relimp_dip_pois, p_relimp_herb_pois) # %>% ggsave("rel_imp_pois_nonspat.png", "png", "figures/rel_imp/", dpi = 150, height = 10, width = 10, units = "in")
 
@@ -405,17 +426,14 @@ grps_gaus_relimp <- rel_imp_sum(grps_gaus)
 dip_gaus_relimp <- rel_imp_sum(dip_gaus)
 herb_gaus_relimp <- rel_imp_sum(herb_gaus)
 
-p_relimp_grps_gaus <- plot_relimp(grps_gaus_relimp, grps_col, "Groupers")
+p_relimp_grps_gaus <- plot_relimp(grps_gaus_relimp, guild_colours$grps, "Groupers")
 # ggsave("p_relimp_grps_gaus_nonspat.png", p_relimp_grps_gaus, "png", "figures/rel_imp/", dpi = 300, width = 11.74, height = 4, units = "in")
-p_relimp_dip_gaus <- plot_relimp(dip_gaus_relimp, dip_col, "Diplodus")
+p_relimp_dip_gaus <- plot_relimp(dip_gaus_relimp, guild_colours$dip, "Diplodus")
 # ggsave("p_relimp_dip_gaus_nonspat.png", p_relimp_dip_gaus, "png", "figures/rel_imp/", dpi = 300, width = 11.74, height = 4, units = "in")
-p_relimp_herb_gaus <- plot_relimp(herb_gaus_relimp, herb_col, "Herbivores")
+p_relimp_herb_gaus <- plot_relimp(herb_gaus_relimp, guild_colours$herb, "Herbivores")
 # ggsave("p_relimp_herb_gaus_nonspat.png", p_relimp_herb_gaus, "png", "figures/rel_imp/", dpi = 300, width = 11.74, height = 4, units = "in")
 egg::ggarrange(p_relimp_grps_gaus, p_relimp_dip_gaus, p_relimp_herb_gaus) # %>% ggsave("rel_imp_gaus_nonspat.png", "png", "figures/rel_imp/", dpi = 150, height = 10, width = 10, units = "in")
 
-grps_data %>% 
-  group_by(lon, lat, site, trans, species, mpa, temp, depth, prod) %>% 
-  summarise(abundance = sum(abundance))
-grps_data %>% colnames()
+
 
 
