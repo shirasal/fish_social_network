@@ -221,8 +221,8 @@ env_vector <- c("temp", "depth", "prod")
 anthro_vector <- c("mpa")
 
 ### Guilds
-groupers <- c("Epinephelus.costae", "Epinephelus.marginatus",
-              "Mycteroperca.rubra", "Serranus.cabrilla", "Serranus.scriba")
+groupers <- c("Epinephelus.costae", "Epinephelus.marginatus", "Serranus.cabrilla", 
+              "Serranus.scriba")
 diplodus <- c("Diplodus.annularis", "Diplodus.puntazzo", "Diplodus.sargus",
               "Diplodus.vulgaris")
 herbivores <- c("Siganus.rivulatus", "Siganus.luridus", "Sarpa.salpa",
@@ -273,8 +273,8 @@ grps_mat <- create_spp_mat(dataset = med_clean, guild = groupers, covariate = c(
 dip_mat <- create_spp_mat(dataset = med_clean, guild = diplodus, covariate = c("mpa", "temp", "depth", "prod"))
 herb_mat <- create_spp_mat(dataset = med_clean, guild = herbivores, covariate = c("mpa", "temp", "depth", "prod"))
 
-# save.image(file = "data/base_data_and_matrices.RData")
-load("data/base_data_and_matrices.RData")
+save.image(file = "data/base_data_and_matrices.RData")
+# load("data/base_data_and_matrices.RData")
 
 # Raw data view -----------------------------------------------------------
 
@@ -476,7 +476,7 @@ for (j in 1:length(spp_list)) {
 spp_maps[[1]] # Check
 
 # # Plot all together in two methods (very time consuming)
-# patchwork::wrap_plots(spp_maps) %>% ggsave(filename = "species_maps.png", 
+# patchwork::wrap_plots(spp_maps) %>% ggsave(filename = "species_maps.png",
 #                                            device = "png", path = "figures", height = 16, width = 30, units = "in")
 
 list.files(path = "figures/species_maps") # Check all maps have been written to the directory
@@ -487,22 +487,9 @@ list.files(path = "figures/species_maps") # Check all maps have been written to 
 
 ### Poisson
 
-grps_pois <- MRFcov(grps_mat, n_nodes = 5, family = "poisson")
+grps_pois <- MRFcov(grps_mat, n_nodes = 4, family = "poisson")
 dip_pois <- MRFcov(dip_mat, n_nodes = 4, family = "poisson")
 herb_pois <- MRFcov(herb_mat, n_nodes = 4, family = "poisson")
-
-## Check for interactions
-lapply(grps_pois$key_coefs, function(x) x %>% 
-         filter(Rel_importance > 0.1) %>% 
-         filter(str_detect(string = Variable, pattern = "_")))
-
-lapply(dip_pois$key_coefs, function(x) x %>% 
-         filter(Rel_importance > 0.1) %>% 
-         filter(str_detect(string = Variable, pattern = "_")))
-
-lapply(herb_pois$key_coefs, function(x) x %>% 
-         filter(Rel_importance > 0.1) %>% 
-         filter(str_detect(string = Variable, pattern = "_")))
 
 ## Relative importance summary
 grps_pois_relimp <- rel_imp_sum(grps_pois)
@@ -519,14 +506,23 @@ egg::ggarrange(p_relimp_grps_pois, p_relimp_dip_pois, p_relimp_herb_pois) %>%
   ggsave(filename = "rel_imp_pois_nonspat.png", device = "png", path = "figures/rel_imp/", 
          dpi = 150, height = 10, width = 10, units = "in")
 
+## Check for interactions
+lapply(grps_pois$key_coefs, function(x) x %>% 
+         filter(str_detect(string = Variable, pattern = "_")))
 
-### Gaussian
+lapply(dip_pois$key_coefs, function(x) x %>% 
+         filter(str_detect(string = Variable, pattern = "_")))
 
-std_grps_mat <- grps_mat %>% mutate(across(1:5, .fns = scale))
-std_dip_mat <- dip_mat %>% mutate(across(1:5, .fns = scale))
-std_herb_mat <- herb_mat %>% mutate(across(1:5, .fns = scale))
+lapply(herb_pois$key_coefs, function(x) x %>% 
+         filter(str_detect(string = Variable, pattern = "_")))
 
-grps_gaus <- MRFcov(std_grps_mat, n_nodes = 5, family = "gaussian")
+### Gaussian ----
+
+std_grps_mat <- grps_mat %>% mutate(across(1:4, .fns = scale))
+std_dip_mat <- dip_mat %>% mutate(across(1:4, .fns = scale))
+std_herb_mat <- herb_mat %>% mutate(across(1:4, .fns = scale))
+
+grps_gaus <- MRFcov(std_grps_mat, n_nodes = 4, family = "gaussian")
 dip_gaus <- MRFcov(std_dip_mat, n_nodes = 4, family = "gaussian")
 herb_gaus <- MRFcov(std_herb_mat, n_nodes = 4, family = "gaussian")
 
@@ -558,7 +554,7 @@ egg::ggarrange(p_relimp_grps_gaus, p_relimp_dip_gaus, p_relimp_herb_gaus) %>%
   ggsave(filename = "rel_imp_gaus_nonspat.png", device = "png", path = "figures/rel_imp/", 
          dpi = 150, height = 10, width = 10, units = "in")
 
-### Abundance rankings + Gaussian
+### Abundance rankings + Gaussian -----
 
 grps_rank <- grps_mat %>% 
   mutate(across(1:4, .fns = rank))
@@ -596,7 +592,7 @@ herb_rank %>%
   xlab("Rank") + ylab("Frequency") +
   facet_wrap(~species)
 
-grps_rank_mod <- MRFcov(grps_rank, n_nodes = 5, family = "gaussian")
+grps_rank_mod <- MRFcov(grps_rank, n_nodes = 4, family = "gaussian")
 dip_rank_mod <- MRFcov(dip_rank, n_nodes = 4, family = "gaussian")
 herb_rank_mod <- MRFcov(herb_rank, n_nodes = 4, family = "gaussian")
 
