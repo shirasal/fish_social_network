@@ -630,43 +630,28 @@ egg::ggarrange(p_relimp_grps_rank, p_relimp_dip_rank, p_relimp_herb_rank) %>%
 
 ### Poisson
 
-vis_temp_pred_pair("Epinephelus.marginatus", "Mycteroperca.rubra", grps_mat, grps_pois, groupers, 5) %>% 
-  ggsave(filename = "figures/predictions/E_marginatus-M_rubra--TEMP.png", device = "png")
-vis_temp_pred_pair("Mycteroperca.rubra", "Epinephelus.marginatus", grps_mat, grps_pois, groupers, 5) %>% 
-  ggsave(filename = "figures/predictions/M_rubra-E_marginatus--TEMP.png", device = "png")
+vis_temp_pred_pair("Epinephelus.costae", "Serranus.cabrilla", grps_mat, grps_pois, groupers, 4) %>% 
+  ggsave(filename = "figures/predictions/final/E_costae-S_cabrilla--TEMP.png", device = "png")
+vis_mpa_pred_pair("Epinephelus.costae", "Serranus.cabrilla", grps_mat, grps_pois, groupers, 4) %>% 
+  ggsave(filename = "figures/predictions/final/E_costae-S_cabrilla--MPA.png", device = "png")
+vis_mpa_pred_pair("Epinephelus.costae", "Epinephelus.marginatus", grps_mat, grps_pois, groupers, 4) %>% 
+  ggsave(filename = "figures/predictions/final/E_costae-E_marginatus--MPA.png", device = "png")
 
 vis_temp_pred_pair("Diplodus.annularis", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus, 4) %>% 
-  ggsave(filename = "figures/predictions/D_annularis-D_vulgaris--TEMP.png", device = "png")
+  ggsave(filename = "figures/predictions/final/D_annularis-D_vulgaris--TEMP.png", device = "png")
+vis_mpa_pred_pair("Diplodus.puntazzo", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus, 4) %>% 
+  ggsave(filename = "figures/predictions/final/D_puntazzo-D_vulgaris--MPA.png", device = "png")
+vis_mpa_pred_pair("Diplodus.sargus", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus, 4) %>% 
+  ggsave(filename = "figures/predictions/final/D_sargus-D_vulgaris--MPA.png", device = "png")
+vis_temp_pred_pair("Diplodus.sargus", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus, 4) %>% 
+  ggsave(filename = "figures/predictions/final/D_sargus-D_vulgaris--TEMP.png", device = "png")
 vis_mpa_pred_pair("Diplodus.puntazzo", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus, 4) %>% 
   ggsave(filename = "figures/predictions/D_puntazzo-D_vulgaris--MPA.png", device = "png")
-vis_mpa_pred_pair("Diplodus.sargus", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus, 4) %>% 
-  ggsave(filename = "figures/predictions/D_sargus-D_vulgaris--MPA.png", device = "png")
 vis_mpa_pred_pair("Diplodus.vulgaris", "Diplodus.sargus", dip_mat, dip_pois, diplodus, 4) %>% 
   ggsave(filename = "figures/predictions/D_vulgaris-D_sargus--MPA.png", device = "png")
-
-vis_temp_pred_pair("Siganus.rivulatus", "Sparisoma.cretense", herb_mat, herb_pois, herbivores, 4) %>% 
-  ggsave(filename = "figures/predictions/S_rivulatus-S_cretense--TEMP.png", device = "png")
-vis_temp_pred_pair("Siganus.luridus", "Siganus.rivulatus", herb_mat, herb_pois, herbivores, 4) %>% 
-  ggsave(filename = "figures/predictions/S_luridus-S_rivulatus--TEMP.png", device = "png")
-vis_mpa_pred_pair("Siganus.luridus", "Sparisoma.cretense", herb_mat, herb_pois, herbivores, 4) %>% 
-  ggsave(filename = "figures/predictions/S_luridus-S_cretense--MPA.png", device = "png")
-vis_temp_pred_pair("Sparisoma.cretense", "Siganus.rivulatus", herb_mat, herb_pois, herbivores, 4) %>% 
-  ggsave(filename = "figures/predictions/S_cretense-S_rivulatus--TEMP.png", device = "png")
-vis_mpa_pred_pair("Sparisoma.cretense", "Siganus.luridus", herb_mat, herb_pois, herbivores, 4) %>% 
-  ggsave(filename = "figures/predictions/S_cretense-S_luridus--MPA.png", device = "png")
-
-### Gaussian (standardised)
-
-vis_temp_pred_pair("Epinephelus.costae", "Serranus.cabrilla", std_grps_mat, grps_gaus, groupers, 5) %>% 
-  ggsave(filename = "figures/predictions/E_costae-S_cabrilla--TEMP--gauss.png", device = "png")
-
-vis_temp_pred_pair("Diplodus.annularis", "Diplodus.sargus", std_dip_mat, dip_gaus, diplodus, 4) %>% 
-  ggsave(filename = "figures/predictions/D_annularis-D_sargus--TEMP--gauss.png", device = "png")
-
-vis_temp_pred_pair("Siganus.rivulatus", "Siganus.luridus", std_herb_mat, herb_gaus, herbivores, 4) %>% 
-  ggsave(filename = "figures/predictions/S_rivulatus-S_luridus--TEMP--gauss.png", device = "png")
-
-vis_temp_pred_pair("Siganus.luridus", "Siganus.rivulatus", std_herb_mat, herb_gaus, herbivores, 4) %>% 
-  ggsave(filename = "figures/predictions/S_luridus-S_rivulatus--TEMP--gauss.png", device = "png")
-
-
+vis_mpa_pred_pair("Diplodus.vulgaris", "Diplodus.puntazzo", dip_mat, dip_pois, diplodus, 4) %>% 
+  ggsave(filename = "figures/predictions/D_vulgaris-D_puntazzo--MPA.png", device = "png")
+vis_temp_pred_pair("Diplodus.vulgaris", "Diplodus.sargus", dip_mat, dip_pois, diplodus, 4) %>% 
+  ggsave(filename = "figures/predictions/D_vulgaris-D_sargus--TEMP.png", device = "png")
+vis_temp_pred_pair("Diplodus.vulgaris", "Diplodus.annularis", dip_mat, dip_pois, diplodus, 4) %>% 
+  ggsave(filename = "figures/predictions/D_vulgaris-D_annularis--TEMP.png", device = "png")
