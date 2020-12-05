@@ -1027,5 +1027,14 @@ coefs_sum(dip_pois) %>%
   pivot_longer(cols = 3:8) %>% 
   mutate(coefficient_type = str_remove(.$name, "_coef")) %>% 
   na.omit() %>% 
+  select(species, coefficient_type, value, direction) %>% 
   arrange(coefficient_type, species, direction)
 
+
+# Compare spatial / Nonspatial results ------------------------------------
+
+grps_pois_relimp
+grps_pois_spat_relimp
+
+dip_pois_relimp
+dip_pois_spat_relimp
