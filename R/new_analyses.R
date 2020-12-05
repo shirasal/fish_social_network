@@ -219,27 +219,38 @@ coefs_sum <- function(guild_mod, guild){
                          filter(Variable %in% env_vector) %>%
                          group_by(Standardised_coef > 0) %>% 
                          summarise(coefs = sum(Standardised_coef), .groups = "drop") %>% 
-                         transmute(direction = `Standardised_coef > 0`, env_coefficient = coefs) %>%
+                         transmute(direction = `Standardised_coef > 0`, env_coef = coefs) %>%
                          mutate(direction = case_when(.$direction == TRUE ~ "pos",
                                                       .$direction == FALSE ~ "neg",
                                                       TRUE ~ as.character(.$direction)))) %>% 
+    bind_rows(.id = "id")
+  
+  temp_effect <- lapply(guild_mod$key_coefs, FUN = function(x) x %>%
+                          filter(Variable == "temp") %>%
+                          group_by(Standardised_coef > 0) %>% 
+                          summarise(coefs = sum(Standardised_coef), .groups = "drop") %>% 
+                          transmute(direction = `Standardised_coef > 0`, temp_coef = coefs) %>%
+                          mutate(direction = case_when(.$direction == TRUE ~ "pos",
+                                                       .$direction == FALSE ~ "neg",
+                                                       TRUE ~ as.character(.$direction)))) %>% 
     bind_rows(.id = "id")
   
   anthro_effect <- lapply(guild_mod$key_coefs, FUN = function(x) x %>%
                             filter(Variable %in% anthro_vector) %>%
                             group_by(Standardised_coef > 0) %>% 
                             summarise(coefs = sum(Standardised_coef), .groups = "drop") %>% 
-                            transmute(direction = `Standardised_coef > 0`, mpa_coefficient = coefs) %>%
+                            transmute(direction = `Standardised_coef > 0`, mpa_coef = coefs) %>%
                             mutate(direction = case_when(.$direction == TRUE ~ "pos",
                                                          .$direction == FALSE ~ "neg",
                                                          TRUE ~ as.character(.$direction)))) %>% 
     bind_rows(.id = "id")
+
   
   biotic_effect <- lapply(guild_mod$key_coefs, FUN = function(x) x %>%
                             filter(Variable %in% colnames(guild_mod$graph)) %>%
                             group_by(Standardised_coef > 0) %>% 
                             summarise(coefs = sum(Standardised_coef), .groups = "drop") %>% 
-                            transmute(direction = `Standardised_coef > 0`, bio_coefficient = coefs) %>%
+                            transmute(direction = `Standardised_coef > 0`, bio_coef = coefs) %>%
                             mutate(direction = case_when(.$direction == TRUE ~ "pos",
                                                          .$direction == FALSE ~ "neg",
                                                          TRUE ~ as.character(.$direction)))) %>% 
@@ -249,7 +260,7 @@ coefs_sum <- function(guild_mod, guild){
                              filter(str_detect(string = Variable, pattern = "temp_")) %>%
                              group_by(Standardised_coef > 0) %>% 
                              summarise(coefs = sum(Standardised_coef), .groups = "drop") %>%
-                             transmute(direction = `Standardised_coef > 0`, bio_env_coefficient = coefs) %>%
+                             transmute(direction = `Standardised_coef > 0`, bio_env_coef = coefs) %>%
                              mutate(direction = case_when(.$direction == TRUE ~ "pos",
                                                           .$direction == FALSE ~ "neg",
                                                           TRUE ~ as.character(.$direction)))) %>%
@@ -259,7 +270,7 @@ coefs_sum <- function(guild_mod, guild){
                                 filter(str_detect(string = Variable, pattern = "mpa_")) %>%
                                 group_by(Standardised_coef > 0) %>% 
                                 summarise(coefs = sum(Standardised_coef), .groups = "drop") %>%
-                                transmute(direction = `Standardised_coef > 0`, bio_mpa_coefficient = coefs) %>%
+                                transmute(direction = `Standardised_coef > 0`, bio_mpa_coef = coefs) %>%
                                 mutate(direction = case_when(.$direction == TRUE ~ "pos",
                                                              .$direction == FALSE ~ "neg",
                                                              TRUE ~ as.character(.$direction)))) %>%
@@ -267,6 +278,7 @@ coefs_sum <- function(guild_mod, guild){
   
   
   env_effect %>%
+    left_join(temp_effect, by = c("id", "direction")) %>% 
     left_join(anthro_effect, by = c("id", "direction")) %>%
     left_join(biotic_effect, by = c("id", "direction")) %>% 
     left_join(env_bio_effect, by = c("id", "direction")) %>%
@@ -1005,16 +1017,15 @@ list.files("figures/predictions/final/", "MPA_raw.png") %>% length()
 # Coefficients ------------------------------------------------------------
 
 coefs_sum(grps_pois) %>% 
-  pivot_longer(cols = 3:7) %>% 
-  mutate(coefficient_type = str_remove(.$name, "_coefficient")) %>% 
+  pivot_longer(cols = 3:8) %>% 
+  mutate(coefficient_type = str_remove(.$name, "_coef")) %>% 
   na.omit() %>% 
   select(species, coefficient_type, value, direction) %>% 
-  arrange(species, coefficient_type, direction)
+  arrange(coefficient_type, species, direction)
 
 coefs_sum(dip_pois) %>% 
-  pivot_longer(cols = 3:7) %>% 
-  mutate(coefficient_type = str_remove(.$name, "_coefficient")) %>% 
+  pivot_longer(cols = 3:8) %>% 
+  mutate(coefficient_type = str_remove(.$name, "_coef")) %>% 
   na.omit() %>% 
-  select(species, coefficient_type, value, direction) %>% 
-  arrange(species, coefficient_type, direction)
+  arrange(coefficient_type, species, direction)
 
