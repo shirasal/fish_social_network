@@ -213,6 +213,66 @@ vis_temp_pred_pair <- function(species_i, species_j, spp_mat, spp_mod, guild, n_
     theme(legend.title = element_text(face = "italic"), plot.subtitle = element_text(face = "italic"))
 }
 
+### Summarise coefficients for each species, separating positive from negative
+coefs_sum <- function(guild_mod, guild){
+  env_effect <- lapply(guild_mod$key_coefs, FUN = function(x) x %>%
+                         filter(Variable %in% env_vector) %>%
+                         group_by(Standardised_coef > 0) %>% 
+                         summarise(coefs = sum(Standardised_coef), .groups = "drop") %>% 
+                         transmute(direction = `Standardised_coef > 0`, env_coefficient = coefs) %>%
+                         mutate(direction = case_when(.$direction == TRUE ~ "pos",
+                                                      .$direction == FALSE ~ "neg",
+                                                      TRUE ~ as.character(.$direction)))) %>% 
+    bind_rows(.id = "id")
+  
+  anthro_effect <- lapply(guild_mod$key_coefs, FUN = function(x) x %>%
+                            filter(Variable %in% anthro_vector) %>%
+                            group_by(Standardised_coef > 0) %>% 
+                            summarise(coefs = sum(Standardised_coef), .groups = "drop") %>% 
+                            transmute(direction = `Standardised_coef > 0`, mpa_coefficient = coefs) %>%
+                            mutate(direction = case_when(.$direction == TRUE ~ "pos",
+                                                         .$direction == FALSE ~ "neg",
+                                                         TRUE ~ as.character(.$direction)))) %>% 
+    bind_rows(.id = "id")
+  
+  biotic_effect <- lapply(guild_mod$key_coefs, FUN = function(x) x %>%
+                            filter(Variable %in% colnames(guild_mod$graph)) %>%
+                            group_by(Standardised_coef > 0) %>% 
+                            summarise(coefs = sum(Standardised_coef), .groups = "drop") %>% 
+                            transmute(direction = `Standardised_coef > 0`, bio_coefficient = coefs) %>%
+                            mutate(direction = case_when(.$direction == TRUE ~ "pos",
+                                                         .$direction == FALSE ~ "neg",
+                                                         TRUE ~ as.character(.$direction)))) %>% 
+    bind_rows(.id = "id")
+  
+  env_bio_effect <- lapply(guild_mod$key_coefs, FUN = function(x) x %>%
+                             filter(str_detect(string = Variable, pattern = "temp_")) %>%
+                             group_by(Standardised_coef > 0) %>% 
+                             summarise(coefs = sum(Standardised_coef), .groups = "drop") %>%
+                             transmute(direction = `Standardised_coef > 0`, bio_env_coefficient = coefs) %>%
+                             mutate(direction = case_when(.$direction == TRUE ~ "pos",
+                                                          .$direction == FALSE ~ "neg",
+                                                          TRUE ~ as.character(.$direction)))) %>%
+    bind_rows(.id = "id")
+  
+  anthro_bio_effect <- lapply(guild_mod$key_coefs, FUN = function(x) x %>%
+                                filter(str_detect(string = Variable, pattern = "mpa_")) %>%
+                                group_by(Standardised_coef > 0) %>% 
+                                summarise(coefs = sum(Standardised_coef), .groups = "drop") %>%
+                                transmute(direction = `Standardised_coef > 0`, bio_mpa_coefficient = coefs) %>%
+                                mutate(direction = case_when(.$direction == TRUE ~ "pos",
+                                                             .$direction == FALSE ~ "neg",
+                                                             TRUE ~ as.character(.$direction)))) %>%
+    bind_rows(.id = "id")
+  
+  
+  env_effect %>%
+    left_join(anthro_effect, by = c("id", "direction")) %>%
+    left_join(biotic_effect, by = c("id", "direction")) %>% 
+    left_join(env_bio_effect, by = c("id", "direction")) %>%
+    left_join(anthro_bio_effect, by = c("id", "direction")) %>% 
+    arrange(direction)
+}
 
 # Data --------------------------------------------------------------------
 
@@ -476,8 +536,8 @@ for (j in 1:length(spp_list)) {
 spp_maps[[1]] # Check
 
 # # Plot all together in two methods (very time consuming)
-# patchwork::wrap_plots(spp_maps) %>% ggsave(filename = "species_maps.png",
-#                                            device = "png", path = "figures", height = 16, width = 30, units = "in")
+# patchwork::wrap_plots(spp_maps) 
+# ggsave(filename = "species_maps.png", device = "png", path = "figures", height = 16, width = 30, units = "in")
 
 list.files(path = "figures/species_maps") # Check all maps have been written to the directory
 
@@ -933,4 +993,16 @@ dip_mat %>%
   theme(plot.title = element_text(face = "italic"),
         plot.subtitle = element_text(face = "italic"))
 ggsave(filename = "figures/predictions/final/D_vulgaris-D_puntazzo--MPA_raw.png", device = "png", dpi = 150)
+
+# Check all files exported:
+list.files("figures/predictions/final/", "TEMP.png") %>% length()
+list.files("figures/predictions/final/", "TEMP_raw.png") %>% length()
+list.files("figures/predictions/final/", "MPA.png") %>% length()
+list.files("figures/predictions/final/", "MPA_raw.png") %>% length()
+
+
+# Coefficients ------------------------------------------------------------
+
+coefs_sum(grps_pois)
+coefs_sum(dip_pois)
 
