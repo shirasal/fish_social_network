@@ -87,7 +87,7 @@ plot_relimp <- function(rel_imp_df, col, guild_name){
 }
 
 ### MPA predictions visualisation
-vis_mpa_pred_pair <- function(species_i, species_j, spp_mat, spp_mod, guild, n_spp){
+vis_mpa_pred_pair <- function(species_i, species_j, spp_mat, spp_mod, guild){
   # Create a vector of all other species except species_j
   all_other_species <- guild[-which(guild == species_j)]
   
@@ -100,12 +100,12 @@ vis_mpa_pred_pair <- function(species_i, species_j, spp_mat, spp_mod, guild, n_s
            across(all_of(all_other_species), .fns = mean)) %>% 
     group_by(mpa) %>% 
     sample_n(1)
-  # Scenario 2: species_j is at its max abundance, other species are at their mean abundance
+  # Scenario 2: species_j is at its 90th percentile abundance, other species are at their mean abundance
   j_max <- spp_mat %>% 
     mutate(temp = median(temp),
            depth = median(depth),
            prod = median(prod),
-           across(.cols = all_of(species_j), .fns = max),
+           across(.cols = all_of(species_j), .fns = function(x) quantile(x, 0.9)),
            across(all_of(all_other_species), .fns = mean)) %>% 
     group_by(mpa) %>% 
     sample_n(1)
@@ -130,7 +130,7 @@ vis_mpa_pred_pair <- function(species_i, species_j, spp_mat, spp_mod, guild, n_s
   # Visualise the predictions
   ## Create a dataframe with all the predictions, sorted by scenario
   predictions_mpa <- mpa_predict %>% 
-    pivot_longer(cols = all_of(2:(1+n_spp)),
+    pivot_longer(cols = all_of(2:5),
                  names_to = "species",
                  values_to = "prediction", 
                  names_repair = "minimal")
@@ -141,7 +141,7 @@ vis_mpa_pred_pair <- function(species_i, species_j, spp_mat, spp_mod, guild, n_s
     ggplot() +
     aes(x = mpa, y = prediction, fill = scenario) +
     stat_summary(geom = "bar", fun = "mean", position = "dodge") +
-    # stat_summary(geom = "errorbar", fun.data = "mean_se", position = position_dodge(width = 0.8), width = 0.2) +
+    stat_summary(geom = "errorbar", fun.data = "mean_se", position = position_dodge(width = 0.8), width = 0.2) +
     xlab("MPA") + ylab("Abundance Prediction") +
     labs(title = "Observation predictions",
          subtitle = stringr::str_replace(species_i, "\\.", "\\ "),
@@ -151,7 +151,7 @@ vis_mpa_pred_pair <- function(species_i, species_j, spp_mat, spp_mod, guild, n_s
 }
 
 ### Temperature predictions visualisation
-vis_temp_pred_pair <- function(species_i, species_j, spp_mat, spp_mod, guild, n_spp){
+vis_temp_pred_pair <- function(species_i, species_j, spp_mat, spp_mod, guild){
   # Create a vector of all other species except species_j
   all_other_species <- guild[-which(guild == species_j)]
   
@@ -164,12 +164,12 @@ vis_temp_pred_pair <- function(species_i, species_j, spp_mat, spp_mod, guild, n_
            across(all_of(all_other_species), .fns = mean)) %>% 
     group_by(temp = round(temp, digits = 1)) %>% 
     sample_n(1)
-  # Scenario 2: species_j is at its max abundance, other species are at their mean abundance
+  # Scenario 2: species_j is at its 90th percentile abundance, other species are at their mean abundance
   j_max <- spp_mat %>% 
     mutate(depth = median(depth),
            prod = median(prod),
            mpa = TRUE,
-           across(.cols = all_of(species_j), .fns = max),
+           across(.cols = all_of(species_j), .fns = function(x) quantile(x, 0.9)),
            across(all_of(all_other_species), .fns = mean)) %>% 
     group_by(temp = round(temp, digits = 1)) %>% 
     sample_n(1)
@@ -194,7 +194,7 @@ vis_temp_pred_pair <- function(species_i, species_j, spp_mat, spp_mod, guild, n_
   # Visualise the predictions
   ## Create a dataframe with all the predictions, sorted by scenario
   predictions_temp <- temp_predict %>% 
-    pivot_longer(cols = all_of(2:(1+n_spp)),
+    pivot_longer(cols = all_of(2:5),
                  names_to = "species",
                  values_to = "prediction", 
                  names_repair = "minimal")
@@ -313,9 +313,8 @@ med_clean <- med_raw %>%
          sal = scale(sal_mean),
          prod = scale(pp_mean)) %>%
   group_by(lon, lat, site, trans, species, mpa, temp, depth, prod) %>% 
-  summarise(abundance = sum(sp.n)) %>%
-  select(site, lon, lat, trans, species, abundance, mpa, temp, depth, prod) %>% 
-  ungroup()
+  summarise(abundance = sum(sp.n), .groups = "drop") %>%
+  select(site, lon, lat, trans, species, abundance, mpa, temp, depth, prod)
 
 guilds_data <- med_raw %>%
   filter(species %in% c(groupers, diplodus, herbivores)) %>% 
@@ -328,9 +327,8 @@ guilds_data <- med_raw %>%
                            species %in% diplodus ~ "seabreams",
                            species %in% herbivores ~ "herbivores")) %>%
   group_by(lon, lat, site, trans, species, guild, mpa, temp, depth, prod) %>% 
-  summarise(abundance = sum(sp.n)) %>%
-  select(site, lon, lat, trans, species, abundance, guild, mpa, temp, depth, prod) %>% 
-  ungroup()
+  summarise(abundance = sum(sp.n), .groups = "drop") %>%
+  select(site, lon, lat, trans, species, abundance, guild, mpa, temp, depth, prod)
 
 ### Mean vectors for continuous variables
 mean_depth <- median(scale(med_raw$depth), na.rm = TRUE)
@@ -377,9 +375,9 @@ herb_boxplot <- guilds_data %>%
   theme(axis.text.x = element_text(angle = 30, vjust = 0.5))
 
 boxplot_guilds <- list(grps_boxplot, dip_boxplot, herb_boxplot)
-patchwork::wrap_plots(boxplot_guilds, ncol = 1) %>% 
-  ggsave(filename = "guilds_boxplots.png", 
-         device = "png", path = "figures", height = 8, width = 6, units = "in")
+patchwork::wrap_plots(boxplot_guilds, ncol = 1)
+ggsave(filename = "guilds_boxplots.png", device = "png", path = "figures", 
+       height = 8, width = 6, units = "in")
 
 ## BOXPLOTS per GUILD - transformed
 
@@ -411,9 +409,9 @@ herb_log_boxplot <- guilds_data %>%
   theme(axis.text.x = element_text(angle = 30, vjust = 0.5))
 
 boxplot_guilds_log <- list(grps_log_boxplot, dip_log_boxplot, herb_log_boxplot)
-patchwork::wrap_plots(boxplot_guilds_log, ncol = 1) %>% 
-  ggsave(filename = "guilds_boxplots_log.png", 
-         device = "png", path = "figures", height = 8, width = 6, units = "in")
+patchwork::wrap_plots(boxplot_guilds_log, ncol = 1)
+ggsave(filename = "guilds_boxplots_log.png", device = "png", path = "figures",
+       height = 8, width = 6, units = "in")
 
 ## HISTOGRAMS per SPECIES
 grps_hist <- guilds_data %>% 
@@ -544,7 +542,7 @@ for (j in 1:length(spp_list)) {
 
 spp_maps[[1]] # Check
 
-# # Plot all together in two methods (very time consuming)
+# # Plot all together (very time consuming)
 # patchwork::wrap_plots(spp_maps) 
 # ggsave(filename = "species_maps.png", device = "png", path = "figures", height = 16, width = 30, units = "in")
 
@@ -571,19 +569,9 @@ p_relimp_dip_pois <- plot_relimp(dip_pois_relimp, guild_colours$dip, "Diplodus")
 # ggsave("p_relimp_dip_pois_nonspat.png", p_relimp_dip_pois, "png", "figures/rel_imp/", dpi = 300, width = 11.74, height = 4, units = "in")
 p_relimp_herb_pois <- plot_relimp(herb_pois_relimp, guild_colours$herb, "Herbivores")
 # ggsave("p_relimp_herb_pois_nonspat.png", p_relimp_herb_pois, "png", "figures/rel_imp/", dpi = 300, width = 11.74, height = 4, units = "in")
-egg::ggarrange(p_relimp_grps_pois, p_relimp_dip_pois, p_relimp_herb_pois) %>% 
-  ggsave(filename = "rel_imp_pois_nonspat.png", device = "png", path = "figures/rel_imp/", 
+egg::ggarrange(p_relimp_grps_pois, p_relimp_dip_pois, p_relimp_herb_pois)
+ggsave(filename = "rel_imp_pois_nonspat.png", device = "png", path = "figures/rel_imp/", 
          dpi = 150, height = 10, width = 10, units = "in")
-
-## Check for interactions
-lapply(grps_pois$key_coefs, function(x) x %>% 
-         filter(str_detect(string = Variable, pattern = "_")))
-
-lapply(dip_pois$key_coefs, function(x) x %>% 
-         filter(str_detect(string = Variable, pattern = "_")))
-
-lapply(herb_pois$key_coefs, function(x) x %>% 
-         filter(str_detect(string = Variable, pattern = "_")))
 
 
 ### Spatial (Poisson)
@@ -613,7 +601,7 @@ herb_pois_spat_relimp <- rel_imp_sum(herb_pois_spat)
 p_relimp_grps_pois_spat <- plot_relimp(grps_pois_spat_relimp, guild_colours$grps, "Groupers")
 p_relimp_dip_pois_spat <- plot_relimp(dip_pois_spat_relimp, guild_colours$dip, "Diplodus")
 p_relimp_herb_pois_spat <- plot_relimp(herb_pois_spat_relimp, guild_colours$herb, "Herbivores")
-egg::ggarrange(p_relimp_grps_pois_spat, p_relimp_dip_pois_spat, p_relimp_herb_pois_spat) %>% 
+egg::ggarrange(p_relimp_grps_pois_spat, p_relimp_dip_pois_spat, p_relimp_herb_pois_spat)
   ggsave(filename = "rel_imp_pois_spat.png", device = "png", path = "figures/rel_imp/", 
          dpi = 150, height = 10, width = 10, units = "in")
 
@@ -731,6 +719,14 @@ egg::ggarrange(p_relimp_grps_rank, p_relimp_dip_rank, p_relimp_herb_rank) %>%
 # Visualisations ----------------------------------------------------------
 
 ### Poisson
+
+## Check for interactions
+lapply(grps_pois$key_coefs, function(x) x %>% 
+         filter(str_detect(string = Variable, pattern = "_")))
+
+lapply(dip_pois$key_coefs, function(x) x %>% 
+         filter(str_detect(string = Variable, pattern = "_")))
+
 ## Temperature
 
 # y                  ~ cov_biotic                  rel_imp           coef
@@ -742,16 +738,16 @@ egg::ggarrange(p_relimp_grps_rank, p_relimp_dip_rank, p_relimp_herb_rank) %>%
 # Diplodus.vulgaris ~ temp_Diplodus.annularis     0.02311833        0.08714881
 
 # Groupers
-vis_temp_pred_pair("Epinephelus.costae", "Serranus.cabrilla", grps_mat, grps_pois, groupers, 4) %>% 
+vis_temp_pred_pair("Epinephelus.costae", "Serranus.cabrilla", grps_mat, grps_pois, groupers) %>%
   ggsave(filename = "figures/predictions/final/E_costae-S_cabrilla--TEMP.png", device = "png")
 # Seabream
-vis_temp_pred_pair("Diplodus.annularis", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus, 4) %>% 
+vis_temp_pred_pair("Diplodus.annularis", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus) %>% 
   ggsave(filename = "figures/predictions/final/D_annularis-D_vulgaris--TEMP.png", device = "png")
-vis_temp_pred_pair("Diplodus.sargus", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus, 4) %>% 
+vis_temp_pred_pair("Diplodus.sargus", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus) %>% 
   ggsave(filename = "figures/predictions/final/D_sargus-D_vulgaris--TEMP.png", device = "png")
-vis_temp_pred_pair("Diplodus.vulgaris", "Diplodus.sargus", dip_mat, dip_pois, diplodus, 4) %>% 
+vis_temp_pred_pair("Diplodus.vulgaris", "Diplodus.sargus", dip_mat, dip_pois, diplodus) %>% 
   ggsave(filename = "figures/predictions/final/D_vulgaris-D_sargus--TEMP.png", device = "png")
-vis_temp_pred_pair("Diplodus.vulgaris", "Diplodus.annularis", dip_mat, dip_pois, diplodus, 4) %>% 
+vis_temp_pred_pair("Diplodus.vulgaris", "Diplodus.annularis", dip_mat, dip_pois, diplodus) %>% 
   ggsave(filename = "figures/predictions/final/D_vulgaris-D_annularis--TEMP.png", device = "png")
 
 ## MPA
