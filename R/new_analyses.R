@@ -1055,15 +1055,16 @@ plot_graph <- function(guild_mod, plot_title){
     scale_edge_color_manual(values = c(net_cols[["pos"]], net_cols[["neg"]])) +
     geom_node_point(aes(size = deg), col = "grey", alpha = 0.5) +
     geom_node_text(aes(label = name), repel = TRUE, check_overlap = TRUE, 
-                   point.padding = unit(0.2, "lines")) +
+                   point.padding = unit(0.2, "lines"), fontface = "italic") +
     theme(legend.position = "none",
           aspect.ratio = 1,
-          panel.background = element_blank()) +
-    ggtitle(plot_title)
+          panel.background = element_blank())
 }
 
-plot_graph(grps_pois, plot_title = "Groupers network")
-ggsave("figures/networks/groupers_network.png", device = "png", dpi = 300)
+plot_graph(grps_pois)
+ggsave("figures/networks/groupers_network.png", device = "png", 
+       dpi = 300, width = 4, unit = "in")
 
-plot_graph(dip_pois, "Seabreams network")
-ggsave("figures/networks/diplodus_network.png", device = "png", dpi = 300)
+plot_graph(dip_pois)
+ggsave("figures/networks/diplodus_network.png", device = "png", 
+       dpi = 300, width = 4, unit = "in")
