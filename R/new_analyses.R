@@ -142,7 +142,7 @@ vis_mpa_pred_pair <- function(species_i, species_j, spp_mat, spp_mod, guild, n_s
     aes(x = mpa, y = prediction, fill = scenario) +
     stat_summary(geom = "bar", fun = "mean", position = "dodge") +
     # stat_summary(geom = "errorbar", fun.data = "mean_se", position = position_dodge(width = 0.8), width = 0.2) +
-    xlab("MPA") + ylab("Prediction") +
+    xlab("MPA") + ylab("Abundance Prediction") +
     labs(title = "Observation predictions",
          subtitle = stringr::str_replace(species_i, "\\.", "\\ "),
          fill = stringr::str_replace(species_j, "\\.", "\\ ")) +
@@ -205,7 +205,7 @@ vis_temp_pred_pair <- function(species_i, species_j, spp_mat, spp_mod, guild, n_
     ggplot() +
     aes(x = temp, y = prediction, col = scenario) +
     geom_smooth(method = "lm", formula = y ~ x, cex = 3, alpha = 0.1) +
-    xlab("Temperature (scaled)") + ylab("Prediction") +
+    xlab("Temperature (scaled)") + ylab("Abundance Prediction") +
     labs(title = "Observation predictions",
          subtitle = stringr::str_replace(species_i, "\\.", "\\ "),
          col = stringr::str_replace(species_j, "\\.", "\\ ")) +
