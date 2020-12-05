@@ -658,37 +658,11 @@ egg::ggarrange(p_relimp_grps_rank, p_relimp_dip_rank, p_relimp_herb_rank) %>%
 
 
 
+
 # Visualisations ----------------------------------------------------------
 
 ### Poisson
-
-vis_temp_pred_pair("Epinephelus.costae", "Serranus.cabrilla", grps_mat, grps_pois, groupers, 4) %>% 
-  ggsave(filename = "figures/predictions/final/E_costae-S_cabrilla--TEMP.png", device = "png")
-vis_mpa_pred_pair("Epinephelus.costae", "Serranus.cabrilla", grps_mat, grps_pois, groupers, 4) %>% 
-  ggsave(filename = "figures/predictions/final/E_costae-S_cabrilla--MPA.png", device = "png")
-vis_mpa_pred_pair("Epinephelus.costae", "Epinephelus.marginatus", grps_mat, grps_pois, groupers, 4) %>% 
-  ggsave(filename = "figures/predictions/final/E_costae-E_marginatus--MPA.png", device = "png")
-
-vis_temp_pred_pair("Diplodus.annularis", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus, 4) %>% 
-  ggsave(filename = "figures/predictions/final/D_annularis-D_vulgaris--TEMP.png", device = "png")
-vis_temp_pred_pair("Diplodus.sargus", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus, 4) %>% 
-  ggsave(filename = "figures/predictions/final/D_sargus-D_vulgaris--TEMP.png", device = "png")
-vis_temp_pred_pair("Diplodus.vulgaris", "Diplodus.sargus", dip_mat, dip_pois, diplodus, 4) %>% 
-  ggsave(filename = "figures/predictions/final/D_vulgaris-D_sargus--TEMP.png", device = "png")
-vis_temp_pred_pair("Diplodus.vulgaris", "Diplodus.annularis", dip_mat, dip_pois, diplodus, 4) %>% 
-  ggsave(filename = "figures/predictions/final/D_vulgaris-D_annularis--TEMP.png", device = "png")
-vis_mpa_pred_pair("Diplodus.puntazzo", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus, 4) %>% 
-  ggsave(filename = "figures/predictions/final/D_puntazzo-D_vulgaris--MPA.png", device = "png")
-vis_mpa_pred_pair("Diplodus.vulgaris", "Diplodus.sargus", dip_mat, dip_pois, diplodus, 4) %>% 
-  ggsave(filename = "figures/predictions/final/D_vulgaris-D_sargus--MPA.png", device = "png")
-vis_mpa_pred_pair("Diplodus.vulgaris", "Diplodus.puntazzo", dip_mat, dip_pois, diplodus, 4) %>% 
-  ggsave(filename = "figures/predictions/final/D_vulgaris-D_puntazzo--MPA.png", device = "png")
-vis_mpa_pred_pair("Diplodus.puntazzo", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus, 4) %>% 
-  ggsave(filename = "figures/predictions/final/D_puntazzo-D_vulgaris--MPA.png", device = "png")
-vis_mpa_pred_pair("Diplodus.sargus", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus, 4) %>% 
-  ggsave(filename = "figures/predictions/final/D_sargus-D_vulgaris--MPA.png", device = "png")
-
-# Raw data with scenarios -------------------------------------------------
+## Temperature
 
 # y                  ~ cov_biotic                  rel_imp           coef
 # -----------------  -----------------------    -------------      -----------
@@ -698,16 +672,64 @@ vis_mpa_pred_pair("Diplodus.sargus", "Diplodus.vulgaris", dip_mat, dip_pois, dip
 # Diplodus.vulgaris ~ temp_Diplodus.sargus     0.05159193        0.13018894
 # Diplodus.vulgaris ~ temp_Diplodus.annularis     0.02311833        0.08714881
 
-# scenarios_temp <- function(spp_mat, sp_i, sp_j, guild_col){
-#   spp_mat %>% 
-#   mutate(species_j = if_else(sp_j == 0, "absent", "present")) %>% 
-#   ggplot() +
-#   aes(x = temp, y = sp_i) +
-#   geom_point(col = guild_col) +
-#   stat_smooth(method = "gam", formula = y ~ s(x, bs = "cs"), col = "darkcyan", alpha = 0.3) +
-#   xlab("Temperature") + ylab(str_glue("{sp_i} Abundance")) +
-#   facet_wrap(~species_j, ncol = 2)
-# }
+# Groupers
+vis_temp_pred_pair("Epinephelus.costae", "Serranus.cabrilla", grps_mat, grps_pois, groupers, 4) %>% 
+  ggsave(filename = "figures/predictions/final/E_costae-S_cabrilla--TEMP.png", device = "png")
+# Seabream
+vis_temp_pred_pair("Diplodus.annularis", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus, 4) %>% 
+  ggsave(filename = "figures/predictions/final/D_annularis-D_vulgaris--TEMP.png", device = "png")
+vis_temp_pred_pair("Diplodus.sargus", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus, 4) %>% 
+  ggsave(filename = "figures/predictions/final/D_sargus-D_vulgaris--TEMP.png", device = "png")
+vis_temp_pred_pair("Diplodus.vulgaris", "Diplodus.sargus", dip_mat, dip_pois, diplodus, 4) %>% 
+  ggsave(filename = "figures/predictions/final/D_vulgaris-D_sargus--TEMP.png", device = "png")
+vis_temp_pred_pair("Diplodus.vulgaris", "Diplodus.annularis", dip_mat, dip_pois, diplodus, 4) %>% 
+  ggsave(filename = "figures/predictions/final/D_vulgaris-D_annularis--TEMP.png", device = "png")
+
+## MPA
+
+# y                  ~ cov_biotic                  rel_imp           coef
+# -----------------  -----------------------    -------------      -----------
+# Epinephelus.costae ~ mpa_Serranus.cabrilla     0.07737350       -0.05396605
+# Epinephelus.costae ~ mpa_Epinephelus.marginatus  0.06208940       -0.04834296
+# Diplodus.annularis ~ mpa_Diplodus.vulgaris     0.04784076        0.05427835
+# Diplodus.puntazzo ~ mpa_Diplodus.vulgaris     0.35485998        0.15129631
+# Diplodus.sargus ~ mpa_Diplodus.vulgaris     0.20124590         0.2634552
+# Diplodus.vulgaris ~ mpa_Diplodus.sargus     0.21127450        0.26345518
+# Diplodus.vulgaris ~ mpa_Diplodus.puntazzo     0.06967714        0.15129631
+
+# Groupers
+vis_mpa_pred_pair("Epinephelus.costae", "Serranus.cabrilla", grps_mat, grps_pois, groupers, 4) %>% 
+  ggsave(filename = "figures/predictions/final/E_costae-S_cabrilla--MPA.png", device = "png")
+vis_mpa_pred_pair("Epinephelus.costae", "Epinephelus.marginatus", grps_mat, grps_pois, groupers, 4) %>% 
+  ggsave(filename = "figures/predictions/final/E_costae-E_marginatus--MPA.png", device = "png")
+vis_mpa_pred_pair("Epinephelus.marginatus", "Epinephelus.costae", grps_mat, grps_pois, groupers, 4) %>% 
+  ggsave(filename = "figures/predictions/final/E_marginatus-E_costae--MPA.png", device = "png")
+# Seabream
+vis_mpa_pred_pair("Diplodus.annularis", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus, 4) %>% 
+  ggsave(filename = "figures/predictions/final/D_annularis-D_vulgaris--MPA.png", device = "png")
+vis_mpa_pred_pair("Diplodus.puntazzo", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus, 4) %>% 
+  ggsave(filename = "figures/predictions/final/D_puntazzo-D_vulgaris--MPA.png", device = "png")
+vis_mpa_pred_pair("Diplodus.sargus", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus, 4) %>% 
+  ggsave(filename = "figures/predictions/final/D_sargus-D_vulgaris--MPA.png", device = "png")
+vis_mpa_pred_pair("Diplodus.vulgaris", "Diplodus.sargus", dip_mat, dip_pois, diplodus, 4) %>% 
+  ggsave(filename = "figures/predictions/final/D_vulgaris-D_sargus--MPA.png", device = "png")
+vis_mpa_pred_pair("Diplodus.vulgaris", "Diplodus.puntazzo", dip_mat, dip_pois, diplodus, 4) %>% 
+  ggsave(filename = "figures/predictions/final/D_vulgaris-D_puntazzo--MPA.png", device = "png")
+
+# Raw data with scenarios -------------------------------------------------
+lapply(grps_pois$key_coefs, function(x) x %>% 
+         filter(str_detect(string = Variable, pattern = "_")))
+
+lapply(dip_pois$key_coefs, function(x) x %>% 
+         filter(str_detect(string = Variable, pattern = "_")))
+
+# y                  ~ cov_biotic                  rel_imp           coef
+# -----------------  -----------------------    -------------      -----------
+# Epinephelus.costae ~ temp_Serranus.cabrilla     0.07217235        0.05212067
+# Diplodus.annularis ~ temp_Diplodus.vulgaris     0.12332969        0.08714881
+# Diplodus.sargus ~ temp_Diplodus.vulgaris     0.05466831         0.1373128
+# Diplodus.vulgaris ~ temp_Diplodus.sargus     0.05159193        0.13018894
+# Diplodus.vulgaris ~ temp_Diplodus.annularis     0.02311833        0.08714881
 
 # Epinephelus.costae ~ temp_Serranus.cabrilla
 grps_mat %>% 
@@ -798,40 +820,16 @@ ggsave(filename = "figures/predictions/final/D_vulgaris-D_annularis--TEMP_raw.pn
 
 # y                  ~ cov_biotic                  rel_imp           coef
 # -----------------  -----------------------    -------------      -----------
-# Epinephelus.costae ~ mpa_Serranus.cabrilla     0.07737350       -0.05396605
-# Epinephelus.costae ~ mpa_Epinephelus.marginatus  0.06208940       -0.04834296
-# Diplodus.annularis ~ mpa_Diplodus.vulgaris     0.04784076        0.05427835
-# Diplodus.puntazzo ~ mpa_Diplodus.vulgaris     0.35485998        0.15129631
-# Diplodus.sargus ~ mpa_Diplodus.vulgaris     0.20124590         0.2634552
-# Diplodus.vulgaris ~ mpa_Diplodus.sargus     0.21127450        0.26345518
-# Diplodus.vulgaris ~ mpa_Diplodus.puntazzo     0.06967714        0.15129631
+# Epinephelus.costae ~ mpa_Serranus.cabrilla      0.07737350      -0.05396605
+# Epinephelus.costae ~ mpa_Epinephelus.marginatus 0.06208940      -0.04834296
+# Epinephelus.marginatus ~ mpa_Epinephelus.costae	0.05148053	    -0.04834296
+# Diplodus.annularis ~ mpa_Diplodus.vulgaris      0.04784076       0.05427835
+# Diplodus.puntazzo ~ mpa_Diplodus.vulgaris       0.35485998       0.15129631
+# Diplodus.sargus ~ mpa_Diplodus.vulgaris         0.20124590       0.2634552
+# Diplodus.vulgaris ~ mpa_Diplodus.sargus         0.21127450       0.26345518
+# Diplodus.vulgaris ~ mpa_Diplodus.puntazzo       0.06967714       0.15129631
 
 # Epinephelus.costae ~ mpa_Serranus.cabrilla
-# grps_mat %>% 
-#   mutate(species_j = if_else(Serranus.cabrilla == 0, "Species j Absent", "Species j Present")) %>% 
-#   ggplot() +
-#   aes(x = mpa, y = log2(Epinephelus.costae+0.1)) +
-#   geom_point(col = guild_colours$grps) +
-#   stat_smooth(method = "lm", formula = y ~ s(x, bs = "cs"), col = "darkcyan", alpha = 0.3) +
-#   xlab("MPA") + ylab("Abundance (nonparanormal)") +
-#   ggtitle("Epinephelus costae", subtitle = "Serranus cabrilla") +
-#   facet_wrap(~species_j, ncol = 2) + 
-#   theme(plot.title = element_text(face = "italic"),
-#         plot.subtitle = element_text(face = "italic"))
-# 
-# grps_mat %>% 
-#   mutate(species_j = if_else(Serranus.cabrilla == 0, "Species j Absent", "Species j Present")) %>% 
-#   ggplot() +
-#   aes(x = mpa, y = log2(Epinephelus.costae+0.1)) +
-#   stat_summary(geom = "bar", fun = "mean", position = "dodge", 
-#                col = guild_colours$grps, fill = "ghostwhite") +
-#   stat_summary(geom = "errorbar", fun.data = "mean_se", 
-#                position = position_dodge(width = 0.8), width = 0.2, col = "dimgray") +
-#   xlab("MPA") + ylab("Abundance (nonparanormal)") +
-#   ggtitle("Epinephelus costae", subtitle = "Serranus cabrilla") +
-#   facet_wrap(~species_j, ncol = 2) + 
-#   theme(plot.title = element_text(face = "italic"),
-#         plot.subtitle = element_text(face = "italic"))
 
 grps_mat %>% 
   mutate(species_j = if_else(Serranus.cabrilla == 0, "Species j Absent", "Species j Present")) %>% 
@@ -843,8 +841,9 @@ grps_mat %>%
   facet_wrap(~species_j, ncol = 2) + 
   theme(plot.title = element_text(face = "italic"),
         plot.subtitle = element_text(face = "italic"))
+ggsave(filename = "figures/predictions/final/E_costae-S_cabrilla--MPA_raw.png", device = "png", dpi = 150)
 
-# Epinephelus.costae ~ mpa_Epinephelus.marginatus  0.06208940       -0.04834296
+# Epinephelus.costae ~ mpa_Epinephelus.marginatus
 grps_mat %>% 
   mutate(species_j = if_else(Epinephelus.marginatus == 0, "Species j Absent", "Species j Present")) %>% 
   ggplot() +
@@ -855,10 +854,22 @@ grps_mat %>%
   facet_wrap(~species_j, ncol = 2) + 
   theme(plot.title = element_text(face = "italic"),
         plot.subtitle = element_text(face = "italic"))
+ggsave(filename = "figures/predictions/final/E_costae-Emarginatus--MPA_raw.png", device = "png", dpi = 150)
 
+# Epinephelus.marginatus ~ mpa_Epinephelus.costae
+grps_mat %>% 
+  mutate(species_j = if_else(Epinephelus.costae == 0, "Species j Absent", "Species j Present")) %>% 
+  ggplot() +
+  aes(x = mpa, y = log2(Epinephelus.marginatus+0.1)) +
+  geom_boxplot(col = guild_colours$grps, fill = "ghostwhite") +
+  xlab("MPA") + ylab("Abundance (nonparanormal)") +
+  ggtitle("Epinephelus marginatus", subtitle = "Epinephelus costae") +
+  facet_wrap(~species_j, ncol = 2) + 
+  theme(plot.title = element_text(face = "italic"),
+        plot.subtitle = element_text(face = "italic"))
+ggsave(filename = "figures/predictions/final/Emarginatus-E_costae--MPA_raw.png", device = "png", dpi = 150)
 
 # Diplodus.annularis ~ mpa_Diplodus.vulgaris
-
 dip_mat %>% 
   mutate(species_j = if_else(Diplodus.vulgaris == 0, "Species j Absent", "Species j Present")) %>% 
   ggplot() +
@@ -869,41 +880,9 @@ dip_mat %>%
   facet_wrap(~species_j, ncol = 2) + 
   theme(plot.title = element_text(face = "italic"),
         plot.subtitle = element_text(face = "italic"))
-
-# Diplodus.vulgaris ~ mpa_Diplodus.puntazzo
-dip_mat %>% 
-  mutate(species_j = if_else(Diplodus.puntazzo == 0, "Species j Absent", "Species j Present")) %>% 
-  ggplot() +
-  aes(x = mpa, y = log2(Diplodus.vulgaris+0.1)) +
-  geom_boxplot(col = guild_colours$grps, fill = "ghostwhite") +
-  xlab("MPA") + ylab("Abundance (nonparanormal)") +
-  ggtitle("Diplodus vulgaris", subtitle = "Diplodus puntazzo") +
-  facet_wrap(~species_j, ncol = 2) + 
-  theme(plot.title = element_text(face = "italic"),
-        plot.subtitle = element_text(face = "italic"))
-
-ggsave(filename = "figures/predictions/final/D_vulgaris-D_puntazzo--MPA_raw.png", device = "png", dpi = 150)
-
-# Diplodus.vulgaris ~ mpa_Diplodus.puntazzo
-dip_mat %>% 
-  mutate(species_j = if_else(Diplodus.puntazzo == 0, "Species j Absent", "Species j Present")) %>% 
-  ggplot() +
-  aes(x = mpa, y = log2(Diplodus.vulgaris+0.1)) +
-  stat_summary(geom = "bar", fun = "mean", position = "dodge", 
-               col = guild_colours$grps, fill = "ghostwhite") +
-  stat_summary(geom = "errorbar", fun.data = "mean_se",
-               position = position_dodge(width = 0.8), width = 0.2, col = "dimgray") +
-  xlab("MPA") + ylab("Abundance (nonparanormal)") +
-  ggtitle("Diplodus vulgaris", subtitle = "Diplodus puntazzo") +
-  facet_wrap(~species_j, ncol = 2) + 
-  theme(plot.title = element_text(face = "italic"),
-        plot.subtitle = element_text(face = "italic"))
-
-ggsave(filename = "figures/predictions/final/D_vulgaris-D_puntazzo--MPA_test.png", device = "png", dpi = 150)
-
+ggsave(filename = "figures/predictions/final/D_annularis-D_vulgaris--MPA_raw.png", device = "png", dpi = 150)
 
 # Diplodus.puntazzo ~ mpa_Diplodus.vulgaris
-
 dip_mat %>% 
   mutate(species_j = if_else(Diplodus.vulgaris == 0, "Species j Absent", "Species j Present")) %>% 
   ggplot() +
@@ -914,46 +893,44 @@ dip_mat %>%
   facet_wrap(~species_j, ncol = 2) + 
   theme(plot.title = element_text(face = "italic"),
         plot.subtitle = element_text(face = "italic"))
-
 ggsave(filename = "figures/predictions/final/D_puntazzo-D_vulgaris--MPA_raw.png", device = "png", dpi = 150)
 
+# Diplodus.sargus ~ mpa_Diplodus.vulgaris
 dip_mat %>% 
-  mutate(species_j = case_when(Diplodus.vulgaris == 0 ~ "Species j Absent", 
-                               Diplodus.vulgaris > quantile(dip_mat$Diplodus.vulgaris, .9) ~ "Species j Present")) %>%
-  na.omit() %>% 
+  mutate(species_j = if_else(Diplodus.vulgaris == 0, "Species j Absent", "Species j Present")) %>% 
   ggplot() +
-  aes(x = mpa, y = log2(Diplodus.puntazzo+0.1)) +
-  stat_summary(geom = "bar", fun = "mean", position = "dodge", 
-               col = guild_colours$grps, fill = "ghostwhite") +
-  stat_summary(geom = "errorbar", fun.data = "mean_se",
-               position = position_dodge(width = 0.8), width = 0.2, col = "dimgray") +
+  aes(x = mpa, y = log2(Diplodus.sargus+0.1)) +
+  geom_boxplot(col = guild_colours$grps, fill = "ghostwhite") +
   xlab("MPA") + ylab("Abundance (nonparanormal)") +
-  ggtitle("Diplodus puntazzo", subtitle = "Diplodus vulgaris") +
+  ggtitle("Diplodus sargus", subtitle = "Diplodus vulgaris") +
   facet_wrap(~species_j, ncol = 2) + 
   theme(plot.title = element_text(face = "italic"),
         plot.subtitle = element_text(face = "italic"))
+ggsave(filename = "figures/predictions/final/D_sargus-D_vulgaris--MPA_raw.png", device = "png", dpi = 150)
 
-ggsave(filename = "figures/predictions/final/D_puntazzo-D_vulgaris--MPA_test.png", device = "png", dpi = 150)
-
-guilds_data %>% 
-  filter(species == "Diplodus.vulgaris") %>% 
+# Diplodus.vulgaris ~ mpa_Diplodus.sargus
+dip_mat %>% 
+  mutate(species_j = if_else(Diplodus.sargus == 0, "Species j Absent", "Species j Present")) %>% 
   ggplot() +
-  aes(x = species, y = log2(abundance+0.1)) +
-  geom_boxplot(col = guild_colours$dip) +
-  xlab("") + ylab("Abundance") +
-  ggtitle(names(guilds_data$guild)) +
-  theme(axis.text.x = element_text(angle = 30, vjust = 0.5))
+  aes(x = mpa, y = log2(Diplodus.vulgaris+0.1)) +
+  geom_boxplot(col = guild_colours$grps, fill = "ghostwhite") +
+  xlab("MPA") + ylab("Abundance (nonparanormal)") +
+  ggtitle("Diplodus vulgaris", subtitle = "Diplodus sargus") +
+  facet_wrap(~species_j, ncol = 2) + 
+  theme(plot.title = element_text(face = "italic"),
+        plot.subtitle = element_text(face = "italic"))
+ggsave(filename = "figures/predictions/final/D_vulgaris-D_sargus--MPA_raw.png", device = "png", dpi = 150)
 
-guilds_data %>% 
-  filter(species == "Diplodus.vulgaris") %>% 
+# Diplodus.vulgaris ~ mpa_Diplodus.puntazzo
+dip_mat %>% 
+  mutate(species_j = if_else(Diplodus.puntazzo == 0, "Species j Absent", "Species j Present")) %>% 
   ggplot() +
-  aes(log2(abundance+0.1)) +
-  geom_histogram(fill = guild_colours$dip, binwidth = .6) +
-  xlab("Abundance (log2)") + ylab("Frequency")
+  aes(x = mpa, y = log2(Diplodus.vulgaris+0.1)) +
+  geom_boxplot(col = guild_colours$grps, fill = "ghostwhite") +
+  xlab("MPA") + ylab("Abundance (nonparanormal)") +
+  ggtitle("Diplodus vulgaris", subtitle = "Diplodus puntazzo") +
+  facet_wrap(~species_j, ncol = 2) + 
+  theme(plot.title = element_text(face = "italic"),
+        plot.subtitle = element_text(face = "italic"))
+ggsave(filename = "figures/predictions/final/D_vulgaris-D_puntazzo--MPA_raw.png", device = "png", dpi = 150)
 
-guilds_data %>% 
-  filter(species == "Diplodus.vulgaris") %>% 
-  ggplot() +
-  aes(abundance+0.1) +
-  geom_histogram(fill = guild_colours$dip) +
-  xlab("Abundance") + ylab("Frequency")
