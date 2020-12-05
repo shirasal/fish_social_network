@@ -277,13 +277,9 @@ coefs_sum <- function(guild_mod, guild){
     bind_rows(.id = "id")
   
   
-  env_effect %>%
-    left_join(temp_effect, by = c("id", "direction")) %>% 
-    left_join(anthro_effect, by = c("id", "direction")) %>%
-    left_join(biotic_effect, by = c("id", "direction")) %>% 
-    left_join(env_bio_effect, by = c("id", "direction")) %>%
-    left_join(anthro_bio_effect, by = c("id", "direction")) %>% 
-    arrange(direction) %>% 
+  bind_rows(env_effect, temp_effect, anthro_effect, biotic_effect, 
+            env_bio_effect, anthro_bio_effect) %>% 
+    arrange(direction, id) %>% 
     rename(species = id)
 }
 
@@ -1016,19 +1012,23 @@ list.files("figures/predictions/final/", "MPA_raw.png") %>% length()
 
 # Coefficients ------------------------------------------------------------
 
-coefs_sum(grps_pois) %>% 
+grps_coefs <- coefs_sum(grps_pois) %>% 
   pivot_longer(cols = 3:8) %>% 
   mutate(coefficient_type = str_remove(.$name, "_coef")) %>% 
-  na.omit() %>% 
+  na.omit(value) %>%
   select(species, coefficient_type, value, direction) %>% 
-  arrange(coefficient_type, species, direction)
+  arrange(coefficient_type, species, direction) 
+grps_coefs %>% 
+  print(n = Inf)
 
-coefs_sum(dip_pois) %>% 
+dip_coefs <- coefs_sum(dip_pois) %>% 
   pivot_longer(cols = 3:8) %>% 
   mutate(coefficient_type = str_remove(.$name, "_coef")) %>% 
-  na.omit() %>% 
+  na.omit(value) %>%
   select(species, coefficient_type, value, direction) %>% 
-  arrange(coefficient_type, species, direction)
+  arrange(coefficient_type, species, direction) 
+dip_coefs %>% 
+  print(n = Inf)
 
 
 # Compare spatial / Nonspatial results ------------------------------------
