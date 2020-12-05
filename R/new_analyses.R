@@ -810,9 +810,22 @@ grps_mat %>%
   theme(plot.title = element_text(face = "italic"),
         plot.subtitle = element_text(face = "italic"))
 
-ggsave(filename = "figures/predictions/final/E_costae-S_cabrilla--TEMP_raw.png", device = "png", 
-       scale = c(2,1), dpi = 150)
-
+# All in one graph:
+grps_mat %>% 
+  mutate(scenario = if_else(Serranus.cabrilla == 0, "Species j Absent", "Species j Present"),
+         Temperature = grps_mat$temp * attr(grps_mat$temp, 'scaled:scale') + attr(grps_mat$temp, 'scaled:center')) %>% 
+  ggplot() +
+  aes(x = Temperature, y = log2(Epinephelus.costae+0.1)) +
+  geom_point(aes(colour = scenario), alpha = 0.1) +
+  stat_smooth(aes(colour = scenario), method = "gam", alpha = 0.3) +
+  xlab("Temperature (°C)") + ylab("Abundance (nonparanormal)") +
+  ggtitle("Epinephelus costae") +
+  scale_color_manual(name = "Serranus cabrilla", 
+                     labels = c('Absent','Present'), values = c("#031D44", "#FF99C9")) +
+  theme(plot.title = element_text(face = "bold.italic"),
+        legend.title = element_text(face = "bold.italic"))
+ggsave(filename = "figures/predictions/final/E_costae-S_cabrilla--TEMP_raw.png", 
+       device = "png", dpi = 150)
 
 # Diplodus.annularis ~ temp_Diplodus.vulgaris
 dip_mat %>% 
@@ -820,7 +833,7 @@ dip_mat %>%
          Temperature = dip_mat$temp * attr(dip_mat$temp, 'scaled:scale') + attr(dip_mat$temp, 'scaled:center')) %>% 
   ggplot() +
   aes(x = Temperature, y = log2(Diplodus.annularis+0.1)) +
-  geom_point(col = guild_colours$grps) +
+  geom_point(col = guild_colours$dip) +
   stat_smooth(method = "gam", formula = y ~ s(x, bs = "cs"), col = "darkcyan", alpha = 0.3) +
   xlab("Temperature (°C)") + ylab("Abundance (nonparanormal)") +
   ggtitle("Diplodus annularis", subtitle = "Diplodus vulgaris") +
@@ -828,8 +841,21 @@ dip_mat %>%
   theme(plot.title = element_text(face = "italic"),
         plot.subtitle = element_text(face = "italic"))
 
-ggsave(filename = "figures/predictions/final/D_annularis-D_vulgaris--TEMP_raw.png", device = "png", 
-       scale = c(2,1), dpi = 150)
+dip_mat %>% 
+  mutate(scenario = if_else(Diplodus.vulgaris == 0, "Species j Absent", "Species j Present"),
+         Temperature = dip_mat$temp * attr(dip_mat$temp, 'scaled:scale') + attr(dip_mat$temp, 'scaled:center')) %>% 
+  ggplot() +
+  aes(x = Temperature, y = log2(Diplodus.annularis+0.1)) +
+  geom_point(aes(colour = scenario), alpha = 0.1) +
+  stat_smooth(aes(colour = scenario), method = "gam", alpha = 0.3) +
+  xlab("Temperature (°C)") + ylab("Abundance (nonparanormal)") +
+  ggtitle("Diplodus annularis") +
+  scale_color_manual(name = "Diplodus vulgaris", 
+                     labels = c('Absent','Present'), values = c("#031D44", "#FF99C9")) +
+  theme(plot.title = element_text(face = "bold.italic"),
+        legend.title = element_text(face = "bold.italic"))
+ggsave(filename = "figures/predictions/final/D_annularis-D_vulgaris--TEMP_raw.png", 
+       device = "png", dpi = 150)
 
 # Diplodus.sargus ~ temp_Diplodus.vulgaris
 dip_mat %>% 
@@ -845,8 +871,21 @@ dip_mat %>%
   theme(plot.title = element_text(face = "italic"),
         plot.subtitle = element_text(face = "italic"))
 
-ggsave(filename = "figures/predictions/final/D_sargus-D_vulgaris--TEMP_raw.png", device = "png", 
-       scale = c(2,1), dpi = 150)
+dip_mat %>% 
+  mutate(scenario = if_else(Diplodus.vulgaris == 0, "Species j Absent", "Species j Present"),
+         Temperature = dip_mat$temp * attr(dip_mat$temp, 'scaled:scale') + attr(dip_mat$temp, 'scaled:center')) %>% 
+  ggplot() +
+  aes(x = Temperature, y = log2(Diplodus.sargus+0.1)) +
+  geom_point(aes(colour = scenario), alpha = 0.1) +
+  stat_smooth(aes(colour = scenario), method = "gam", alpha = 0.3) +
+  xlab("Temperature (°C)") + ylab("Abundance (nonparanormal)") +
+  ggtitle("Diplodus sargus") +
+  scale_color_manual(name = "Diplodus vulgaris", 
+                     labels = c('Absent','Present'), values = c("#031D44", "#FF99C9")) +
+  theme(plot.title = element_text(face = "bold.italic"),
+        legend.title = element_text(face = "bold.italic"))
+ggsave(filename = "figures/predictions/final/D_sargus-D_vulgaris--TEMP_raw.png", 
+       device = "png", dpi = 150)
 
 # Diplodus.vulgaris ~ temp_Diplodus.sargus
 dip_mat %>% 
@@ -862,8 +901,21 @@ dip_mat %>%
   theme(plot.title = element_text(face = "italic"),
         plot.subtitle = element_text(face = "italic"))
 
-ggsave(filename = "figures/predictions/final/D_vulgaris-D_sargus--TEMP_raw.png", device = "png", 
-       scale = c(2,1), dpi = 150)
+dip_mat %>% 
+  mutate(scenario = if_else(Diplodus.sargus == 0, "Species j Absent", "Species j Present"),
+         Temperature = dip_mat$temp * attr(dip_mat$temp, 'scaled:scale') + attr(dip_mat$temp, 'scaled:center')) %>% 
+  ggplot() +
+  aes(x = Temperature, y = log2(Diplodus.vulgaris+0.1)) +
+  geom_point(aes(colour = scenario), alpha = 0.1) +
+  stat_smooth(aes(colour = scenario), method = "gam", alpha = 0.3) +
+  xlab("Temperature (°C)") + ylab("Abundance (nonparanormal)") +
+  ggtitle("Diplodus vulgaris") +
+  scale_color_manual(name = "Diplodus sargus", 
+                     labels = c('Absent','Present'), values = c("#031D44", "#FF99C9")) +
+  theme(plot.title = element_text(face = "bold.italic"),
+        legend.title = element_text(face = "bold.italic"))
+ggsave(filename = "figures/predictions/final/D_vulgaris-D_sargus--TEMP_raw.png", 
+       device = "png", dpi = 150)
 
 # Diplodus.vulgaris ~ temp_Diplodus.annularis
 dip_mat %>% 
@@ -879,8 +931,21 @@ dip_mat %>%
   theme(plot.title = element_text(face = "italic"),
         plot.subtitle = element_text(face = "italic"))
 
-ggsave(filename = "figures/predictions/final/D_vulgaris-D_annularis--TEMP_raw.png", device = "png", 
-       scale = c(2,1), dpi = 150)
+dip_mat %>% 
+  mutate(scenario = if_else(Diplodus.annularis == 0, "Species j Absent", "Species j Present"),
+         Temperature = dip_mat$temp * attr(dip_mat$temp, 'scaled:scale') + attr(dip_mat$temp, 'scaled:center')) %>% 
+  ggplot() +
+  aes(x = Temperature, y = log2(Diplodus.vulgaris+0.1)) +
+  geom_point(aes(colour = scenario), alpha = 0.1) +
+  stat_smooth(aes(colour = scenario), method = "gam", alpha = 0.3) +
+  xlab("Temperature (°C)") + ylab("Abundance (nonparanormal)") +
+  ggtitle("Diplodus vulgaris") +
+  scale_color_manual(name = "Diplodus annularis", 
+                     labels = c('Absent','Present'), values = c("#031D44", "#FF99C9")) +
+  theme(plot.title = element_text(face = "bold.italic"),
+        legend.title = element_text(face = "bold.italic"))
+ggsave(filename = "figures/predictions/final/D_vulgaris-D_annularis--TEMP_raw.png", 
+       device = "png", dpi = 150)
 
 
 # y                  ~ cov_biotic                  rel_imp           coef
@@ -945,19 +1010,32 @@ dip_mat %>%
   facet_wrap(~species_j, ncol = 2) + 
   theme(plot.title = element_text(face = "italic"),
         plot.subtitle = element_text(face = "italic"))
+
+dip_mat %>% 
+  mutate(scenario = if_else(Diplodus.vulgaris == 0, "absent", "present")) %>% 
+  ggplot() +
+  aes(x = mpa, y = log2(Diplodus.annularis+0.1)) +
+  geom_boxplot(aes(colour = scenario), fill = "ghostwhite") +
+  xlab("MPA") + ylab("Abundance (nonparanormal)") +
+  ggtitle("Diplodus annularis") +
+  scale_color_manual(name = "Diplodus vulgaris", 
+                     labels = c('Absent','Present'), values = c("#031D44", "#FF99C9")) +
+  theme(plot.title = element_text(face = "bold.italic"),
+        legend.title = element_text(face = "bold.italic"))
 ggsave(filename = "figures/predictions/final/D_annularis-D_vulgaris--MPA_raw.png", device = "png", dpi = 150)
 
 # Diplodus.puntazzo ~ mpa_Diplodus.vulgaris
 dip_mat %>% 
-  mutate(species_j = if_else(Diplodus.vulgaris == 0, "Species j Absent", "Species j Present")) %>% 
+  mutate(scenario = if_else(Diplodus.vulgaris == 0, "absent", "present")) %>% 
   ggplot() +
   aes(x = mpa, y = log2(Diplodus.puntazzo+0.1)) +
-  geom_boxplot(col = guild_colours$grps, fill = "ghostwhite") +
+  geom_boxplot(aes(colour = scenario), fill = "ghostwhite") +
   xlab("MPA") + ylab("Abundance (nonparanormal)") +
-  ggtitle("Diplodus puntazzo", subtitle = "Diplodus vulgaris") +
-  facet_wrap(~species_j, ncol = 2) + 
-  theme(plot.title = element_text(face = "italic"),
-        plot.subtitle = element_text(face = "italic"))
+  ggtitle("Diplodus puntazzo") +
+  scale_color_manual(name = "Diplodus vulgaris", 
+                     labels = c('Absent','Present'), values = c("#031D44", "#FF99C9")) +
+  theme(plot.title = element_text(face = "bold.italic"),
+        legend.title = element_text(face = "bold.italic"))
 ggsave(filename = "figures/predictions/final/D_puntazzo-D_vulgaris--MPA_raw.png", device = "png", dpi = 150)
 
 # Diplodus.sargus ~ mpa_Diplodus.vulgaris
@@ -971,6 +1049,18 @@ dip_mat %>%
   facet_wrap(~species_j, ncol = 2) + 
   theme(plot.title = element_text(face = "italic"),
         plot.subtitle = element_text(face = "italic"))
+
+dip_mat %>% 
+  mutate(scenario = if_else(Diplodus.vulgaris == 0, "absent", "present")) %>% 
+  ggplot() +
+  aes(x = mpa, y = log2(Diplodus.sargus+0.1)) +
+  geom_boxplot(aes(colour = scenario), fill = "ghostwhite") +
+  xlab("MPA") + ylab("Abundance (nonparanormal)") +
+  ggtitle("Diplodus sargus") +
+  scale_color_manual(name = "Diplodus vulgaris", 
+                     labels = c('Absent','Present'), values = c("#031D44", "#FF99C9")) +
+  theme(plot.title = element_text(face = "bold.italic"),
+        legend.title = element_text(face = "bold.italic"))
 ggsave(filename = "figures/predictions/final/D_sargus-D_vulgaris--MPA_raw.png", device = "png", dpi = 150)
 
 # Diplodus.vulgaris ~ mpa_Diplodus.sargus
@@ -984,6 +1074,18 @@ dip_mat %>%
   facet_wrap(~species_j, ncol = 2) + 
   theme(plot.title = element_text(face = "italic"),
         plot.subtitle = element_text(face = "italic"))
+
+dip_mat %>% 
+  mutate(scenario = if_else(Diplodus.sargus == 0, "absent", "present")) %>% 
+  ggplot() +
+  aes(x = mpa, y = log2(Diplodus.vulgaris+0.1)) +
+  geom_boxplot(aes(colour = scenario), fill = "ghostwhite") +
+  xlab("MPA") + ylab("Abundance (nonparanormal)") +
+  ggtitle("Diplodus vulgaris") +
+  scale_color_manual(name = "Diplodus sargus", 
+                     labels = c('Absent','Present'), values = c("#031D44", "#FF99C9")) +
+  theme(plot.title = element_text(face = "bold.italic"),
+        legend.title = element_text(face = "bold.italic"))
 ggsave(filename = "figures/predictions/final/D_vulgaris-D_sargus--MPA_raw.png", device = "png", dpi = 150)
 
 # Diplodus.vulgaris ~ mpa_Diplodus.puntazzo
@@ -997,6 +1099,18 @@ dip_mat %>%
   facet_wrap(~species_j, ncol = 2) + 
   theme(plot.title = element_text(face = "italic"),
         plot.subtitle = element_text(face = "italic"))
+
+dip_mat %>% 
+  mutate(scenario = if_else(Diplodus.puntazzo == 0, "absent", "present")) %>% 
+  ggplot() +
+  aes(x = mpa, y = log2(Diplodus.vulgaris+0.1)) +
+  geom_boxplot(aes(colour = scenario), fill = "ghostwhite") +
+  xlab("MPA") + ylab("Abundance (nonparanormal)") +
+  ggtitle("Diplodus vulgaris") +
+  scale_color_manual(name = "Diplodus puntazzo", 
+                     labels = c('Absent','Present'), values = c("#031D44", "#FF99C9")) +
+  theme(plot.title = element_text(face = "bold.italic"),
+        legend.title = element_text(face = "bold.italic"))
 ggsave(filename = "figures/predictions/final/D_vulgaris-D_puntazzo--MPA_raw.png", device = "png", dpi = 150)
 
 # Check all files exported:
