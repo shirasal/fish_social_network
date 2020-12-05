@@ -971,6 +971,18 @@ grps_mat %>%
   facet_wrap(~species_j, ncol = 2) + 
   theme(plot.title = element_text(face = "italic"),
         plot.subtitle = element_text(face = "italic"))
+
+grps_mat %>% 
+  mutate(scenario = if_else(Serranus.cabrilla == 0, "absent", "present")) %>% 
+  ggplot() +
+  aes(x = mpa, y = log2(Epinephelus.costae+0.1)) +
+  geom_boxplot(aes(colour = scenario), fill = "ghostwhite") +
+  xlab("MPA") + ylab("Abundance (nonparanormal)") +
+  ggtitle("Epinephelus costae") +
+  scale_color_manual(name = "Serranus cabrilla", 
+                     labels = c('Absent','Present'), values = c("#031D44", "#FF99C9")) +
+  theme(plot.title = element_text(face = "bold.italic"),
+        legend.title = element_text(face = "bold.italic"))
 ggsave(filename = "figures/predictions/final/E_costae-S_cabrilla--MPA_raw.png", device = "png", dpi = 150)
 
 # Epinephelus.costae ~ mpa_Epinephelus.marginatus
@@ -984,6 +996,18 @@ grps_mat %>%
   facet_wrap(~species_j, ncol = 2) + 
   theme(plot.title = element_text(face = "italic"),
         plot.subtitle = element_text(face = "italic"))
+
+grps_mat %>% 
+  mutate(scenario = if_else(Epinephelus.marginatus == 0, "absent", "present")) %>% 
+  ggplot() +
+  aes(x = mpa, y = log2(Epinephelus.costae+0.1)) +
+  geom_boxplot(aes(colour = scenario), fill = "ghostwhite") +
+  xlab("MPA") + ylab("Abundance (nonparanormal)") +
+  ggtitle("Epinephelus costae") +
+  scale_color_manual(name = "Epinephelus marginatus", 
+                     labels = c('Absent','Present'), values = c("#031D44", "#FF99C9")) +
+  theme(plot.title = element_text(face = "bold.italic"),
+        legend.title = element_text(face = "bold.italic"))
 ggsave(filename = "figures/predictions/final/E_costae-Emarginatus--MPA_raw.png", device = "png", dpi = 150)
 
 # Epinephelus.marginatus ~ mpa_Epinephelus.costae
@@ -997,6 +1021,18 @@ grps_mat %>%
   facet_wrap(~species_j, ncol = 2) + 
   theme(plot.title = element_text(face = "italic"),
         plot.subtitle = element_text(face = "italic"))
+
+grps_mat %>% 
+  mutate(scenario = if_else(Epinephelus.costae == 0, "absent", "present")) %>% 
+  ggplot() +
+  aes(x = mpa, y = log2(Epinephelus.marginatus+0.1)) +
+  geom_boxplot(aes(colour = scenario), fill = "ghostwhite") +
+  xlab("MPA") + ylab("Abundance (nonparanormal)") +
+  ggtitle("Epinephelus marginatus") +
+  scale_color_manual(name = "Epinephelus costae", 
+                     labels = c('Absent','Present'), values = c("#031D44", "#FF99C9")) +
+  theme(plot.title = element_text(face = "bold.italic"),
+        legend.title = element_text(face = "bold.italic"))
 ggsave(filename = "figures/predictions/final/Emarginatus-E_costae--MPA_raw.png", device = "png", dpi = 150)
 
 # Diplodus.annularis ~ mpa_Diplodus.vulgaris
