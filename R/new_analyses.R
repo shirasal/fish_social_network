@@ -7,10 +7,9 @@ create_spp_mat <- function(dataset, guild, covariate){
   cols <- c(c("lat", "lon", "site", "trans", "species"), env_vector, anthro_vector)
   dataset %>%
     group_by_at(.vars = cols) %>%
-    summarise(n = sum(abundance)) %>% 
+    summarise(n = sum(abundance), .groups = "drop") %>% 
     spread(species, n, fill = 0) %>% 
-    ungroup() %>%
-    na.omit() %>% 
+    na.omit() %>% # See 'issues' for more information on dropped observations
     mutate(loc = paste(site, trans)) %>% 
     group_by(loc) %>%
     column_to_rownames("loc") %>% 
@@ -144,12 +143,11 @@ vis_mpa_pred_pair <- function(species_i, species_j, spp_mat, spp_mod, guild){
     aes(x = mpa, y = prediction, fill = scenario) +
     stat_summary(geom = "bar", fun = "mean", position = "dodge") +
     stat_summary(geom = "errorbar", fun.data = "mean_se", position = position_dodge(width = 0.8), width = 0.2) +
-    xlab("MPA") + ylab("Abundance Prediction") +
-    labs(title = "Observation predictions",
-         subtitle = stringr::str_replace(species_i, "\\.", "\\ "),
-         fill = stringr::str_replace(species_j, "\\.", "\\ ")) +
-    scale_fill_manual(labels = c('Absent','Present'), values = c("#031D44", "#FF99C9")) +
-    theme(legend.title = element_text(face = "italic"), plot.subtitle = element_text(face = "italic"))
+    xlab("MPA") + ylab("Observation predictions") +
+    labs(subtitle = stringr::str_replace(species_i, "\\.", "\\ "),
+         col = stringr::str_replace(species_j, "\\.", "\\ ")) +
+    scale_color_manual(labels = c('Absent','Present'), values = c("#031D44", "#FF99C9")) +
+    theme(legend.title = element_text(face = "bold.italic"), plot.subtitle = element_text(face = "bold.italic"))
 }
 
 ### Temperature predictions visualisation
@@ -217,7 +215,7 @@ vis_temp_pred_pair <- function(species_i, species_j, spp_mat, spp_mod, guild){
     labs(subtitle = stringr::str_replace(species_i, "\\.", "\\ "),
          col = stringr::str_replace(species_j, "\\.", "\\ ")) +
     scale_color_manual(labels = c('Absent','Present'), values = c("#031D44", "#FF99C9")) +
-    theme(legend.title = element_text(face = "italic"), plot.subtitle = element_text(face = "italic"))
+    theme(legend.title = element_text(face = "bold.italic"), plot.subtitle = element_text(face = "bold.italic"))
 }
 
 ### Summarise coefficients for each species, separating positive from negative
@@ -305,7 +303,6 @@ herbivores <- c("Siganus.rivulatus", "Siganus.luridus", "Sarpa.salpa",
                 "Sparisoma.cretense")
 
 guild_colours <- list(grps = "#C54607", dip = "#145D82", herb = "#43AA8B")
-
 all_guilds <- list(groupers = groupers, seabreams = diplodus, herbivores = herbivores)
 
 ### MEData
@@ -314,10 +311,10 @@ med_raw <- read_rds("data/medata.Rds") %>%
   ungroup()
 
 med_clean <- med_raw %>%
-  mutate(mpa = if_else(enforcement <= 1, FALSE, TRUE),
+  mutate(mpa = case_when(enforcement == 1 | enforcement == 0 ~ FALSE,
+                         enforcement == 2 | enforcement == 3 ~ TRUE),
          temp = scale(tmean),
          depth = scale(depth),
-         sal = scale(sal_mean),
          prod = scale(pp_mean)) %>%
   group_by(lon, lat, site, trans, species, mpa, temp, depth, prod) %>% 
   summarise(abundance = sum(sp.n), .groups = "drop") %>%
@@ -325,10 +322,10 @@ med_clean <- med_raw %>%
 
 guilds_data <- med_raw %>%
   filter(species %in% c(groupers, diplodus, herbivores)) %>% 
-  mutate(mpa = if_else(enforcement <= 1, FALSE, TRUE),
+  mutate(mpa = case_when(enforcement == 1 | enforcement == 0 ~ FALSE,
+                         enforcement == 2 | enforcement == 3 ~ TRUE),
          temp = scale(tmean),
          depth = scale(depth),
-         sal = scale(sal_mean),
          prod = scale(pp_mean),
          guild = case_when(species %in% groupers ~ "groupers",
                            species %in% diplodus ~ "seabreams",
@@ -337,18 +334,13 @@ guilds_data <- med_raw %>%
   summarise(abundance = sum(sp.n), .groups = "drop") %>%
   select(site, lon, lat, trans, species, abundance, guild, mpa, temp, depth, prod)
 
-### Mean vectors for continuous variables
-mean_depth <- median(scale(med_raw$depth), na.rm = TRUE)
-mean_prod <- median(scale(med_raw$pp_mean))
-mean_temp <- median(scale(med_raw$tmean))
-
 ### Create species matrices
 grps_mat <- create_spp_mat(dataset = med_clean, guild = groupers, covariate = c("mpa", "temp", "depth", "prod"))
 dip_mat <- create_spp_mat(dataset = med_clean, guild = diplodus, covariate = c("mpa", "temp", "depth", "prod"))
 herb_mat <- create_spp_mat(dataset = med_clean, guild = herbivores, covariate = c("mpa", "temp", "depth", "prod"))
 
-save.image(file = "data/base_data_and_matrices.RData")
-# load("data/base_data_and_matrices.RData")
+# save.image(file = "data/base_data_and_matrices.RData")
+load("data/base_data_and_matrices.RData")
 
 # Raw data view -----------------------------------------------------------
 
