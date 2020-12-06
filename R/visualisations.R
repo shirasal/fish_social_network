@@ -29,10 +29,10 @@ vis_raw_temp(spp_mat = grps_mat, "Serranus.cabrilla", "Epinephelus.costae") %>%
 # Epinephelus.costae ~ Serranus.cabrilla x MPA
 # RI = 0.07; Coef = -0.05
 vis_mpa_pred_pair("Epinephelus.costae", "Serranus.cabrilla", grps_mat, grps_pois, groupers) %>% 
-  ggsave(filename = "figures/predictions/E_costae-S_cabrilla--TEMP.png", device = "png", width = 9, height = 6, units = "in")
+  ggsave(filename = "figures/predictions/E_costae-S_cabrilla--MPA.png", device = "png", width = 9, height = 6, units = "in")
 
 vis_raw_mpa(spp_mat = grps_mat, "Epinephelus.costae", "Serranus.cabrilla") %>% 
-  ggsave(filename = "figures/predictions/E_costae-S_cabrilla--TEMP_raw.png", device = "png", width = 9, height = 6, units = "in")
+  ggsave(filename = "figures/predictions/E_costae-S_cabrilla--MPA_raw.png", device = "png", width = 9, height = 6, units = "in")
 
 
 #----
@@ -111,28 +111,28 @@ vis_raw_temp(species_i = "Diplodus.vulgaris", species_j = "Diplodus.sargus", spp
 # Diplodus.annularis ~ Diplodus.vulgaris x MPA
 #   RI = 0.05 | Coef = 0.06
 vis_mpa_pred_pair("Diplodus.annularis", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus) %>% 
-  ggsave(filename = "figures/predictions/D_annularis-D_vulgaris--TEMP.png", device = "png", width = 9, height = 6, units = "in")
+  ggsave(filename = "figures/predictions/D_annularis-D_vulgaris--MPA.png", device = "png", width = 9, height = 6, units = "in")
 
 vis_raw_mpa(species_i = "Diplodus.annularis", species_j = "Diplodus.vulgaris", spp_mat = dip_mat) %>% 
-  ggsave(filename = "figures/predictions/D_annularis-D_vulgaris--TEMP_raw.png", device = "png", width = 9, height = 6, units = "in")
+  ggsave(filename = "figures/predictions/D_annularis-D_vulgaris--MPA_raw.png", device = "png", width = 9, height = 6, units = "in")
 
 #----
 # Diplodus.puntazzo ~ Diplodus.vulgaris x MPA
 # RI = 0.34 | Coef = 0.15
 vis_mpa_pred_pair("Diplodus.puntazzo", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus) %>% 
-  ggsave(filename = "figures/predictions/D_puntazzo-D_vulgaris--TEMP.png", device = "png", width = 9, height = 6, units = "in")
+  ggsave(filename = "figures/predictions/D_puntazzo-D_vulgaris--MPA.png", device = "png", width = 9, height = 6, units = "in")
 
 vis_raw_mpa(species_i = "Diplodus.puntazzo", species_j = "Diplodus.vulgaris", spp_mat = dip_mat) %>% 
-  ggsave(filename = "figures/predictions/D_puntazzo-D_vulgaris--TEMP_raw.png", device = "png", width = 9, height = 6, units = "in")
+  ggsave(filename = "figures/predictions/D_puntazzo-D_vulgaris--MPA_raw.png", device = "png", width = 9, height = 6, units = "in")
 
 #----
 # Diplodus.sargus ~ Diplodus.vulgaris x MPA
 # RI = 0.2 | Coef = 0.26
 vis_mpa_pred_pair("Diplodus.sargus", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus) %>% 
-  ggsave(filename = "figures/predictions/D_sargus-D_vulgaris--TEMP.png", device = "png", width = 9, height = 6, units = "in")
+  ggsave(filename = "figures/predictions/D_sargus-D_vulgaris--MPA.png", device = "png", width = 9, height = 6, units = "in")
 
 vis_raw_mpa(species_i = "Diplodus.sargus", species_j = "Diplodus.vulgaris", spp_mat = dip_mat) %>% 
-  ggsave(filename = "figures/predictions/D_sargus-D_vulgaris--TEMP_raw.png", device = "png", width = 9, height = 6, units = "in")
+  ggsave(filename = "figures/predictions/D_sargus-D_vulgaris--MPA_raw.png", device = "png", width = 9, height = 6, units = "in")
 
 #----
 # Diplodus.vulgaris ~ Diplodus.sargus x MPA
@@ -147,19 +147,19 @@ vis_raw_mpa(species_i = "Diplodus.vulgaris", species_j = "Diplodus.sargus", spp_
 # Diplodus.vulgaris ~ Diplodus.puntazzo x MPA
 # RI = 0.07 | Coef = 0.15
 vis_mpa_pred_pair("Diplodus.vulgaris", "Diplodus.puntazzo", dip_mat, dip_pois, diplodus) %>% 
-  ggsave(filename = "figures/predictions/D_vulgaris-D_puntazzo--TEMP.png", device = "png", width = 15, height = 11.5, unit = "in")
+  ggsave(filename = "figures/predictions/D_vulgaris-D_puntazzo--MPA.png", device = "png", width = 15, height = 11.5, unit = "in")
 
 vis_raw_mpa(species_i = "Diplodus.vulgaris", species_j = "Diplodus.puntazzo", spp_mat = dip_mat) %>% 
-  ggsave(filename = "figures/predictions/D_vulgaris-D_puntazzo--TEMP_raw.png", device = "png", width = 9, height = 6, units = "in")
+  ggsave(filename = "figures/predictions/D_vulgaris-D_puntazzo--MPA_raw.png", device = "png", width = 9, height = 6, units = "in")
 
 #----
 # Diplodus.vulgaris ~ Diplodus.annularis x MPA
 # RI = 0.01 | Coef = 0.06
 vis_mpa_pred_pair("Diplodus.vulgaris", "Diplodus.annularis", dip_mat, dip_pois, diplodus) %>% 
-  ggsave(filename = "figures/predictions/D_vulgaris-D_annularis--TEMP.png", device = "png", width = 9, height = 6, units = "in")
+  ggsave(filename = "figures/predictions/D_vulgaris-D_annularis--MPA.png", device = "png", width = 9, height = 6, units = "in")
 
 vis_raw_mpa(species_i = "Diplodus.vulgaris", species_j = "Diplodus.annularis", spp_mat = dip_mat) %>% 
-  ggsave(filename = "figures/predictions/D_vulgaris-D_annularis--TEMP_raw.png", device = "png", width = 9, height = 6, units = "in")
+  ggsave(filename = "figures/predictions/D_vulgaris-D_annularis--MPA_raw.png", device = "png", width = 9, height = 6, units = "in")
 
 
 
