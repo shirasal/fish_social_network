@@ -99,7 +99,8 @@ vis_mpa_pred_pair <- function(species_i, species_j, spp_mat, spp_mod, guild){
            across(.cols = all_of(species_j), .fns = function(x) 0),
            across(all_of(all_other_species), .fns = mean)) %>% 
     group_by(mpa) %>% 
-    sample_n(1)
+    sample_n(1) %>% 
+    ungroup()
   # Scenario 2: species_j is at its 90th percentile abundance, other species are at their mean abundance
   j_max <- spp_mat %>% 
     mutate(temp = median(temp),
@@ -108,7 +109,8 @@ vis_mpa_pred_pair <- function(species_i, species_j, spp_mat, spp_mod, guild){
            across(.cols = all_of(species_j), .fns = function(x) quantile(x, 0.9)),
            across(all_of(all_other_species), .fns = mean)) %>% 
     group_by(mpa) %>% 
-    sample_n(1)
+    sample_n(1) %>% 
+    ungroup()
   
   # Create predictions
   ## For when species j is absent
@@ -185,12 +187,12 @@ vis_temp_pred_pair <- function(species_i, species_j, spp_mat, spp_mod, guild){
   predict_abs <- predict_MRF(j_abs, spp_mod) %>% 
     `colnames<-`(guild) %>% 
     as_data_frame() %>% 
-    mutate(temp = j_abs$temp)
+    mutate(temp = j_abs$temperature)
   ## For when species j is absent
   predict_max <- predict_MRF(j_max, spp_mod) %>% 
     `colnames<-`(guild) %>% 
     as_data_frame() %>% 
-    mutate(temp = j_max$temp)
+    mutate(temp = j_max$temperature)
   
   # Put the two scenarios together
   temp_predict <- bind_rows(predict_abs, predict_max, .id = "scenario") %>% 
@@ -211,9 +213,8 @@ vis_temp_pred_pair <- function(species_i, species_j, spp_mat, spp_mod, guild){
     ggplot() +
     aes(x = temp, y = prediction, col = scenario) +
     geom_smooth(method = "lm", formula = y ~ x, cex = 3, alpha = 0.1) +
-    xlab("Temperature (scaled)") + ylab("Abundance Prediction") +
-    labs(title = "Observation predictions",
-         subtitle = stringr::str_replace(species_i, "\\.", "\\ "),
+    xlab("Temperature (°C)") + ylab("Observation predictions") +
+    labs(subtitle = stringr::str_replace(species_i, "\\.", "\\ "),
          col = stringr::str_replace(species_j, "\\.", "\\ ")) +
     scale_color_manual(labels = c('Absent','Present'), values = c("#031D44", "#FF99C9")) +
     theme(legend.title = element_text(face = "italic"), plot.subtitle = element_text(face = "italic"))
@@ -769,22 +770,22 @@ vis_temp_pred_pair("Diplodus.vulgaris", "Diplodus.annularis", dip_mat, dip_pois,
 # Diplodus.vulgaris ~ mpa_Diplodus.puntazzo     0.06967714        0.15129631
 
 # Groupers
-vis_mpa_pred_pair("Epinephelus.costae", "Serranus.cabrilla", grps_mat, grps_pois, groupers, 4) %>% 
+vis_mpa_pred_pair("Epinephelus.costae", "Serranus.cabrilla", grps_mat, grps_pois, groupers) %>% 
   ggsave(filename = "figures/predictions/final/E_costae-S_cabrilla--MPA.png", device = "png")
-vis_mpa_pred_pair("Epinephelus.costae", "Epinephelus.marginatus", grps_mat, grps_pois, groupers, 4) %>% 
+vis_mpa_pred_pair("Epinephelus.costae", "Epinephelus.marginatus", grps_mat, grps_pois, groupers) %>% 
   ggsave(filename = "figures/predictions/final/E_costae-E_marginatus--MPA.png", device = "png")
-vis_mpa_pred_pair("Epinephelus.marginatus", "Epinephelus.costae", grps_mat, grps_pois, groupers, 4) %>% 
+vis_mpa_pred_pair("Epinephelus.marginatus", "Epinephelus.costae", grps_mat, grps_pois, groupers) %>% 
   ggsave(filename = "figures/predictions/final/E_marginatus-E_costae--MPA.png", device = "png")
 # Seabream
-vis_mpa_pred_pair("Diplodus.annularis", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus, 4) %>% 
+vis_mpa_pred_pair("Diplodus.annularis", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus) %>% 
   ggsave(filename = "figures/predictions/final/D_annularis-D_vulgaris--MPA.png", device = "png")
-vis_mpa_pred_pair("Diplodus.puntazzo", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus, 4) %>% 
+vis_mpa_pred_pair("Diplodus.puntazzo", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus) %>% 
   ggsave(filename = "figures/predictions/final/D_puntazzo-D_vulgaris--MPA.png", device = "png")
-vis_mpa_pred_pair("Diplodus.sargus", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus, 4) %>% 
+vis_mpa_pred_pair("Diplodus.sargus", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus) %>% 
   ggsave(filename = "figures/predictions/final/D_sargus-D_vulgaris--MPA.png", device = "png")
-vis_mpa_pred_pair("Diplodus.vulgaris", "Diplodus.sargus", dip_mat, dip_pois, diplodus, 4) %>% 
+vis_mpa_pred_pair("Diplodus.vulgaris", "Diplodus.sargus", dip_mat, dip_pois, diplodus) %>% 
   ggsave(filename = "figures/predictions/final/D_vulgaris-D_sargus--MPA.png", device = "png")
-vis_mpa_pred_pair("Diplodus.vulgaris", "Diplodus.puntazzo", dip_mat, dip_pois, diplodus, 4) %>% 
+vis_mpa_pred_pair("Diplodus.vulgaris", "Diplodus.puntazzo", dip_mat, dip_pois, diplodus) %>% 
   ggsave(filename = "figures/predictions/final/D_vulgaris-D_puntazzo--MPA.png", device = "png")
 
 # Raw data with scenarios -------------------------------------------------
