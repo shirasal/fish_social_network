@@ -1,4 +1,4 @@
-library(tiduverse)
+library(tiduyerse)
 
 # How many species of each site?
 med_raw %>% distinct(species) %>% arrange(species) %>% print(n = Inf)
