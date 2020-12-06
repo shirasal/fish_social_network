@@ -7,19 +7,17 @@ library(MRFcov)
 # The following code runs everything on the diplodus (seabreams) guild, 
 # but everything can be done on any other species group. The following guilds are the ones I'm using:
 
-groupers <- c("Epinephelus.costae", "Epinephelus.marginatus",
-              "Mycteroperca.rubra", "Serranus.cabrilla", "Serranus.scriba")
-diplodus <- c("Diplodus.annularis", "Diplodus.puntazzo", "Diplodus.sargus",
-              "Diplodus.vulgaris", "Diplodus.cervinus")
-herbivores <- c("Siganus.rivulatus", "Siganus.luridus", "Sarpa.salpa",
-                "Sparisoma.cretense")
+groupers <- c("Epinephelus.costae", "Epinephelus.marginatus", "Serranus.cabrilla", "Serranus.scriba")
+diplodus <- c("Diplodus.annularis", "Diplodus.puntazzo", "Diplodus.sargus", "Diplodus.vulgaris")
+herbivores <- c("Siganus.rivulatus", "Siganus.luridus", "Sarpa.salpa", "Sparisoma.cretense")
 
 # Required data -----------------------------------------------------------
 med_raw <- read_rds("data/medata.Rds") %>% ungroup()
 
 med_clean <- med_raw %>%
-  filter(data.origin != "azz_asi") %>% # presence-absence
-  mutate(mpa = if_else(enforcement <= 1, FALSE, TRUE),
+  filter(data.origin != "azz_asi") %>% # presence-absence data
+  mutate(mpa = case_when(enforcement == 1 | enforcement == 0 ~ FALSE,
+                         enforcement == 2 | enforcement == 3 ~ TRUE),
          temp = scale(tmean),
          depth = scale(depth),
          sal = scale(sal_mean),
@@ -28,22 +26,21 @@ med_clean <- med_raw %>%
 
 # Step 1: Create species matrix -------------------------------------------
 # Note that the following function is set to be running on `dataset = med_clean`
-create_spp_mat <- function(dataset, taxa, covariate){
+create_spp_mat <- function(dataset, guild, covariate){
   cols <- c("lat", "lon", "site", "trans", "species", "temp", "depth", "prod", "mpa")
   dataset %>%
     group_by_at(.vars = cols) %>%
-    summarise(n = sum(sp.n)) %>%
+    summarise(n = sum(sp.n), .groups = "drop") %>%
     spread(species, n, fill = 0) %>%
-    ungroup() %>%
-    na.omit() %>% # remove NAs; make sure this part it minimised in the raw data
-    mutate(loc = paste(site, trans)) %>% # Create a unique variable of the location
+    na.omit() %>% # remove NAs; see 'issues' directory for more information on ommited observations
+    mutate(loc = paste(site, trans)) %>%
     group_by(loc) %>%
-    column_to_rownames("loc") %>% # create row names by location
-    select(all_of(taxa), all_of(covariate)) %>% # keep the species and covariates columns
+    column_to_rownames("loc") %>% 
+    select(all_of(guild), all_of(covariate)) %>% 
     ungroup()
 }
 
-dip_mat <- create_spp_mat(dataset = med_clean, taxa = diplodus, covariate = c("mpa", "temp", "depth", "prod"))
+dip_mat <- create_spp_mat(dataset = med_clean, guild = diplodus, covariate = c("mpa", "temp", "depth", "prod"))
 head(dip_mat)
 
 # Step 2: run models ------------------------------------------------------
