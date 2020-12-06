@@ -1,0 +1,159 @@
+---
+title: "Prediction visualisations"
+author: "Shira Salingré"
+date: "`r format(Sys.time(), '%d %b, %Y')`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+source("R/models.R")
+```
+
+First thing first: check out the model results and look for interesting species pairs
+
+# Relative importance of covariates
+```{r fig.height=10, fig.width=10}
+p_relimp_pois
+```
+
+
+## Groupers
+
+```{r}
+# Relative importance
+grps_pois_relimp
+
+# And coefficients
+grps_coefs
+
+```
+
+### Species pairs for visualisations
+Find out which species pairs are effected by covarites interaction
+
+**Temperature**
+```{r}
+lapply(grps_pois$key_coefs, function(x) x %>% 
+         filter(str_detect(string = Variable, pattern = "temp_")))
+
+```
+
+*Epinephelus.costae* ~ *Serranus.cabrilla* x Temperature (RI = 0.08; Coef = 0.06)
+*Serranus.cabrilla* ~ *Epinephelus.costae* x Temperature (RI = 0.01; Coef = 0.06)
+
+**MPA**
+```{r}
+lapply(grps_pois$key_coefs, function(x) x %>% 
+         filter(str_detect(string = Variable, pattern = "mpa_")))
+
+```
+
+*Epinephelus.costae* ~ *Serranus.cabrilla* x MPA (RI = 0.07; Coef = -0.05)
+*Epinephelus.costae* ~ *Epinephelus.marginatus* x MPA (RI = 0.07; Coef = -0.05)
+*Epinephelus.marginatus* ~ *Epinephelus.costae* x MPA (RI = 0.06; Coef = -0.05)
+
+### Visualise abundance of species *i*
+(A) Using `MRF_predict` to predict the abundance of species *i* along temperature gradient / MPA status in two scenarios:
+1. When species *j* is absent
+2. When species *j* is present (at its 90th percentile of abundance)
+
+(B) Using raw data (transformed abundance of species *i*) and smoothed GAM function along temperature gradient / MPA status in two scenarios:
+1. When species *j* is absent
+2. When species *j* is present (at any abundance)
+
+**Epinephelus.costae ~ Serranus.cabrilla x Temperature**
+RI = 0.08
+Coef = 0.06
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+vis_temp_pred_pair("Epinephelus.costae", "Serranus.cabrilla", grps_mat, grps_pois, groupers)
+
+vis_raw_temp(species_i = "Epinephelus.costae", species_j = "Serranus.cabrilla", spp_mat = grps_mat)
+
+```
+
+**Serranus.cabrilla ~ Epinephelus.costae x Temperature**
+RI = 0.01
+Coef = 0.06
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+vis_temp_pred_pair("Serranus.cabrilla", "Epinephelus.costae", grps_mat, grps_pois, groupers)
+
+vis_raw_temp(species_i = "Serranus.cabrilla", species_j = "Epinephelus.costae", spp_mat = grps_mat)
+
+```
+
+**Epinephelus.costae ~ Serranus.cabrilla x MPA**
+RI = 0.07
+Coef = -0.05
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+vis_mpa_pred_pair("Epinephelus.costae", "Serranus.cabrilla", grps_mat, grps_pois, groupers)
+
+vis_raw_mpa(spp_mat = grps_mat, "Epinephelus.costae", "Serranus.cabrilla")
+
+```
+
+**Epinephelus.costae ~ Epinephelus.marginatus x MPA**
+RI = 0.07
+Coef = -0.05
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+vis_mpa_pred_pair("Epinephelus.costae", "Epinephelus.marginatus", grps_mat, grps_pois, groupers)
+
+vis_raw_mpa(spp_mat = grps_mat, "Epinephelus.costae", "Epinephelus.marginatus")
+
+```
+
+**Epinephelus.marginatus ~ Epinephelus.costae x MPA**
+RI = 0.06
+Coef = -0.05
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+vis_mpa_pred_pair("Epinephelus.costae", "Epinephelus.marginatus", grps_mat, grps_pois, groupers)
+
+vis_raw_mpa(spp_mat = grps_mat, "Epinephelus.costae", "Epinephelus.marginatus")
+
+```
+
+## Seabreams
+
+```{r}
+# Relative importance
+dip_pois_relimp
+
+# And coefficients
+dip_coefs
+```
+
+### Species pairs for visualisations
+Find out which species pairs are effected by covarites interaction
+
+**Temperature**
+```{r}
+lapply(dip_pois$key_coefs, function(x) x %>% 
+         filter(str_detect(string = Variable, pattern = "temp_")))
+
+```
+
+*Diplodus.annularis* ~ *Diplodus.vulgaris* x Temperature (RI = 0.1; Coef = 0.08)
+*Diplodus.puntazzo* ~ *Diplodus.vulgaris* x Temperature (RI = 0.01; Coef = -0.03)
+*Diplodus.sargus* ~ *Diplodus.vulgaris* x Temperature (RI = 0.05; Coef = 0.13)
+*Diplodus.vulgaris* ~ *Diplodus.sargus* x Temperature (RI = 0.05; Coef = 0.13)
+*Diplodus.vulgaris* ~ *Diplodus.annularis* x Temperature (RI = 0.02; Coef = 0.08)
+
+**MPA**
+```{r}
+lapply(dip_pois$key_coefs, function(x) x %>% 
+         filter(str_detect(string = Variable, pattern = "mpa_")))
+
+```
+
+*Diplodus.annularis* ~ *Diplodus.vulgaris* x MPA (RI = 0.05; Coef = 0.06)
+*Diplodus.puntazzo* ~ *Diplodus.vulgaris* x MPA (RI = 0.34; Coef = 0.15)
+*Diplodus.sargus* ~ *Diplodus.vulgaris* x MPA (RI = 0.2; Coef = 0.26)
+*Diplodus.vulgaris* ~ *Diplodus.sargus* x MPA (RI = 0.21; Coef = 0.26)
+*Diplodus.vulgaris* ~ *Diplodus.puntazzo* x MPA (RI = 0.07; Coef = 0.15)
+*Diplodus.vulgaris* ~ *Diplodus.annularis* x MPA (RI = 0.01; Coef = 0.06)
+
+
+
