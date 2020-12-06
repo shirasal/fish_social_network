@@ -160,19 +160,25 @@ vis_temp_pred_pair <- function(species_i, species_j, spp_mat, spp_mod, guild){
     mutate(depth = median(depth),
            prod = median(prod),
            mpa = TRUE,
-           across(.cols = all_of(species_j), .fns = function(x) 0),
-           across(all_of(all_other_species), .fns = mean)) %>% 
-    group_by(temp = round(temp, digits = 1)) %>% 
-    sample_n(1)
+           temperature = spp_mat$temp * attr(spp_mat$temp, 'scaled:scale') + attr(spp_mat$temp, 'scaled:center'),
+           across(.cols = all_of(species_j), .funs = function(x) 0),
+           across(.cols = all_of(all_other_species), .fns = mean)) %>% 
+    group_by(temperature = round(temperature, digits = 1)) %>% 
+    sample_n(1) %>%  
+    ungroup() %>% 
+    mutate(temp = scale(temperature))
   # Scenario 2: species_j is at its 90th percentile abundance, other species are at their mean abundance
   j_max <- spp_mat %>% 
     mutate(depth = median(depth),
            prod = median(prod),
            mpa = TRUE,
-           across(.cols = all_of(species_j), .fns = function(x) quantile(x, 0.9)),
-           across(all_of(all_other_species), .fns = mean)) %>% 
-    group_by(temp = round(temp, digits = 1)) %>% 
-    sample_n(1)
+           temperature = spp_mat$temp * attr(spp_mat$temp, 'scaled:scale') + attr(spp_mat$temp, 'scaled:center'),
+           across(.cols = all_of(species_j), .funs = quantile(species_j, 0.9)),
+           across(.cols = all_of(all_other_species), .fns = mean)) %>% 
+    group_by(temperature = round(temperature, digits = 1)) %>% 
+    sample_n(1) %>%  
+    ungroup() %>% 
+    mutate(temp = scale(temperature))
   
   # Create predictions
   ## For when species j is absent
