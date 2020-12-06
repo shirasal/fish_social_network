@@ -156,4 +156,65 @@ lapply(dip_pois$key_coefs, function(x) x %>%
 *Diplodus.vulgaris* ~ *Diplodus.annularis* x MPA (RI = 0.01; Coef = 0.06)
 
 
+### Visualise abundance of species *i*
+(A) Using `MRF_predict` to predict the abundance of species *i* along temperature gradient / MPA status in two scenarios:
+1. When species *j* is absent
+2. When species *j* is present (at its 90th percentile of abundance)
+
+(B) Using raw data (transformed abundance of species *i*) and smoothed GAM function along temperature gradient / MPA status in two scenarios:
+1. When species *j* is absent
+2. When species *j* is present (at any abundance)
+
+**Diplodus.annularis ~ Diplodus.vulgaris x Temperature**
+RI = 0.1
+Coef = 0.08
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+vis_temp_pred_pair("Diplodus.annularis", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus)
+
+vis_raw_temp(species_i = "Diplodus.annularis", species_j = "Diplodus.vulgaris", spp_mat = dip_mat)
+
+```
+**Diplodus.vulgaris ~ Diplodus.annularis x Temperature**
+RI = 0.02
+Coef = 0.08
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+vis_temp_pred_pair("Diplodus.vulgaris", "Diplodus.annularis", dip_mat, dip_pois, diplodus)
+
+vis_raw_temp(species_i = "Diplodus.vulgaris", species_j = "Diplodus.annularis", spp_mat = dip_mat)
+
+```
+
+**Diplodus.puntazzo ~ Diplodus.vulgaris x Temperature**
+RI = 0.01
+Coef = -0.03
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+vis_temp_pred_pair("Diplodus.puntazzo", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus)
+
+vis_raw_temp(species_i = "Diplodus.puntazzo", species_j = "Diplodus.vulgaris", spp_mat = dip_mat)
+
+```
+
+
+**Diplodus.sargus ~ Diplodus.vulgaris x Temperature**
+RI = 0.05
+Coef = 0.13
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+vis_temp_pred_pair("Diplodus.sargus", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus)
+
+vis_raw_temp(species_i = "Diplodus.sargus", species_j = "Diplodus.vulgaris", spp_mat = dip_mat)
+
+```
+
+**Diplodus.vulgaris ~ Diplodus.sargus x Temperature**
+RI = 0.05
+Coef = 0.13
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+vis_temp_pred_pair("Diplodus.vulgaris", "Diplodus.sargus", dip_mat, dip_pois, diplodus)
+
+vis_raw_temp(species_i = "Diplodus.vulgaris", species_j = "Diplodus.sargus", spp_mat = dip_mat)
+
+```
+
+
+
 

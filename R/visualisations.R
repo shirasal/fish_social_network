@@ -1,9 +1,8 @@
 # source("R/models.R")
 # file.edit("Prediction_visualisations.Rmd")
 
-# Groupers
 
-## Temperature
+# Groupers | Temperature --------------------------------------------------
 
 #----
 # Epinephelus.costae ~ Serranus.cabrilla x Temperature
@@ -29,7 +28,9 @@ vis_mpa_pred_pair("Epinephelus.costae", "Serranus.cabrilla", grps_mat, grps_pois
 vis_raw_mpa(spp_mat = grps_mat, "Epinephelus.costae", "Serranus.cabrilla") %>% 
   ggsave(filename = "figures/predictions/E_costae-S_cabrilla--TEMP_raw.png", device = "png")
 
-## MPA
+
+
+# Groupers | MPA ----------------------------------------------------------
 
 #----
 # Epinephelus.costae ~ Epinephelus.marginatus x MPA
@@ -48,5 +49,64 @@ vis_mpa_pred_pair("Epinephelus.costae", "Epinephelus.marginatus", grps_mat, grps
 
 vis_raw_mpa(spp_mat = grps_mat, "Epinephelus.costae", "Epinephelus.costae") %>% 
   ggsave(filename = "figures/predictions/E_costae-E_marginatus--MPA_raw.png", device = "png")
+
+
+
+
+# Seabreams | Temperature -------------------------------------------------
+
+#----
+# Diplodus.annularis ~ Diplodus.vulgaris x Temperature
+# RI = 0.1 ; Coef = 0.08
+vis_temp_pred_pair("Diplodus.annularis", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus) %>% 
+  ggsave(filename = "figures/predictions/D_annularis-D_vulgaris--TEMP.png", device = "png")
+
+vis_raw_temp(species_i = "Diplodus.annularis", species_j = "Diplodus.vulgaris", spp_mat = dip_mat) %>% 
+  ggsave(filename = "figures/predictions/D_annularis-D_vulgaris--TEMP_raw.png", device = "png")
+
+#----
+# Diplodus.vulgaris ~ Diplodus.annularis x Temperature
+# RI = 0.02 | Coef = 0.08
+vis_temp_pred_pair("Diplodus.vulgaris", "Diplodus.annularis", dip_mat, dip_pois, diplodus) %>% 
+  ggsave(filename = "figures/predictions/D_vulgaris-D_annularis--TEMP.png", device = "png")
+
+vis_raw_temp(species_i = "Diplodus.vulgaris", species_j = "Diplodus.annularis", spp_mat = dip_mat) %>% 
+  ggsave(filename = "figures/predictions/D_vulgaris-D_annularis--TEMP_raw.png", device = "png")
+
+#----
+# Diplodus.puntazzo ~ Diplodus.vulgaris x Temperature
+# RI = 0.01 | Coef = -0.03
+vis_temp_pred_pair("Diplodus.puntazzo", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus) %>% 
+  ggsave(filename = "figures/predictions/D_puntazzo-D_vulgaris--TEMP.png", device = "png")
+
+vis_raw_temp(species_i = "Diplodus.puntazzo", species_j = "Diplodus.vulgaris", spp_mat = dip_mat) %>% 
+  ggsave(filename = "figures/predictions/D_puntazzo-D_vulgaris--TEMP_raw.png", device = "png")
+
+#----
+# Diplodus.sargus ~ Diplodus.vulgaris x Temperature
+# RI = 0.05 | Coef = 0.13
+vis_temp_pred_pair("Diplodus.sargus", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus) %>% 
+  ggsave(filename = "figures/predictions/D_sargus-D_vulgaris--TEMP.png", device = "png")
+
+vis_raw_temp(species_i = "Diplodus.sargus", species_j = "Diplodus.vulgaris", spp_mat = dip_mat) %>% 
+  ggsave(filename = "figures/predictions/D_sargus-D_vulgaris--TEMP_raw.png", device = "png")
+
+#----
+# Diplodus.vulgaris ~ Diplodus.sargus x Temperature
+# RI = 0.05 | Coef = 0.13
+vis_temp_pred_pair("Diplodus.vulgaris", "Diplodus.sargus", dip_mat, dip_pois, diplodus) %>% 
+  ggsave(filename = "figures/predictions/D_vulgaris-D_sargus--TEMP.png", device = "png")
+
+vis_raw_temp(species_i = "Diplodus.vulgaris", species_j = "Diplodus.sargus", spp_mat = dip_mat) %>% 
+  ggsave(filename = "figures/predictions/D_vulgaris-D_sargus--TEMP_raw.png", device = "png")
+
+
+
+# Seabreams | MPA ---------------------------------------------------------
+
+
+
+
+
 
 
