@@ -30,30 +30,23 @@ vis_raw_mpa(spp_mat = grps_mat, "Epinephelus.costae", "Serranus.cabrilla") %>%
   ggsave(filename = "figures/predictions/E_costae-S_cabrilla--TEMP_raw.png", device = "png")
 
 ## MPA
-vis_mpa_pred_pair("Epinephelus.costae", "Serranus.cabrilla", grps_mat, grps_pois, groupers)
-ggsave(filename = "figures/predictions/E_costae-S_cabrilla--MPA.png", device = "png")
 
-grps_mat %>% 
-  mutate(scenario = if_else(Serranus.cabrilla == 0, "absent", "present")) %>% # SPECIES J
-  ggplot() +
-  aes(x = mpa, y = log2(Epinephelus.costae+0.1)) + # SPECIES I
-  geom_boxplot(aes(colour = scenario), fill = "ghostwhite") +
-  xlab("MPA") + ylab("Abundance (nonparanormal)") +
-  ggtitle("Epinephelus costae") + # SPECIES I
-  scale_color_manual(name = "Serranus cabrilla",  # SPECIES J
-                     labels = c('Absent','Present'), values = c("#031D44", "#FF99C9")) +
-  theme(plot.title = element_text(face = "bold.italic"),
-        legend.title = element_text(face = "bold.italic"))
+#----
+# Epinephelus.costae ~ Epinephelus.marginatus x MPA
+# RI = 0.07 ; # Coef = -0.05
+vis_mpa_pred_pair("Epinephelus.costae", "Epinephelus.marginatus", grps_mat, grps_pois, groupers) %>% 
+  ggsave(filename = "figures/predictions/E_marginatus-E_costae--MPA.png", device = "png")
 
-# Seabream
-vis_temp_pred_pair("Diplodus.annularis", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus) 
-ggsave(filename = "figures/predictions/final/D_annularis-D_vulgaris--TEMP.png", device = "png")
-vis_temp_pred_pair("Diplodus.sargus", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus)
-ggsave(filename = "figures/predictions/final/D_sargus-D_vulgaris--TEMP.png", device = "png")
-vis_temp_pred_pair("Diplodus.vulgaris", "Diplodus.sargus", dip_mat, dip_pois, diplodus)
-ggsave(filename = "figures/predictions/final/D_vulgaris-D_sargus--TEMP.png", device = "png")
-vis_temp_pred_pair("Diplodus.vulgaris", "Diplodus.annularis", dip_mat, dip_pois, diplodus)
-ggsave(filename = "figures/predictions/final/D_vulgaris-D_annularis--TEMP.png", device = "png")
+vis_raw_mpa(spp_mat = grps_mat, "Epinephelus.costae", "Epinephelus.marginatus") %>% 
+  ggsave(filename = "figures/predictions/E_marginatus-E_costae--MPA_raw.png", device = "png")
 
-## MPA
+#----
+# Epinephelus.marginatus ~ Epinephelus.costae x MPA
+# RI = 0.06 ; Coef = -0.05
+vis_mpa_pred_pair("Epinephelus.costae", "Epinephelus.marginatus", grps_mat, grps_pois, groupers) %>% 
+  ggsave(filename = "figures/predictions/E_costae-E_marginatus--MPA.png", device = "png")
+
+vis_raw_mpa(spp_mat = grps_mat, "Epinephelus.costae", "Epinephelus.costae") %>% 
+  ggsave(filename = "figures/predictions/E_costae-E_marginatus--MPA_raw.png", device = "png")
+
 

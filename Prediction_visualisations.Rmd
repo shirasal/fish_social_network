@@ -109,9 +109,9 @@ vis_raw_mpa(spp_mat = grps_mat, "Epinephelus.costae", "Epinephelus.marginatus")
 RI = 0.06
 Coef = -0.05
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
-vis_mpa_pred_pair("Epinephelus.costae", "Epinephelus.marginatus", grps_mat, grps_pois, groupers)
+vis_mpa_pred_pair("Epinephelus.marginatus", "Epinephelus.costae", grps_mat, grps_pois, groupers)
 
-vis_raw_mpa(spp_mat = grps_mat, "Epinephelus.costae", "Epinephelus.marginatus")
+vis_raw_mpa(spp_mat = grps_mat, "Epinephelus.marginatus", "Epinephelus.costae")
 
 ```
 
