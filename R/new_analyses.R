@@ -60,7 +60,6 @@ rel_imp_sum <- function(guild_mod){
     left_join(anthro_bio_relimp, by = "species")
 }
 
-
 ### Plot relative importance of covariates by covariate for each species, within guild:
 plot_relimp <- function(rel_imp_df, col, guild_name){
   rel_imp_df %>% 
@@ -95,7 +94,7 @@ vis_mpa_pred_pair <- function(species_i, species_j, spp_mat, spp_mod, guild){
     mutate(temp = median(temp),
            depth = median(depth),
            prod = median(prod),
-           across(.cols = all_of(species_j), .fns = function(x) 0),
+           across(all_of(species_j), .fns = function(x) 0),
            across(all_of(all_other_species), .fns = mean)) %>% 
     group_by(mpa) %>% 
     sample_n(1) %>% 
@@ -145,8 +144,8 @@ vis_mpa_pred_pair <- function(species_i, species_j, spp_mat, spp_mod, guild){
     stat_summary(geom = "errorbar", fun.data = "mean_se", position = position_dodge(width = 0.8), width = 0.2) +
     xlab("MPA") + ylab("Observation predictions") +
     labs(subtitle = stringr::str_replace(species_i, "\\.", "\\ "),
-         col = stringr::str_replace(species_j, "\\.", "\\ ")) +
-    scale_color_manual(labels = c('Absent','Present'), values = c("#031D44", "#FF99C9")) +
+         fill = stringr::str_replace(species_j, "\\.", "\\ ")) +
+    scale_fill_manual(labels = c('Absent','Present'), values = c("#031D44", "#FF99C9")) +
     theme(legend.title = element_text(face = "bold.italic"), plot.subtitle = element_text(face = "bold.italic"))
 }
 
@@ -638,7 +637,7 @@ p_relimp_dip_gaus <- plot_relimp(dip_gaus_relimp, guild_colours$dip, "Diplodus")
 # ggsave("p_relimp_dip_gaus_nonspat.png", p_relimp_dip_gaus, "png", "figures/rel_imp/", dpi = 300, width = 11.74, height = 4, units = "in")
 p_relimp_herb_gaus <- plot_relimp(herb_gaus_relimp, guild_colours$herb, "Herbivores")
 # ggsave("p_relimp_herb_gaus_nonspat.png", p_relimp_herb_gaus, "png", "figures/rel_imp/", dpi = 300, width = 11.74, height = 4, units = "in")
-egg::ggarrange(p_relimp_grps_gaus, p_relimp_dip_gaus, p_relimp_herb_gaus) %>% 
+egg::ggarrange(p_relimp_grps_gaus, p_relimp_dip_gaus, p_relimp_herb_gaus)
   ggsave(filename = "rel_imp_gaus_nonspat.png", device = "png", path = "figures/rel_imp/", 
          dpi = 150, height = 10, width = 10, units = "in")
 
@@ -737,16 +736,16 @@ lapply(dip_pois$key_coefs, function(x) x %>%
 # Diplodus.vulgaris ~ temp_Diplodus.annularis     0.02311833        0.08714881
 
 # Groupers
-vis_temp_pred_pair("Epinephelus.costae", "Serranus.cabrilla", grps_mat, grps_pois, groupers) %>%
+vis_temp_pred_pair("Epinephelus.costae", "Serranus.cabrilla", grps_mat, grps_pois, groupers)
   ggsave(filename = "figures/predictions/final/E_costae-S_cabrilla--TEMP.png", device = "png")
 # Seabream
-vis_temp_pred_pair("Diplodus.annularis", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus) %>% 
+vis_temp_pred_pair("Diplodus.annularis", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus) 
   ggsave(filename = "figures/predictions/final/D_annularis-D_vulgaris--TEMP.png", device = "png")
-vis_temp_pred_pair("Diplodus.sargus", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus) %>% 
+vis_temp_pred_pair("Diplodus.sargus", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus)
   ggsave(filename = "figures/predictions/final/D_sargus-D_vulgaris--TEMP.png", device = "png")
-vis_temp_pred_pair("Diplodus.vulgaris", "Diplodus.sargus", dip_mat, dip_pois, diplodus) %>% 
+vis_temp_pred_pair("Diplodus.vulgaris", "Diplodus.sargus", dip_mat, dip_pois, diplodus)
   ggsave(filename = "figures/predictions/final/D_vulgaris-D_sargus--TEMP.png", device = "png")
-vis_temp_pred_pair("Diplodus.vulgaris", "Diplodus.annularis", dip_mat, dip_pois, diplodus) %>% 
+vis_temp_pred_pair("Diplodus.vulgaris", "Diplodus.annularis", dip_mat, dip_pois, diplodus)
   ggsave(filename = "figures/predictions/final/D_vulgaris-D_annularis--TEMP.png", device = "png")
 
 ## MPA
@@ -762,22 +761,22 @@ vis_temp_pred_pair("Diplodus.vulgaris", "Diplodus.annularis", dip_mat, dip_pois,
 # Diplodus.vulgaris ~ mpa_Diplodus.puntazzo     0.06967714        0.15129631
 
 # Groupers
-vis_mpa_pred_pair("Epinephelus.costae", "Serranus.cabrilla", grps_mat, grps_pois, groupers) %>% 
+vis_mpa_pred_pair("Epinephelus.costae", "Serranus.cabrilla", grps_mat, grps_pois, groupers)
   ggsave(filename = "figures/predictions/final/E_costae-S_cabrilla--MPA.png", device = "png")
-vis_mpa_pred_pair("Epinephelus.costae", "Epinephelus.marginatus", grps_mat, grps_pois, groupers) %>% 
+vis_mpa_pred_pair("Epinephelus.costae", "Epinephelus.marginatus", grps_mat, grps_pois, groupers)
   ggsave(filename = "figures/predictions/final/E_costae-E_marginatus--MPA.png", device = "png")
-vis_mpa_pred_pair("Epinephelus.marginatus", "Epinephelus.costae", grps_mat, grps_pois, groupers) %>% 
+vis_mpa_pred_pair("Epinephelus.marginatus", "Epinephelus.costae", grps_mat, grps_pois, groupers)
   ggsave(filename = "figures/predictions/final/E_marginatus-E_costae--MPA.png", device = "png")
 # Seabream
-vis_mpa_pred_pair("Diplodus.annularis", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus) %>% 
+vis_mpa_pred_pair("Diplodus.annularis", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus)
   ggsave(filename = "figures/predictions/final/D_annularis-D_vulgaris--MPA.png", device = "png")
-vis_mpa_pred_pair("Diplodus.puntazzo", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus) %>% 
+vis_mpa_pred_pair("Diplodus.puntazzo", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus)
   ggsave(filename = "figures/predictions/final/D_puntazzo-D_vulgaris--MPA.png", device = "png")
-vis_mpa_pred_pair("Diplodus.sargus", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus) %>% 
+vis_mpa_pred_pair("Diplodus.sargus", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus)
   ggsave(filename = "figures/predictions/final/D_sargus-D_vulgaris--MPA.png", device = "png")
-vis_mpa_pred_pair("Diplodus.vulgaris", "Diplodus.sargus", dip_mat, dip_pois, diplodus) %>% 
+vis_mpa_pred_pair("Diplodus.vulgaris", "Diplodus.sargus", dip_mat, dip_pois, diplodus)
   ggsave(filename = "figures/predictions/final/D_vulgaris-D_sargus--MPA.png", device = "png")
-vis_mpa_pred_pair("Diplodus.vulgaris", "Diplodus.puntazzo", dip_mat, dip_pois, diplodus) %>% 
+vis_mpa_pred_pair("Diplodus.vulgaris", "Diplodus.puntazzo", dip_mat, dip_pois, diplodus)
   ggsave(filename = "figures/predictions/final/D_vulgaris-D_puntazzo--MPA.png", device = "png")
 
 # Raw data with scenarios -------------------------------------------------
