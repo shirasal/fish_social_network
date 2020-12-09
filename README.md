@@ -19,4 +19,4 @@ Data is described in [medata](https://shirasal.github.io/medata/index.html).
 
 Extra: [Species Maps](figures/species_maps)
 
-[Results for viewing](https://raw.githack.com/shirasal/fish_social_network/master/Prediction_visualisations.html) (not final)
+<a href="https://raw.githack.com/shirasal/fish_social_network/master/Prediction_visualisations.html" target="_blank">Results for viewing</a> (not final)
