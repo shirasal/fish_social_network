@@ -18,3 +18,5 @@ Data is described in [medata](https://shirasal.github.io/medata/index.html).
 5. [Predict and visualise](#Prediction_visualisations.Rmd) species pairs abundances - predictions + raw data
 
 Extra: [Species Maps](#figures/species_maps)
+
+[Results for viewing](#Prediction_visualisations.html) (not final)
