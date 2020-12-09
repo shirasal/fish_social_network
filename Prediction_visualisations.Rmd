@@ -7,7 +7,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-source("R/models.R")
+source("R/models.R") # (includes loading of packages, function and objects)
 ```
 
 First thing first: check out the model results and look for interesting species pairs
