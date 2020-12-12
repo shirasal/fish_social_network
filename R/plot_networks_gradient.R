@@ -1,3 +1,4 @@
+source("R/models.R")
 plotMRF_net_cont = function(data, MRF_mod, node_names, covariate, main, cutoff, plot){
   
   if(MRF_mod$mod_type == 'MRFcov'){
@@ -130,8 +131,6 @@ plotMRF_net_cont = function(data, MRF_mod, node_names, covariate, main, cutoff, 
                     line = -2, outer = T, cex = 1.2)
   }
 }
-
-
 
 plotMRF_net_cont(grps_mat, grps_pois, node_names = groupers, covariate = "temp", main = "Groupers network along temperature gradient", plot = TRUE)
 ggsave("figures/grps_net_temp.png", device = "png", dpi = 150, scale = c(1.5, 1.5))
