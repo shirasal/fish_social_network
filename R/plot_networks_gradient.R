@@ -198,3 +198,21 @@ plotMRF_net_factor(grps_mat, grps_pois, groupers, "mpa", "Groupers networks alon
 ggsave("figures/grps_net_mpa.png", device = "png", dpi = 150, scale = c(1.5, 1.5))
 plotMRF_net_factor(dip_mat, dip_pois, diplodus, "mpa", "Diplodus networks along MPAs")
 ggsave("figures/dip_net_mpa.png", device = "png", dpi = 150, scale = c(1.5, 1.5))
+
+# My graph:
+# my_cols <- c(neg = '#3399CC', pos = '#FF3333')
+# 
+# graph <- MRF_mod$graph %>% tidygraph::as_tbl_graph()
+# weights <- igraph::E(graph)$weight
+# deg <- igraph::degree(graph, mode = "all")
+# plot <- ggraph::ggraph(graph, layout = "circle") +
+#   ggraph::geom_edge_link(aes(width = weights, color = weights < 0)) +
+#   ggraph::scale_edge_width(range = c(0.1, 1)) +
+#   ggraph::scale_edge_color_manual(values = c(my_cols[["neg"]], my_cols[["pos"]])) +
+#   ggraph::geom_node_point(aes(size = deg, alpha = 0.5), col = "grey") +
+#   ggraph::geom_node_text(aes(label = name), repel = TRUE, check_overlap = TRUE) +
+#   ggplot::theme(legend.position = "none",
+#         panel.background = element_blank(),
+#         aspect.ratio = 1) +
+#   ggplot::ggtitle(main)
+
