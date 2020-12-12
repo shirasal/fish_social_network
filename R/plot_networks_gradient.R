@@ -133,13 +133,11 @@ plotMRF_net_cont = function(data, MRF_mod, node_names, covariate, main, cutoff, 
 }
 
 plotMRF_net_cont(grps_mat, grps_pois, node_names = groupers, covariate = "temp", main = "Groupers network along temperature gradient", plot = TRUE)
-ggsave("figures/grps_net_temp.png", device = "png", dpi = 150, scale = c(1.5, 1.5))
 plotMRF_net_cont(dip_mat, dip_pois, node_name = diplodus, covariate = "temp", main = "Seabreams network along temperature gradient", plot = TRUE)
-ggsave("figures/dip_net_temp.png", device = "png", dpi = 150, scale = c(1.5, 1.5))
 
 plotMRF_net_factor <- function(data, MRF_mod, node_names, covariate, main){
   #### Function to create network graphs
-  create_netgraph  <- function(matrix, node_names){
+  create_netgraph  <- function(matrix, node_names, predictor_value){
     
     # Create the adjacency network graph
     comm.net <- igraph::graph.adjacency(matrix, weighted = T, mode = "undirected")
@@ -165,7 +163,8 @@ plotMRF_net_factor <- function(data, MRF_mod, node_names, covariate, main){
                      vertex.shape = "crectangle",
                      vertex.label.family = "sans",
                      vertex.label.font = 3,
-                     vertex.label.color = "black")
+                     vertex.label.color = "black",
+                     main = predictor_value)
     return(net.plot)
   }
   
@@ -189,14 +188,12 @@ plotMRF_net_factor <- function(data, MRF_mod, node_names, covariate, main){
   graphics::par(mfrow = c(1, length(observed_cov_unique)))
   cont.cov.mats <- lapply(observed_cov_unique, function(j){
     pred_values <- (covariate_matrix * j) + baseinteraction_matrix
-    net.plot <- create_netgraph(matrix = pred_values, node_names = node_names)
+    net.plot <- create_netgraph(matrix = pred_values, node_names = node_names, predictor_value = as.logical(j))
   })
 }
 
 plotMRF_net_factor(grps_mat, grps_pois, groupers, "mpa", "Groupers networks along MPAs")
-ggsave("figures/grps_net_mpa.png", device = "png", dpi = 150, scale = c(1.5, 1.5))
 plotMRF_net_factor(dip_mat, dip_pois, diplodus, "mpa", "Diplodus networks along MPAs")
-ggsave("figures/dip_net_mpa.png", device = "png", dpi = 150, scale = c(1.5, 1.5))
 
 # My graph:
 # my_cols <- c(neg = '#3399CC', pos = '#FF3333')
