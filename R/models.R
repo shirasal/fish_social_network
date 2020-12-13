@@ -23,8 +23,44 @@ p_relimp_herb_pois <- plot_relimp(herb_pois_relimp, guild_colours$herb, "Herbivo
 p_relimp_pois <- egg::ggarrange(p_relimp_grps_pois, p_relimp_dip_pois, p_relimp_herb_pois)
 # ggsave(filename = "rel_imp_pois_nonspat.png", device = "png", path = "figures/rel_imp/", dpi = 150, height = 10, width = 10, units = "in")
 
+# Relative importance means
+colMeans(grps_pois_relimp[2:ncol(grps_pois_relimp)]) %>% 
+  plot()
+colMeans(dip_pois_relimp[2:ncol(dip_pois_relimp)]) %>% 
+  plot()
+colMeans(herb_pois_relimp[2:ncol(herb_pois_relimp)]) %>% 
+  plot()
 
- 
+# Mean relative importance explained
+rowSums(grps_pois_relimp[2:ncol(grps_pois_relimp)]) %>% mean()
+rowSums(dip_pois_relimp[2:ncol(dip_pois_relimp)]) %>% mean()
+rowSums(herb_pois_relimp[2:ncol(herb_pois_relimp)]) %>% mean()
+
+# Stationary effect
+grps_pois_relimp %>% 
+  pivot_longer(2:6, names_to = "type", values_to = "rel_imp") %>% 
+  mutate(nonstationary = str_detect(type, "_bio_")) %>% 
+  group_by(species, nonstationary) %>% 
+  summarise(sum = sum(rel_imp)) %>% 
+  group_by(nonstationary) %>% 
+  summarise(mean(sum))
+
+dip_pois_relimp %>% 
+  pivot_longer(2:6, names_to = "type", values_to = "rel_imp") %>% 
+  mutate(nonstationary = str_detect(type, "_bio_")) %>% 
+  group_by(species, nonstationary) %>% 
+  summarise(sum = sum(rel_imp)) %>% 
+  group_by(nonstationary) %>% 
+  summarise(mean(sum))
+
+herb_pois_relimp %>% 
+  pivot_longer(2:6, names_to = "type", values_to = "rel_imp") %>% 
+  mutate(nonstationary = str_detect(type, "_bio_")) %>% 
+  group_by(species, nonstationary) %>% 
+  summarise(sum = sum(rel_imp)) %>% 
+  group_by(nonstationary) %>% 
+  summarise(mean(sum))
+
 # # Spatial Poisson CRF -----------------------------------------------------
 # 
 # med_coords <- med_clean %>% 
