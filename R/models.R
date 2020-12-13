@@ -16,7 +16,7 @@ herb_pois_relimp <- rel_imp_sum(herb_pois)
 
 p_relimp_grps_pois <- plot_relimp(grps_pois_relimp, guild_colours$grps, "Groupers")
 # ggsave("p_relimp_grps_pois_nonspat.png", p_relimp_grps_pois, "png", "figures/rel_imp/", dpi = 300, width = 11.74, height = 4, units = "in")
-p_relimp_dip_pois <- plot_relimp(dip_pois_relimp, guild_colours$dip, "Diplodus")
+p_relimp_dip_pois <- plot_relimp(dip_pois_relimp, guild_colours$dip, "Seabreams")
 # ggsave("p_relimp_dip_pois_nonspat.png", p_relimp_dip_pois, "png", "figures/rel_imp/", dpi = 300, width = 11.74, height = 4, units = "in")
 p_relimp_herb_pois <- plot_relimp(herb_pois_relimp, guild_colours$herb, "Herbivores")
 # ggsave("p_relimp_herb_pois_nonspat.png", p_relimp_herb_pois, "png", "figures/rel_imp/", dpi = 300, width = 11.74, height = 4, units = "in")
