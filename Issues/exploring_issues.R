@@ -1,4 +1,5 @@
-library(tiduyerse)
+library(tidyverse)
+load("data/data_and_objects.RData")
 
 # How many species of each site?
 med_raw %>% distinct(species) %>% arrange(species) %>% print(n = Inf)
@@ -7,10 +8,24 @@ dip_test <- c("Diplodus.annularis", "Diplodus.cervinus", "Diplodus.puntazzo", "D
 grps_test <- c("Epinephelus.aeneus", "Epinephelus.caninus", "Epinephelus.costae", "Epinephelus.marginatus", "Mycteroperca.rubra", "Serranus.cabrilla", "Serranus.hepatus", "Serranus.scriba")
 herb_test <- c("Sparisoma.cretense", "Siganus.luridus", "Siganus.rivulatus", "Sarpa.salpa", "Scarus.ghobban")
 
-med_raw %>% group_by(species) %>% count(site) %>% 
-  group_by(species) %>% summarise(blah = n()) %>% 
-  filter(species %in% c(dip_test, grps_test, herb_test)) %>%
-  arrange(species) %>% print(n = Inf)
+# Check in how many transects species appear:
+med_raw %>% 
+  mutate(guild = case_when(species %in% dip_test ~ "diplodus",
+                           species %in% grps_test ~ "groupers",
+                           species %in% herb_test ~ "herbivores")) %>% 
+  group_by(guild, species) %>% count(site, trans) %>% 
+  group_by(guild, species) %>% summarise(count_trans = n()) %>% 
+  filter(!is.na(guild)) %>%
+  arrange(guild, count_trans) %>% print(n = Inf)
+
+med_raw %>% 
+  mutate(guild = case_when(species %in% dip_test ~ "diplodus",
+                           species %in% grps_test ~ "groupers",
+                           species %in% herb_test ~ "herbivores")) %>% 
+  group_by(guild, species) %>% count(site) %>% 
+  group_by(guild, species) %>% summarise(count_site = n()) %>% 
+  filter(!is.na(guild)) %>%
+  arrange(guild, count_site) %>% print(n = Inf)
 
 # NAs #
 depth_NA <- med_clean %>%
