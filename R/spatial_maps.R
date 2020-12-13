@@ -3,10 +3,10 @@ library(sf)
 library(tidyverse)
 library(sdmpredictors) 
 
-med_ext <- raster::extent(sf::st_read("C:/Users/shira/Documents/MSc/medata/Med_World_Seas_IHO_v3_MarineRegions/Medit_seas_IHO.shp"))
+med_shp <- sf::st_read("C:/Users/shira/Documents/MSc/medata/Med_World_Seas_IHO_v3_MarineRegions/Medit_seas_IHO.shp")
+med_ext <- raster::extent(med_shp)
 
-list_layers(marine = TRUE) %>% View
-
+# list_layers(marine = TRUE) %>% View
 
 # Temperature -------------------------------------------------------------
 tmean <- load_layers("BO_sstmean")
@@ -84,4 +84,20 @@ ggplot(data = med_bathy_df) +
         legend.position = "right")
 # ggsave("figures/maps/depth_med_biooracle.png", device = "png", dpi = 300, scale = c(2,2))
 
+
+
+# MPAs --------------------------------------------------------------------
+med_raw %>% 
+  ungroup() %>% 
+  mutate(mpa = case_when(enforcement == 1 | enforcement == 0 ~ FALSE,
+                         enforcement == 2 | enforcement == 3 ~ TRUE)) %>% 
+  filter(!is.na(mpa)) %>% 
+  ggplot() + 
+  # geom_count(aes(x = lon, y = lat, col = mpa, alpha = after_stat(prop)), size = 5, shape = 17) +
+  geom_point(aes(x = lon, y = lat, col = mpa), alpha = .8, size = 5, shape = 17) +
+  geom_sf(data = med_shp, colour = "black", fill = "#00E5E5", alpha = 0.4) +
+  scale_color_manual(values = c("ivory4", "orchid3"), labels = c("Non-MPA", "MPA"), name = "") +
+  xlab("Longitude") + ylab("Latitude") + 
+  theme_bw()
+ggsave("figures/maps/sampled_mpas.png", device = "png", dpi = 300, scale = c(2,2))
 
