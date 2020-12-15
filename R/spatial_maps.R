@@ -64,14 +64,14 @@ med_bathy <- raster::crop(bathy, med_ext)
 map_bathy <- rasterToPoints(med_bathy)
 med_bathy_df <- data.frame(map_bathy) %>% rename(Longitude = x, Latitude = y, Bathymetry = layer)
 
-med_depth <- med_raw %>% select(Longitude = lon, Latitude = lat, Depth = depth)
+# med_depth <- med_raw %>% select(Longitude = lon, Latitude = lat, Depth = depth)
 
 # plot(med_bathy_df)
 ggplot(data = med_bathy_df) +
   aes(y = Latitude, x = Longitude) + 
   geom_raster(aes(fill = Bathymetry)) +
-  geom_point(data = med_depth %>% na.omit(), aes(y = Latitude, x = Longitude, col = Depth), shape = 15, size = 6, alpha = 0.3) + 
-  scale_color_gradientn(colours = c("#f7fcfd", "#4d004b"), name = " Sampled Depth (m)") +
+  # geom_point(data = med_depth %>% na.omit(), aes(y = Latitude, x = Longitude, col = Depth), shape = 15, size = 6, alpha = 0.3) + 
+  # scale_color_gradientn(colours = c("#f7fcfd", "#4d004b"), name = " Sampled Depth (m)") +
   scale_fill_gradientn(colours = c("#08306b", "#deebf7"), name = "Depth (m)") +
   theme_bw() +
   coord_quickmap() + 
