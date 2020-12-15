@@ -3,7 +3,7 @@ library(sf)
 library(tidyverse)
 library(sdmpredictors) 
 
-med_shp <- sf::st_read("C:/Users/shira/Documents/MSc/medata/Med_World_Seas_IHO_v3_MarineRegions/Medit_seas_IHO.shp")
+med_shp <- sf::st_read("C:/Users/shira/Documents/MSc/GIS/Mediterranean Sea/Mediterranean_Sea_Area.shp")
 med_ext <- raster::extent(med_shp)
 
 # list_layers(marine = TRUE) %>% View
