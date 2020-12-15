@@ -2,20 +2,20 @@ Species,Covariate,Interaction,Rel_importance,Coefficient
 Epinephelus costae,depth,NA,0.20075000212669866,0.087100287444824
 Epinephelus costae,depth,Epinephelus marginatus,0.09916967642780376,0.06121829884168599
 Epinephelus costae,depth,Serranus cabrilla,0.012602340830718404,-0.021823149079425945
-Epinephelus costae,Epinephelus.marginatus,NA,0.2087413891263806,0.08881699873782076
+Epinephelus costae,Epinephelus marginatus,NA,0.2087413891263806,0.08881699873782076
 Epinephelus costae,mpa,NA,0.010772750151803822,-0.02017693071766187
 Epinephelus costae,mpa,Epinephelus marginatus,0.06184191635428296,-0.0483429644637014
 Epinephelus costae,mpa,Serranus cabrilla,0.07097832802355208,-0.051791047077386576
 Epinephelus costae,prod,Serranus cabrilla,0.05792847993979704,-0.04678836565456396
-Epinephelus costae,Serranus.cabrilla,NA,0.21739611931612743,0.09063954205534913
+Epinephelus costae,Serranus cabrilla,NA,0.21739611931612743,0.09063954205534913
 Epinephelus costae,temp,Serranus cabrilla,0.059817188829664886,0.047544995267374233
 Epinephelus marginatus,mpa,NA,0.7313960740642248,0.19509757609490774
 Epinephelus marginatus,depth,Epinephelus costae,0.07201308090387987,0.06121829884168599
-Epinephelus marginatus,Epinephelus.costae,NA,0.1515797074732799,0.08881699873782076
+Epinephelus marginatus,Epinephelus costae,NA,0.1515797074732799,0.08881699873782076
 Epinephelus marginatus,mpa,Epinephelus costae,0.04490714385777066,-0.0483429644637014
 Serranus cabrilla,depth,NA,0.12058547071719422,0.1946200434615648
 Serranus cabrilla,mpa,NA,0.014667419196911254,-0.06787610703908027
-Serranus cabrilla,Epinephelus.costae,NA,0.02615503213235653,0.09063954205534913
+Serranus cabrilla,Epinephelus costae,NA,0.02615503213235653,0.09063954205534913
 Serranus cabrilla,prod,NA,0.021788580313790922,0.08939695409652533
 Serranus cabrilla,temp,NA,0.790222160548304,-0.4982125646426473
 Serranus scriba,mpa,NA,0.10370947212416692,0.09975724449905954
