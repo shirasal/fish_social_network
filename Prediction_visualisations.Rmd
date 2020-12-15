@@ -39,8 +39,7 @@ lapply(grps_pois$key_coefs, function(x) x %>%
 
 ```
 
-*Epinephelus.costae* ~ *Serranus.cabrilla* x Temperature (RI = 0.08; Coef = 0.06)
-*Serranus.cabrilla* ~ *Epinephelus.costae* x Temperature (RI = 0.01; Coef = 0.06)
+*Epinephelus.costae* ~ *Serranus.cabrilla* x Temperature (RI = 0.06)
 
 **MPA**
 ```{r}
@@ -49,9 +48,9 @@ lapply(grps_pois$key_coefs, function(x) x %>%
 
 ```
 
-*Epinephelus.costae* ~ *Serranus.cabrilla* x MPA (RI = 0.07; Coef = -0.05)
-*Epinephelus.costae* ~ *Epinephelus.marginatus* x MPA (RI = 0.07; Coef = -0.05)
-*Epinephelus.marginatus* ~ *Epinephelus.costae* x MPA (RI = 0.06; Coef = -0.05)
+*Epinephelus.costae* ~ *Serranus.cabrilla* x MPA (RI = 0.07)
+*Epinephelus.costae* ~ *Epinephelus.marginatus* x MPA (RI = 0.06)
+*Epinephelus.marginatus* ~ *Epinephelus.costae* x MPA (RI = 0.04)
 
 ### Visualise abundance of species *i*
 (A) Using `MRF_predict` to predict the abundance of species *i* along temperature gradient / MPA status in two scenarios:
@@ -63,25 +62,16 @@ lapply(grps_pois$key_coefs, function(x) x %>%
 2. When species *j* is present (at any abundance)
 
 **Epinephelus.costae ~ Serranus.cabrilla x Temperature**
-RI = 0.08
-Coef = 0.06
+RI = 0.06
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE, dev='png', fig.show='hold', fig.ncol=2}
 vis_temp_pred_pair("Epinephelus.costae", "Serranus.cabrilla", grps_mat, grps_pois, groupers)
 vis_raw_temp(species_i = "Epinephelus.costae", species_j = "Serranus.cabrilla", spp_mat = grps_mat)
 ```
 
-**Serranus.cabrilla ~ Epinephelus.costae x Temperature**
-RI = 0.01
-Coef = 0.06
-
-```{r echo=FALSE, message=FALSE, warning=FALSE, dev='png', fig.show='hold', fig.ncol=2}
-vis_temp_pred_pair("Serranus.cabrilla", "Epinephelus.costae", grps_mat, grps_pois, groupers)
-vis_raw_temp(species_i = "Serranus.cabrilla", species_j = "Epinephelus.costae", spp_mat = grps_mat)
-```
 
 **Epinephelus.costae ~ Serranus.cabrilla x MPA**
 RI = 0.07
-Coef = -0.05
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, dev='png', fig.show='hold', fig.ncol=2}
 vis_mpa_pred_pair("Epinephelus.costae", "Serranus.cabrilla", grps_mat, grps_pois, groupers)
@@ -90,8 +80,7 @@ vis_raw_mpa(spp_mat = grps_mat, "Epinephelus.costae", "Serranus.cabrilla")
 ```
 
 **Epinephelus.costae ~ Epinephelus.marginatus x MPA**
-RI = 0.07
-Coef = -0.05
+RI = 0.06
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, dev='png', fig.show='hold', fig.ncol=2}
 vis_mpa_pred_pair("Epinephelus.costae", "Epinephelus.marginatus", grps_mat, grps_pois, groupers)
@@ -99,8 +88,8 @@ vis_raw_mpa(spp_mat = grps_mat, "Epinephelus.costae", "Epinephelus.marginatus")
 ```
 
 **Epinephelus.marginatus ~ Epinephelus.costae x MPA**
-RI = 0.06
-Coef = -0.05
+RI = 0.04
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE, dev='png', fig.show='hold', fig.ncol=2}
 vis_mpa_pred_pair("Epinephelus.marginatus", "Epinephelus.costae", grps_mat, grps_pois, groupers)
 vis_raw_mpa(spp_mat = grps_mat, "Epinephelus.marginatus", "Epinephelus.costae")
@@ -127,11 +116,11 @@ lapply(dip_pois$key_coefs, function(x) x %>%
 
 ```
 
-*Diplodus.annularis* ~ *Diplodus.vulgaris* x Temperature (RI = 0.1; Coef = 0.08)
-*Diplodus.puntazzo* ~ *Diplodus.vulgaris* x Temperature (RI = 0.01; Coef = -0.03)
-*Diplodus.sargus* ~ *Diplodus.vulgaris* x Temperature (RI = 0.05; Coef = 0.13)
-*Diplodus.vulgaris* ~ *Diplodus.sargus* x Temperature (RI = 0.05; Coef = 0.13)
-*Diplodus.vulgaris* ~ *Diplodus.annularis* x Temperature (RI = 0.02; Coef = 0.08)
+*Diplodus.annularis* ~ *Diplodus.vulgaris* x Temperature (RI = 0.07)
+*Diplodus.puntazzo* ~ *Diplodus.vulgaris* x Temperature (RI = 0.01)
+*Diplodus.sargus* ~ *Diplodus.vulgaris* x Temperature (RI = 0.04)
+*Diplodus.vulgaris* ~ *Diplodus.sargus* x Temperature (RI = 0.04)
+*Diplodus.vulgaris* ~ *Diplodus.annularis* x Temperature (RI = 0.01)
 
 **MPA**
 ```{r}
@@ -140,12 +129,11 @@ lapply(dip_pois$key_coefs, function(x) x %>%
 
 ```
 
-*Diplodus.annularis* ~ *Diplodus.vulgaris* x MPA (RI = 0.05; Coef = 0.06)
-*Diplodus.puntazzo* ~ *Diplodus.vulgaris* x MPA (RI = 0.34; Coef = 0.15)
-*Diplodus.sargus* ~ *Diplodus.vulgaris* x MPA (RI = 0.2; Coef = 0.26)
-*Diplodus.vulgaris* ~ *Diplodus.sargus* x MPA (RI = 0.21; Coef = 0.26)
-*Diplodus.vulgaris* ~ *Diplodus.puntazzo* x MPA (RI = 0.07; Coef = 0.15)
-*Diplodus.vulgaris* ~ *Diplodus.annularis* x MPA (RI = 0.01; Coef = 0.06)
+*Diplodus.annularis* ~ *Diplodus.vulgaris* x MPA (RI = 0.04)
+*Diplodus.puntazzo* ~ *Diplodus.vulgaris* x MPA (RI = 0.33)
+*Diplodus.sargus* ~ *Diplodus.vulgaris* x MPA (RI = 0.19)
+*Diplodus.vulgaris* ~ *Diplodus.sargus* x MPA (RI = 0.22)
+*Diplodus.vulgaris* ~ *Diplodus.puntazzo* x MPA (RI = 0.07)
 
 
 ### Visualise abundance of species *i*
@@ -158,15 +146,13 @@ lapply(dip_pois$key_coefs, function(x) x %>%
 2. When species *j* is present (at any abundance)
 
 **Diplodus.annularis ~ Diplodus.vulgaris x Temperature**
-RI = 0.1
-Coef = 0.08
+RI = 0.07
 ```{r echo=FALSE, message=FALSE, warning=FALSE, dev='png', fig.show='hold', fig.ncol=2}
 vis_temp_pred_pair("Diplodus.annularis", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus)
 vis_raw_temp(species_i = "Diplodus.annularis", species_j = "Diplodus.vulgaris", spp_mat = dip_mat)
 ```
 **Diplodus.vulgaris ~ Diplodus.annularis x Temperature**
-RI = 0.02
-Coef = 0.08
+RI = 0.01
 ```{r echo=FALSE, message=FALSE, warning=FALSE, dev='png', fig.show='hold', fig.ncol=2}
 vis_temp_pred_pair("Diplodus.vulgaris", "Diplodus.annularis", dip_mat, dip_pois, diplodus)
 vis_raw_temp(species_i = "Diplodus.vulgaris", species_j = "Diplodus.annularis", spp_mat = dip_mat)
@@ -175,7 +161,6 @@ vis_raw_temp(species_i = "Diplodus.vulgaris", species_j = "Diplodus.annularis", 
 
 **Diplodus.puntazzo ~ Diplodus.vulgaris x Temperature**
 RI = 0.01
-Coef = -0.03
 ```{r echo=FALSE, message=FALSE, warning=FALSE, dev='png', fig.show='hold', fig.ncol=2}
 vis_temp_pred_pair("Diplodus.puntazzo", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus)
 vis_raw_temp(species_i = "Diplodus.puntazzo", species_j = "Diplodus.vulgaris", spp_mat = dip_mat)
@@ -203,26 +188,16 @@ vis_raw_temp(species_i = "Diplodus.vulgaris", species_j = "Diplodus.sargus", spp
 
 
 **Diplodus.annularis ~ Diplodus.vulgaris x MPA**
-RI = 0.05
-Coef = 0.06
+RI = 0.04
 ```{r echo=FALSE, message=FALSE, warning=FALSE, dev='png', fig.show='hold', fig.ncol=2}
 vis_mpa_pred_pair("Diplodus.annularis", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus)
 vis_raw_mpa(species_i = "Diplodus.annularis", species_j = "Diplodus.vulgaris", spp_mat = dip_mat)
 
 ```
 
-**Diplodus.vulgaris ~ Diplodus.annularis x MPA**
-RI = 0.01; Coef = 0.06
-```{r echo=FALSE, message=FALSE, warning=FALSE, dev='png', fig.show='hold', fig.ncol=2}
-vis_mpa_pred_pair("Diplodus.vulgaris", "Diplodus.annularis", dip_mat, dip_pois, diplodus)
-vis_raw_mpa(species_i = "Diplodus.vulgaris", species_j = "Diplodus.annularis", spp_mat = dip_mat)
-
-```
-
-
 **Diplodus.puntazzo ~ Diplodus.vulgaris x MPA**
-RI = 0.34
-Coef = 0.15
+RI = 0.33
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE, dev='png', fig.show='hold', fig.ncol=2}
 vis_mpa_pred_pair("Diplodus.puntazzo", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus)
 vis_raw_mpa(species_i = "Diplodus.puntazzo", species_j = "Diplodus.vulgaris", spp_mat = dip_mat)
@@ -231,7 +206,6 @@ vis_raw_mpa(species_i = "Diplodus.puntazzo", species_j = "Diplodus.vulgaris", sp
 
 **Diplodus.vulgaris ~ Diplodus.puntazzo x MPA**
 RI = 0.07
-Coef = 0.15
 ```{r echo=FALSE, message=FALSE, warning=FALSE, dev='png', fig.show='hold', fig.ncol=2}
 vis_mpa_pred_pair("Diplodus.vulgaris", "Diplodus.puntazzo", dip_mat, dip_pois, diplodus)
 vis_raw_mpa(species_i = "Diplodus.vulgaris", species_j = "Diplodus.puntazzo", spp_mat = dip_mat)
@@ -240,7 +214,7 @@ vis_raw_mpa(species_i = "Diplodus.vulgaris", species_j = "Diplodus.puntazzo", sp
 
 
 **Diplodus.sargus ~ Diplodus.vulgaris x MPA** 
-RI = 0.2; Coef = 0.26
+RI = 0.19
 ```{r echo=FALSE, message=FALSE, warning=FALSE, dev='png', fig.show='hold', fig.ncol=2}
 vis_mpa_pred_pair("Diplodus.sargus", "Diplodus.vulgaris", dip_mat, dip_pois, diplodus)
 vis_raw_mpa(species_i = "Diplodus.sargus", species_j = "Diplodus.vulgaris", spp_mat = dip_mat)
@@ -248,7 +222,7 @@ vis_raw_mpa(species_i = "Diplodus.sargus", species_j = "Diplodus.vulgaris", spp_
 ```
 
 **Diplodus.vulgaris ~ Diplodus.sargus x MPA**
-RI = 0.21; Coef = 0.26
+RI = 0.22
 ```{r echo=FALSE, message=FALSE, warning=FALSE, dev='png', fig.show='hold', fig.ncol=2}
 vis_mpa_pred_pair("Diplodus.vulgaris", "Diplodus.sargus", dip_mat, dip_pois, diplodus)
 vis_raw_mpa(species_i = "Diplodus.vulgaris", species_j = "Diplodus.sargus", spp_mat = dip_mat)

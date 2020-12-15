@@ -221,7 +221,7 @@ vis_temp_pred_pair <- function(species_i, species_j, spp_mat, spp_mod, guild){
     ggplot() +
     aes(x = temp, y = prediction, col = scenario) +
     geom_smooth(method = "lm", formula = y ~ x, cex = 3, alpha = 0.1) +
-    xlab("Temperature (°C)") + ylab("Observation predictions (nonparanormal)") +
+    xlab(paste("Temperature", "(°C)")) + ylab("Observations prediction") +
     labs(subtitle = stringr::str_replace(species_i, "\\.", "\\ "),
          col = stringr::str_replace(species_j, "\\.", "\\ ")) +
     scale_color_manual(labels = c('Absent','Present'), values = c("#031D44", "#FF99C9")) +
