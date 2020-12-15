@@ -84,7 +84,8 @@ plot_relimp <- function(rel_imp_df, col, guild_name){
     labs(subtitle = guild_name) +
     theme(axis.text.x = element_text(angle = 45, hjust = 1), strip.placement = "outside",
           axis.title.x = element_blank(), axis.title.y = element_blank(),
-          strip.text.x = element_text(size = 12, face = "bold"))
+          strip.text.x = element_text(size = 12, face = "bold"),
+          plot.margin = margin(.2,1,.2,1, "cm"))
 }
 
 
