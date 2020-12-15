@@ -252,7 +252,7 @@ vis_raw_mpa <- function(spp_mat, species_i, species_j){
     ggplot() +
     aes(x = mpa, y = log2(spp_mat[[species_i]] + 0.1), group = scenario) +
     geom_boxplot(aes(colour = scenario), fill = "ghostwhite") +
-    xlab("MPA") + ylab("Abundance (nonparanormal)") +
+    xlab("MPA") + ylab("Observations prediction") +
     ggtitle(str_replace(species_i, "\\.", "\\ ")) +
     scale_color_manual(name = str_replace(species_j, "\\.", "\\ "), 
                        labels = c('Absent','Present'), values = c("#031D44", "#FF99C9")) +
