@@ -24,12 +24,9 @@ p_relimp_pois <- egg::ggarrange(p_relimp_grps_pois, p_relimp_dip_pois, p_relimp_
 # ggsave(filename = "rel_imp_pois_nonspat.png", device = "png", path = "figures/rel_imp/", dpi = 150, height = 10, width = 10, units = "in")
 
 # Relative importance means
-colMeans(grps_pois_relimp[2:ncol(grps_pois_relimp)]) %>% 
-  plot()
-colMeans(dip_pois_relimp[2:ncol(dip_pois_relimp)]) %>% 
-  plot()
-colMeans(herb_pois_relimp[2:ncol(herb_pois_relimp)]) %>% 
-  plot()
+colMeans(grps_pois_relimp[2:ncol(grps_pois_relimp)])
+colMeans(dip_pois_relimp[2:ncol(dip_pois_relimp)])
+colMeans(herb_pois_relimp[2:ncol(herb_pois_relimp)])
 
 # Mean relative importance explained
 rowSums(grps_pois_relimp[2:ncol(grps_pois_relimp)]) %>% mean()
