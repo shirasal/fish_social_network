@@ -13,7 +13,9 @@ med_raw %>%
   facet_wrap(~species) + 
   xlab("Temperature") + ylab("Abundance (log)") +
   scale_color_manual("Guild", 
-                     values = c("Groupers" = "#eccbae", "Seabreams" = "#d29a4c" , "Herbivores" = "#145d82")) +
+                     values = c("Groupers" = guild_colours$grps,
+                                "Seabreams" = guild_colours$dip ,
+                                "Herbivores" = guild_colours$herb)) +
   theme(strip.text = element_text(face = "italic"))
 
 species_temp <- lapply(as.list(c(groupers, diplodus, herbivores)), function(sp) {
