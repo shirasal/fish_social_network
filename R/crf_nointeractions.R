@@ -2,15 +2,11 @@ source("R/packages.R")
 source("R/functions.R")
 load("data/data_and_objects.RData")
 
+n_nodes = 4
 
 # Groupers ----------------------------------------------------------------
 
-# A standard CRF
-n_nodes = 4
 grps_dat <- grps_mat
-grps_crf <- MRFcov(grps_dat, n_nodes = n_nodes, family = 'poisson')
-grps_crf$graph
-grps_crf$direct_coefs
 
 # To fit without interactions, the simplest way given the package constraints is to set these
 # columns to zero so they will be regularised out of the model
@@ -34,8 +30,6 @@ grps_noint_relimp <- rel_imp_sum(grps_no_int)
 
 # Seabreams ---------------------------------------------------------------
 
-# A standard CRF
-n_nodes = 4
 dip_dat <- dip_mat
 
 # To fit without interactions, the simplest way given the package constraints is to set these
@@ -60,8 +54,6 @@ dip_noint_relimp <- rel_imp_sum(dip_no_int)
 
 # Herbivores --------------------------------------------------------------
 
-# A standard CRF
-n_nodes = 4
 herb_dat <- herb_mat
 
 # To fit without interactions, the simplest way given the package constraints is to set these
@@ -90,3 +82,4 @@ p_relimp_herb_noint <- plot_relimp(herb_noint_relimp, guild_colours$herb, "Herbi
 p_relimp_noint <- egg::ggarrange(p_relimp_grps_noint, p_relimp_dip_noint, p_relimp_herb_noint)
 # ggsave(p_relimp_noint, filename = "rel_imp_noint.png", device = "png", path = "figures/rel_imp/", dpi = 150, height = 10, width = 10, units = "in")
 # ggsave(p_relimp_noint, filename = "rel_imp_noint.pdf", device = "pdf", path = "figures/rel_imp/", dpi = 150, height = 10, width = 10, units = "in")
+
