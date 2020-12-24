@@ -27,25 +27,23 @@ plotMRF_net_cont = function(data, MRF_mod, node_names, covariate, main, cutoff, 
     # Create the adjacency network graph
     comm.net <- igraph::graph.adjacency(matrix, weighted = T, mode = "undirected")
     # Specify edge colours
-    cols <- c(neg = "#3399CC", pos = "#FF3333")
+    cols <- c(neg = "#FF3333", pos = "#3399CC")
     
     igraph::E(comm.net)$color <- ifelse(igraph::E(comm.net)$weight < 0,
                                         cols[["neg"]],
                                         cols[["pos"]])
-    comm.net <- igraph::delete.edges(comm.net, which(abs(igraph::E(comm.net)$weight) <= 0))
-    igraph::E(comm.net)$width <- abs(igraph::E(comm.net)$weight) * 2
-    igraph::V(comm.net)$label <- node_names
-    igraph::V(comm.net)$size <- 44
+    igraph::E(comm.net)$width <- abs(igraph::E(comm.net)$weight)
+    igraph::V(comm.net)$label <- str_replace(node_names, "\\.", "\\ ")
     igraph::V(comm.net)$color <- grDevices::adjustcolor("grey", alpha.f = .6)
     
     # Create the network plot
-    graphics::par(mar = c(0, 0, 0, 0))
+    graphics::par(mar = c(2,2,2,2))
     net.plot <- plot(comm.net,
                      # layout = igraph::layout.davidson.harel(comm.net),
-                     layout = igraph::layout.circle,
                      vertex.label.cex = 0.84,
+                     layout = igraph::layout.circle,
                      vertex.frame.color = grDevices::adjustcolor("grey", alpha.f = .6),
-                     vertex.shape = "crectangle",
+                     vertex.shape = "circle",
                      vertex.label.family = "sans",
                      vertex.label.font = 3,
                      vertex.label.color = "black")
@@ -110,7 +108,7 @@ plotMRF_net_cont = function(data, MRF_mod, node_names, covariate, main, cutoff, 
   }
   
   #### Create a gridded plot object to plot the three networks
-  graphics::par(mfrow = c(1, length(observed_cov_quantiles)))
+  graphics::par(mfrow = c(1, length(observed_cov_quantiles)), mar = c(2,2,2,2))
   cont.cov.mats <- lapply(observed_cov_quantiles, function(j){
     pred_values <- (covariate_matrix * j) + baseinteraction_matrix
     net.plot <- create_netgraph(matrix = pred_values,
@@ -131,9 +129,15 @@ plotMRF_net_cont = function(data, MRF_mod, node_names, covariate, main, cutoff, 
                     line = -2, outer = T, cex = 1.2)
   }
 }
-
+png(filename = "figures/networks/temp_grps.png", res = 150, width = 5, height = 3.7, units = "in")
 plotMRF_net_cont(grps_mat, grps_pois, node_names = groupers, covariate = "temp", main = "Groupers network along temperature gradient", plot = TRUE)
+dev.off()
+
+png(filename = "figures/networks/temp_dip.png", res = 150, width = 5, height = 3.7, units = "in")
 plotMRF_net_cont(dip_mat, dip_pois, node_name = diplodus, covariate = "temp", main = "Seabreams network along temperature gradient", plot = TRUE)
+dev.off()
+
+
 
 plotMRF_net_factor <- function(data, MRF_mod, node_names, covariate, main){
   #### Function to create network graphs
@@ -142,25 +146,23 @@ plotMRF_net_factor <- function(data, MRF_mod, node_names, covariate, main){
     # Create the adjacency network graph
     comm.net <- igraph::graph.adjacency(matrix, weighted = T, mode = "undirected")
     # Specify edge colours
-    cols <- c(neg = "#3399CC", pos = "#FF3333")
+    cols <- c(neg = "#FF3333", pos = "#3399CC")
     
     igraph::E(comm.net)$color <- ifelse(igraph::E(comm.net)$weight < 0,
                                         cols[["neg"]],
                                         cols[["pos"]])
-    comm.net <- igraph::delete.edges(comm.net, which(abs(igraph::E(comm.net)$weight) <= 0))
-    igraph::E(comm.net)$width <- abs(igraph::E(comm.net)$weight) * 2
-    igraph::V(comm.net)$label <- node_names
-    igraph::V(comm.net)$size <- 44
+    igraph::E(comm.net)$width <- abs(igraph::E(comm.net)$weight)
+    igraph::V(comm.net)$label <- str_replace(node_names, "\\.", "\\ ")
     igraph::V(comm.net)$color <- grDevices::adjustcolor("grey", alpha.f = .6)
     
     # Create the network plot
-    graphics::par(mar = c(0, 0, 0, 0))
+    graphics::par(mar = c(2, 2, 2, 2))
     net.plot <- plot(comm.net,
                      # layout = igraph::layout.davidson.harel(comm.net),
                      layout = igraph::layout.circle,
                      vertex.label.cex = 0.84,
                      vertex.frame.color = grDevices::adjustcolor("grey", alpha.f = .6),
-                     vertex.shape = "crectangle",
+                     vertex.shape = "circle",
                      vertex.label.family = "sans",
                      vertex.label.font = 3,
                      vertex.label.color = "black",
@@ -185,16 +187,19 @@ plotMRF_net_factor <- function(data, MRF_mod, node_names, covariate, main){
   observed_cov_unique <- as.numeric(unique(observed_cov_values, na.rm = T))
   
   #### Create a gridded plot object to plot the three networks
-  graphics::par(mfrow = c(1, length(observed_cov_unique)))
+  graphics::par(mfrow = c(1, length(observed_cov_unique)), mar = c(2,2,2,2))
   cont.cov.mats <- lapply(observed_cov_unique, function(j){
     pred_values <- (covariate_matrix * j) + baseinteraction_matrix
     net.plot <- create_netgraph(matrix = pred_values, node_names = node_names, predictor_value = as.logical(j))
   })
 }
-
+png(filename = "figures/networks/mpa_grps.png", res = 150, width = 9.79, height = 7.38, units = "in")
 plotMRF_net_factor(grps_mat, grps_pois, groupers, "mpa", "Groupers networks along MPAs")
-plotMRF_net_factor(dip_mat, dip_pois, diplodus, "mpa", "Diplodus networks along MPAs")
+dev.off()
 
+png(filename = "figures/networks/mpa_dip.png", res = 150, width = 9.79, height = 7.38, units = "in")
+plotMRF_net_factor(dip_mat, dip_pois, diplodus, "mpa", "Diplodus networks along MPAs")
+dev.off()
 # My graph:
 # my_cols <- c(neg = '#3399CC', pos = '#FF3333')
 # 
