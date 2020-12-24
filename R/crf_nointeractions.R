@@ -83,3 +83,17 @@ p_relimp_noint <- egg::ggarrange(p_relimp_grps_noint, p_relimp_dip_noint, p_reli
 # ggsave(p_relimp_noint, filename = "rel_imp_noint.png", device = "png", path = "figures/rel_imp/", dpi = 150, height = 10, width = 10, units = "in")
 # ggsave(p_relimp_noint, filename = "rel_imp_noint.pdf", device = "pdf", path = "figures/rel_imp/", dpi = 150, height = 10, width = 10, units = "in")
 
+# Relative importance means
+colMeans(grps_noint_relimp[2:ncol(grps_noint_relimp)])
+colMeans(dip_noint_relimp[2:ncol(dip_noint_relimp)])
+colMeans(herb_noint_relimp[2:ncol(herb_noint_relimp)])
+
+paste("Groupers Main Effect RI: ", sum(colMeans(grps_noint_relimp[2:ncol(grps_noint_relimp)])))
+paste("Groupers Mean RI ENV/BIO ratio: ", colMeans(grps_noint_relimp[2:ncol(grps_noint_relimp)])[1]/colMeans(grps_noint_relimp[2:ncol(grps_noint_relimp)])[3])
+paste("Groupers Mean RI (ENV+MPA)/BIO ratio: ", (colMeans(grps_noint_relimp[2:ncol(grps_noint_relimp)])[1]+colMeans(grps_noint_relimp[2:ncol(grps_noint_relimp)])[2])/colMeans(grps_noint_relimp[2:ncol(grps_noint_relimp)])[3])
+paste("Groupers Mean RI MPA/BIO ratio: ", colMeans(grps_noint_relimp[2:ncol(grps_noint_relimp)])[2]/colMeans(grps_noint_relimp[2:ncol(grps_noint_relimp)])[3])
+
+paste("Seabreams Main Effect RI: ", sum(colMeans(dip_noint_relimp[2:ncol(dip_noint_relimp)])))
+paste("Seabreams Mean RI ENV/BIO ratio: ", colMeans(dip_noint_relimp[2:ncol(dip_noint_relimp)])[1]/colMeans(dip_noint_relimp[2:ncol(dip_noint_relimp)])[3])
+paste("Seabreams Mean RI (ENV+MPA)/BIO ratio: ", (colMeans(dip_noint_relimp[2:ncol(dip_noint_relimp)])[1]+colMeans(dip_noint_relimp[2:ncol(dip_noint_relimp)])[2])/colMeans(dip_noint_relimp[2:ncol(dip_noint_relimp)])[3])
+paste("Seabreams Mean RI MPA/BIO ratio: ", colMeans(dip_noint_relimp[2:ncol(dip_noint_relimp)])[2]/colMeans(dip_noint_relimp[2:ncol(dip_noint_relimp)])[3])
