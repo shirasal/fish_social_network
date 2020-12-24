@@ -33,7 +33,7 @@ rowSums(grps_pois_relimp[2:ncol(grps_pois_relimp)]) %>% mean()
 rowSums(dip_pois_relimp[2:ncol(dip_pois_relimp)]) %>% mean()
 rowSums(herb_pois_relimp[2:ncol(herb_pois_relimp)]) %>% mean()
 
-# Stationary effect
+# Nonstationary effect
 grps_pois_relimp %>% 
   pivot_longer(2:6, names_to = "type", values_to = "rel_imp") %>% 
   mutate(nonstationary = str_detect(type, "_bio_")) %>% 
