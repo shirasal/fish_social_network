@@ -23,10 +23,10 @@ plot_graph <- function(guild_mod, plot_title){
           panel.background = element_blank())
 }
 
-plot_graph(grps_pois)
+plot_graph(grps_no_int)
 ggsave("figures/networks/groupers_network.png", device = "png", 
        dpi = 300, width = 4, unit = "in")
 
-plot_graph(dip_pois)
+plot_graph(dip_no_int)
 ggsave("figures/networks/diplodus_network.png", device = "png", 
        dpi = 300, width = 4, unit = "in")
