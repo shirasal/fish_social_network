@@ -9,7 +9,7 @@ med_ext <- raster::extent(med_shp)
 # list_layers(marine = TRUE) %>% View
 
 # Temperature -------------------------------------------------------------
-tmean <- load_layers("BO_sstmean")
+tmean <- load_layers("BO_sstmean") # BO21_tempmean_ss
 med_temp <- raster::crop(tmean, med_ext)
 map_temp <- rasterToPoints(med_temp)
 med_temp_df <- data.frame(map_temp) %>% rename(Longitude = x, Latitude = y, Temperature = layer)
