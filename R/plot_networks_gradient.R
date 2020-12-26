@@ -32,7 +32,7 @@ plotMRF_net_cont = function(data, MRF_mod, node_names, covariate, main, cutoff, 
     igraph::E(comm.net)$color <- ifelse(igraph::E(comm.net)$weight < 0,
                                         cols[["neg"]],
                                         cols[["pos"]])
-    igraph::E(comm.net)$width <- abs(igraph::E(comm.net)$weight)
+    igraph::E(comm.net)$width <- abs(igraph::E(comm.net)$weight) * 2
     igraph::V(comm.net)$label <- str_replace(node_names, "\\.", "\\ ")
     igraph::V(comm.net)$color <- grDevices::adjustcolor("grey", alpha.f = .6)
     
@@ -151,16 +151,15 @@ plotMRF_net_factor <- function(data, MRF_mod, node_names, covariate, main){
     igraph::E(comm.net)$color <- ifelse(igraph::E(comm.net)$weight < 0,
                                         cols[["neg"]],
                                         cols[["pos"]])
-    igraph::E(comm.net)$width <- abs(igraph::E(comm.net)$weight)
+    igraph::E(comm.net)$width <- abs(igraph::E(comm.net)$weight*50)
     igraph::V(comm.net)$label <- str_replace(node_names, "\\.", "\\ ")
     igraph::V(comm.net)$color <- grDevices::adjustcolor("grey", alpha.f = .6)
     
     # Create the network plot
     graphics::par(mar = c(2, 2, 2, 2))
     net.plot <- plot(comm.net,
-                     # layout = igraph::layout.davidson.harel(comm.net),
                      layout = igraph::layout.circle,
-                     vertex.label.cex = 0.84,
+                     vertex.label.cex = 1.2,
                      vertex.frame.color = grDevices::adjustcolor("grey", alpha.f = .6),
                      vertex.shape = "circle",
                      vertex.label.family = "sans",
@@ -197,9 +196,18 @@ png(filename = "figures/networks/mpa_grps.png", res = 150, width = 9.79, height 
 plotMRF_net_factor(grps_mat, grps_pois, groupers, "mpa", "Groupers networks along MPAs")
 dev.off()
 
+pdf(file = "figures/networks/mpa_grps.pdf", width = 10, height = 6)
+plotMRF_net_factor(grps_mat, grps_pois, groupers, "mpa", "Groupers networks along MPAs")
+dev.off()
+
 png(filename = "figures/networks/mpa_dip.png", res = 150, width = 9.79, height = 7.38, units = "in")
 plotMRF_net_factor(dip_mat, dip_pois, diplodus, "mpa", "Diplodus networks along MPAs")
 dev.off()
+
+pdf(file = "figures/networks/mpa_dip.pdf", width = 10, height = 6)
+plotMRF_net_factor(dip_mat, dip_pois, diplodus, "mpa", "Diplodus networks along MPAs")
+dev.off()
+
 # My graph:
 # my_cols <- c(neg = '#3399CC', pos = '#FF3333')
 # 
