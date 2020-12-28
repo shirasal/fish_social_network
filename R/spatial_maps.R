@@ -93,9 +93,9 @@ med_raw %>%
                          enforcement == 2 | enforcement == 3 ~ TRUE)) %>% 
   filter(!is.na(mpa)) %>% 
   ggplot() + 
-  geom_sf(data = med_shp, colour = "black", fill = "#76b8d9", alpha = .8, ) +
+  geom_sf(data = med_shp, colour = "black", fill = "#76b8d9", alpha = .6) +
   geom_point(aes(x = lon, y = lat, col = mpa, shape = mpa), size = 5) +
-  scale_color_manual(values = c("ivory4", "orchid3"), labels = c("Not protected", "Protected"), name = "MPA") +
+  scale_color_manual(values = c("chartreuse4", "orchid3"), labels = c("Not protected", "Protected"), name = "MPA") +
   scale_shape_manual(values = c(13, 19), labels = c("Not protected", "Protected"), name = "MPA") +
   xlab("Longitude") + ylab("Latitude") + 
   theme_bw() +
@@ -106,5 +106,5 @@ med_raw %>%
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         legend.position = "right")
-ggsave("figures/maps/sampled_mpas.png", device = "png", dpi = 300, scale = c(2,2))
+ggsave("figures/maps/sampled_mpas.png", device = "png", dpi = 300, width = 10, height = 4.5)
 
