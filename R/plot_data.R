@@ -29,8 +29,8 @@ species_temp <- lapply(as.list(c(groupers, diplodus, herbivores)), function(sp) 
     theme(title = element_text(face = "italic"))
 })
 
-ggpubr::ggarrange(plotlist = species_temp, ncol = 5, nrow = 3) %>% 
-  ggpubr::annotate_figure(bottom = ggpubr::text_grob("Temperature (C)"),
+ggpubr::ggarrange(plotlist = species_temp, ncol = 4, nrow = 3) %>% 
+  ggpubr::annotate_figure(bottom = ggpubr::text_grob("Temperature (°C)"),
                           left = ggpubr::text_grob("Abundance", rot = 90))
 ggsave("species_dist_temp.png", device = "png", path = "figures", width = 15, height = 10, units = "in")
 
@@ -48,9 +48,8 @@ med_raw %>%
   ggplot() + 
   aes(x = mpa, y = sp.n) + 
   geom_bar(aes(fill = guild), stat = "identity") + 
-  scale_y_log10() +
-  facet_wrap(~species) + 
-  xlab("MPA") + ylab("Abundance (log)") +
+  facet_wrap(~species, scales = "free_y") + 
+  xlab("MPA") + ylab("Abundance") +
   scale_fill_manual("Guild", 
                     values = c("Groupers" = guild_colours$grps,
                                "Seabreams" = guild_colours$dip ,
