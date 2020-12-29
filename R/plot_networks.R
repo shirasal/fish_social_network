@@ -1,6 +1,6 @@
 source("R/packages.R")
 load("data/data_and_objects.RData")
-source("R/models.R")
+source('R/crf_nointeractions.R', echo = TRUE)
 
 # Overall networks --------------------------------------------------------
 
@@ -16,7 +16,7 @@ plot_graph <- function(guild_mod, plot_title){
     scale_edge_width(range = c(0, 3)) +
     scale_edge_color_manual(values = c(net_cols[["pos"]], net_cols[["neg"]])) +
     geom_node_point(aes(size = deg), col = "grey", alpha = 0.5) +
-    geom_node_text(aes(label = name), repel = TRUE, check_overlap = TRUE, 
+    geom_node_text(aes(label = str_replace(name, "\\.", "\\ ")), repel = TRUE, check_overlap = TRUE, 
                    point.padding = unit(0.2, "lines"), fontface = "italic") +
     theme(legend.position = "none",
           aspect.ratio = 1,
