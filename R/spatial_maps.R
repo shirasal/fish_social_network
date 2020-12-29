@@ -106,5 +106,33 @@ med_raw %>%
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         legend.position = "right")
-ggsave("figures/maps/sampled_mpas.png", device = "png", dpi = 300, width = 10, height = 4.5)
+# ggsave("figures/maps/sampled_mpas.png", device = "png", dpi = 300, width = 10, height = 4.5)
+
+# Seasons -----------------------------------------------------------------
+
+tmean <- load_layers("BO_sstmean") # BO21_tempmean_ss
+med_temp <- raster::crop(tmean, med_ext)
+map_temp <- rasterToPoints(med_temp)
+med_temp_df <- data.frame(map_temp) %>% rename(Longitude = x, Latitude = y, Temperature = layer)
+
+
+med_raw %>% 
+  ggplot() + 
+  aes(x = lon, y = lat) +
+  geom_raster(data = med_temp_df, aes(y = Latitude, x = Longitude, fill = Temperature)) +
+  geom_point(aes(shape = season), size = 4) + 
+  scale_fill_gradientn(colours = c("#313695", "#ffffbf", "#a50026"), name = "Temperature °C") +
+  scale_shape(solid = FALSE) + 
+  xlab("Longitude") + ylab("Latitude") +
+  theme_bw() +
+  coord_quickmap() + 
+  theme(axis.title.x = element_text(size = 14),
+        axis.title.y = element_text(size = 14, angle = 90),
+        axis.text.x = element_text(size = 14),
+        axis.text.y = element_text(size = 14),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position = "right")
+# ggsave("C:/Users/shira/Documents/MSc/Thesis/Presentation/Graphs and Maps/temp_effort_all.png", device = "png", dpi = 300, scale = c(2,2))
+
 
